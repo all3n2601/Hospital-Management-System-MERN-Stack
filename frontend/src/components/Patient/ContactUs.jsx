@@ -1,8 +1,10 @@
 import React from 'react'
-
+import Navbar from '../Shared/Navbar'
 function ContactUs() {
   return (
-    <section>contact us page</section>
+    <section>
+    <Navbar/>    
+    contact us page</section>
   )
 }
 
