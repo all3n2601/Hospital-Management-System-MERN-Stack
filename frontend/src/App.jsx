@@ -1,10 +1,12 @@
 import './App.css'
 import HomePage from './page/HomePage'
 import SignInPage from './page/SignInPage';
+import SignUpPage from './page/SignUpPage';
 import Appointment from './components/Patient/Appointment';
 import ContactUs from './components/Patient/ContactUs';
 import AboutUs from './components/Patient/AboutUs';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 
 function App() {
   
@@ -17,6 +19,7 @@ function App() {
         <Route path="/contact-us" element={<ContactUs/>}/>
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/sign-in" element={<SignInPage/>}/>
+        <Route path="/sign-up" element={<SignUpPage/>}/>
       </Routes>
     </Router> 
   )
