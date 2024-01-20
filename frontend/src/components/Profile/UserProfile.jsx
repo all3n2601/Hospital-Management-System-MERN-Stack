@@ -24,7 +24,7 @@ function UserProfile() {
                     </div>
                     <div className='flex flex-col items-start w-full gap-4 '>
                         <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-profile">Settings</NavLink>
-                        <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-appointments">Appointments</NavLink>
+                        <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-appointments">History</NavLink>
                         <NavLink style={navLinkStyle}  className={'w-full p-2 h-[40px] '} to="/user-book-appointment">Book Appointment</NavLink>
                     </div>
                 </div>
