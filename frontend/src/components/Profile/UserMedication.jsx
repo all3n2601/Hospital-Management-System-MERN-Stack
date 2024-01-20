@@ -1,8 +1,8 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom';
 import profiePic from '../../assets/human6.jpg'
-function UserAppointment() {
 
+function UserMedication() {
     const navLinkStyle = ({ isActive }) => {
         return {
           fontWeight: isActive ? '600' : '400',
@@ -17,7 +17,7 @@ function UserAppointment() {
         <div className='h-[80%] w-[80%] bg-white shadow-xl p-2 flex'>
             <div className='bg-slate- h-full w-[18%] flex flex-col justify-between p-2 '>
                 <div className='flex flex-col gap-16'>
-                    <div className='w-full flex flex-col items-center g'>
+                    <div className='w-full flex flex-col items-center '>
                         <img src={profiePic} className='size-24 rounded-full' alt="profile" />
                         <p>Name</p>
                     </div>
@@ -42,4 +42,4 @@ function UserAppointment() {
   )
 }
 
-export default UserAppointment
+export default UserMedication

@@ -10,6 +10,13 @@ import NurseAuthPage from './page/NurseAuthPage';
 import UserProfilePage from './page/UserProfilePage';
 import UserBookAppointment from './components/Profile/UserBookAppointment';
 import UserAppointment from './components/Profile/UserAppointment';
+import DoctorProfilePage from './page/DoctorProfilePage';
+import DoctorAppointmen from './components/Profile/doctor/DoctorAppointmen';
+import DoctorReview from './components/Profile/doctor/DoctorReview';
+import UserMedication from './components/Profile/UserMedication';
+import NurseProfilePage from './page/NurseProfilePage';
+import NurseMedication from './components/Profile/nurse/NurseMedication';
+import NurseBed from './components/Profile/nurse/NurseBed';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 
@@ -29,7 +36,16 @@ function App() {
         <Route path="/nurse-sign-in" element={<NurseAuthPage/>}/>
         <Route path="/user-profile" element={<UserProfilePage/>}/>
         <Route path="/user-appointments" element={<UserAppointment/>}/>
+        <Route path="/doctor-profile" element={<DoctorProfilePage/>}/>
         <Route path="/user-book-appointment" element={<UserBookAppointment/>}/>
+        <Route path="/user-medication" element={<UserMedication/>}/>
+        <Route path="/doctor-review" element={<DoctorReview/>}/>
+        <Route path="/doctor-appointments" element={<DoctorAppointmen/>}/>
+        <Route path="/nurse-profile" element={<NurseProfilePage/>}/>
+        <Route path="/nurse-medication" element={<NurseMedication/>}/>
+        <Route path="/nurse-bed" element={<NurseBed/>}/>
+
+
 
       </Routes>
     </Router> 

@@ -18,14 +18,15 @@ function UserProfile() {
         <div className='h-[80%] w-[80%] bg-white shadow-xl p-2 flex'>
             <div className='bg-slate- h-full w-[18%] flex flex-col justify-between p-2 '>
                 <div className='flex flex-col gap-16'>
-                    <div className='w-full flex flex-col items-center gap-3'>
+                    <div className='w-full flex flex-col items-center '>
                         <img src={profiePic} className='size-24 rounded-full' alt="profile" />
                         <p>Name</p>
                     </div>
                     <div className='flex flex-col items-start w-full gap-4 '>
                         <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-profile">Settings</NavLink>
-                        <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-appointments">Appointments</NavLink>
+                        <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-appointments">History</NavLink>
                         <NavLink style={navLinkStyle}  className={'w-full p-2 h-[40px] '} to="/user-book-appointment">Book Appointment</NavLink>
+                        <NavLink style={navLinkStyle}  className={'w-full p-2 h-[40px] '} to="/user-medication">Medication</NavLink>
                     </div>
                 </div>
                 <div className='w-full text-center  h-[80px] p-2'>
@@ -108,7 +109,7 @@ function UserProfile() {
                                 ></input>
                             </div>
                         </div>
-                        <button className='bg-black text-white p-2 rounded-full'>Update</button>
+                        <button className='bg-black w-[95%] text-white p-2 rounded-full'>Update</button>
                     </form>
                     
             </div>
