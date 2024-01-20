@@ -1,7 +1,20 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function SignIn() {
+
+  const navigate = useNavigate();
+  const handleDoctor = ()=>{
+    navigate('/doctor-sign-in')
+  }
+  const handleNurse = ()=>{
+    navigate('/nurse-sign-in')
+  }
+
   return (
+
+    
+
     <section className='bg-slate-300 h-screen w-screen'>
         <div className="flex items-center justify-center h-full max-w-7xl m-auto md:w-[60%] rounded-xl lg:w-[40%]  ">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md bg-white p-4 rounded-lg">
@@ -18,7 +31,7 @@ function SignIn() {
               Create a free account
             </a>
           </p>
-          <form action="#" method="POST" className="mt-8">
+          <form  className="mt-8">
             <div className="space-y-5">
               <div>
                 <label htmlFor="" className="text-base font-medium text-gray-900">
@@ -48,18 +61,32 @@ function SignIn() {
                   ></input>
                 </div>
               </div>
-              <div>
+              <div className='flex flex-col gap-3'>
                 <button
                   type="button"
                   className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
                 >
                   Get started
                 </button>
+                
               </div>
             </div>
           </form>
           <div className="mt-3 space-y-3">
-
+          <button
+                type="button"
+                className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
+                onClick={handleDoctor}
+                >
+                SignIn As Doctor
+                </button>
+                <button
+                type="button"
+                className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
+                onClick={handleNurse}
+                >
+                SignIn As Nurse
+                </button>
         
           </div>
         </div>

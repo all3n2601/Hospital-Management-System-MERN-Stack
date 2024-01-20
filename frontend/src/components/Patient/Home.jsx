@@ -1,7 +1,14 @@
-import React from 'react'
-import Navbar from '../Shared/Navbar';
+
 import banner from "../../assets/hero.png"
 import service from "../../assets/services.png"
+import human1 from "../../assets/human1.jpg"
+import human4 from "../../assets/human4.jpg"
+import human6 from "../../assets/human6.jpg"
+import doct1 from "../../assets/doct1.jpg"
+import doct2 from "../../assets/doct2.jpg"
+import doct3 from "../../assets/doct3.jpg"
+import doct4 from "../../assets/doct4.jpg"
+import doct5 from "../../assets/doct5.jpg"
 import feedback from "../../assets/feedback.png"
 import review from "../../assets/review.jpg"
 import Footer from '../Shared/Footer';
@@ -9,6 +16,10 @@ import Footer from '../Shared/Footer';
 
 
 function Home() {
+
+    const handleNewsletter = ()=>{
+        alert("Thanks for subscribing to our newsletter");
+    }
 
   return (
     <div className='bg-slate-300'>
@@ -94,7 +105,7 @@ function Home() {
                     
                         <div className="w-[270px] h-[300px] border border-gray-200 rounded-lg bg-green-400 shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human1} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
@@ -105,8 +116,8 @@ function Home() {
 
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct1} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Ramesh Chand</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -115,8 +126,8 @@ function Home() {
                         </div>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct3} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Maxwell Honda</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -125,8 +136,8 @@ function Home() {
                         </div>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human4} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Selena Gomez</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -137,8 +148,8 @@ function Home() {
                     <div className='flex gap-2'>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct2} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Victor Suresh</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -147,8 +158,8 @@ function Home() {
                         </div>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human6} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Mahesh Dalla</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -157,8 +168,8 @@ function Home() {
                         </div>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct4} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Sasuke Uchiha</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                 <a href="/appointment" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 ms-3">Book Appointment</a>
@@ -167,8 +178,8 @@ function Home() {
                         </div>
                         <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
-                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={service} alt=""/>
-                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
+                                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct5} alt=""/>
+                                <h5 className="mb-1 text-xl font-medium text-black">Dr.Miku Uzumaki</h5>
                                 <span className="text-sm text-black">Surgeon</span>
                                 <div className="flex mt-4 md:mt-6">
                                     
@@ -182,7 +193,7 @@ function Home() {
             </div>
         </section>
         <section>
-            <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full '>
+            <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full  '>
                 <div className='flex flex-col justify-center items-center'>
                     <p className='text-3xl font-semibold'>Our Patients Feedback About Us</p>
                     <p className='text-sm text-center'>A hospital is a healthcare institution providing patient treatment with specialized health science and auxiliary healthcare staff and medical equipment.</p>
@@ -216,7 +227,62 @@ function Home() {
             
         </section>
         <section>
-            <div className='w-full h-full flex items-end justify-center'>
+            <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20'>
+                {/* newsletter */}
+                <div className="mx-auto max-w-7xl px-2 py-10 lg:px-0 z-10 ">
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                <div className="w-full md:w-2/3 lg:w-1/2">
+                                <h2 className="text-3xl font-bold text-black">Sign up for our weekly newsletter</h2>
+                                <p className="mt-4 text-gray-600">
+                                Be sure to check out and subscribe to the newsletters of HMS to stay updated about the developments in healthcare field.  
+                                </p>
+                                <div className="mt-4">
+                                    <p className="font-semibold text-gray-800">
+                                    Trusted by over 100,000+ businesses and individuals
+                                    </p>
+                                    <div className="mt-2 flex items-center">
+                                    <div className="flex space-x-1">
+                                        <svg  className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange"><path d="M11.9998 17L6.12197 20.5902L7.72007 13.8906L2.48926 9.40983L9.35479 8.85942L11.9998 2.5L14.6449 8.85942L21.5104 9.40983L16.2796 13.8906L17.8777 20.5902L11.9998 17Z"></path></svg>    
+                                        <svg  className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange"><path d="M11.9998 17L6.12197 20.5902L7.72007 13.8906L2.48926 9.40983L9.35479 8.85942L11.9998 2.5L14.6449 8.85942L21.5104 9.40983L16.2796 13.8906L17.8777 20.5902L11.9998 17Z"></path></svg>    
+                                        <svg  className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange"><path d="M11.9998 17L6.12197 20.5902L7.72007 13.8906L2.48926 9.40983L9.35479 8.85942L11.9998 2.5L14.6449 8.85942L21.5104 9.40983L16.2796 13.8906L17.8777 20.5902L11.9998 17Z"></path></svg>    
+                                        <svg  className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange"><path d="M11.9998 17L6.12197 20.5902L7.72007 13.8906L2.48926 9.40983L9.35479 8.85942L11.9998 2.5L14.6449 8.85942L21.5104 9.40983L16.2796 13.8906L17.8777 20.5902L11.9998 17Z"></path></svg>    
+                                        <svg  className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green"><path d="M11.9998 17L6.12197 20.5902L7.72007 13.8906L2.48926 9.40983L9.35479 8.85942L11.9998 2.5L14.6449 8.85942L21.5104 9.40983L16.2796 13.8906L17.8777 20.5902L11.9998 17Z"></path></svg>
+                                    </div>
+                                    <span className="ml-2 inline-block">
+                                        <span className="text-sm font-semibold text-gray-800">4.8/5 . 3420 Reviews</span>
+                                    </span>
+                                    </div>
+                                </div>
+                                </div>
+                                <div className="mt-10 w-full md:w-2/3 lg:mt-0 lg:w-1/2">
+                                <form className="flex lg:justify-center">
+                                    <div className="flex w-full max-w-md flex-col space-y-4">
+                                    <input
+                                        className="flex h-10 w-full rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                        type="email"
+                                        placeholder="Email"
+                                    ></input>
+                                    <button
+                                        type="button"
+                                        onClick={handleNewsletter}
+                                        className="w-full rounded-md bg-black px-3 py-2 text-sm  font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                    >
+                                        Subscribe
+                                    </button>
+                                    </div>
+                                </form>
+                                <p className="mt-2 lg:text-center">
+                                    <span className="text-sm text-gray-600">
+                                    By signing up, you agree to our terms of service and privacy policy.
+                                    </span>
+                                </p>
+                                </div>
+                            </div>
+                            </div>
+
+                {/* newsletter */}
+            </div>
+            <div className=' hidden lg:flex h-full  max-w-7xl m-auto flex-col items-center justify-end '>
                 <Footer/>
             </div>
         </section>
