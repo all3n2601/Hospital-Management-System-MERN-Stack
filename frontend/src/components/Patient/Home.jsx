@@ -22,7 +22,7 @@ function Home() {
     }
 
   return (
-    <div className='bg-slate-300'>
+    <div className='bg-[#FEFAE0]'>
 
         <section>
             <div className='flex flex-col lg:flex-row h-screen w-screen justify-center items-center max-w-7xl m-auto'>
@@ -96,14 +96,14 @@ function Home() {
             </div>
         </section>
         <section>
-            <div className='h-full w-full flex flex-col justify-center items-center '>
+            <div className='h-full w-full flex flex-col justify-center items-center'>
                 <p className='font-semibold text-3xl pt-16'>Meet Our Specialist</p>
                 <div className='flex flex-col gap-2'>
                     {/* from here */}
 
-                    <div className='flex gap-2'>
+                    <div className='flex gap-3'>
                     
-                        <div className="w-[270px] h-[300px] border border-gray-200 rounded-lg bg-green-400 shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] border border-gray-200 rounded-lg bg-[#D4A373] shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human1} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Rahul Singh</h5>
@@ -114,7 +114,7 @@ function Home() {
                             </div>
                         </div>
 
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct1} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Ramesh Chand</h5>
@@ -124,7 +124,7 @@ function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct3} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Maxwell Honda</h5>
@@ -134,7 +134,7 @@ function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human4} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Selena Gomez</h5>
@@ -145,8 +145,8 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className='flex gap-2'>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                    <div className='flex gap-3'>
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct2} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Victor Suresh</h5>
@@ -156,7 +156,7 @@ function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={human6} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Mahesh Dalla</h5>
@@ -166,7 +166,7 @@ function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct4} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Sasuke Uchiha</h5>
@@ -176,7 +176,7 @@ function Home() {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-[270px] h-[300px] bg-green-400 border border-gray-200 rounded-lg shadow flex justify-center">
+                        <div className="w-[270px] h-[300px] bg-[#D4A373] border border-gray-200 rounded-lg shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
                                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src={doct5} alt=""/>
                                 <h5 className="mb-1 text-xl font-medium text-black">Dr.Miku Uzumaki</h5>
@@ -198,9 +198,9 @@ function Home() {
                     <p className='text-3xl font-semibold'>Our Patients Feedback About Us</p>
                     <p className='text-sm text-center'>A hospital is a healthcare institution providing patient treatment with specialized health science and auxiliary healthcare staff and medical equipment.</p>
                 </div>
-                <div className='flex items-center '>
+                <div className='flex items-center gap-4 '>
                     <img className='h-[300px] hidden md:block' src={feedback} alt="" />
-                    <div className='flex flex-col items-start py-5 p-5 w-[450px] shadow-xl shadow-violet-400 rounded-lg'>
+                    <div className='flex flex-col items-start py-5 p-5 w-[450px] shadow-xl bg-[#E9EDC9] shadow-violet-400 rounded-lg'>
                         <div className='flex justify-center items-center'>
                             <img src={review} className='h-[90px] w-[110px] rounded-full' alt="profile" />
                             <div className='flex flex-col justify-center items-center ps-3'>
