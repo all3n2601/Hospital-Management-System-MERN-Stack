@@ -50,7 +50,7 @@ const verifyUser = (req, res, next) => {
   
       const savedUser = await newUser.save();
   
-      res.json(savedUser);
+      res.json({savedUser, message:"Success"});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -1,6 +1,31 @@
-import React from 'react'
+import React,{useState} from 'react'
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
+
+    const [data, setData] = useState({
+        userName:"",
+        email: "",
+        password: "",
+      });
+      const navigate = useNavigate();
+    
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        axios
+          .post("http://localhost:4451/auth/register", data)
+          .then((res) => {
+            if (res.data.message === "Success") {
+              navigate("/sign-in");
+            }
+          })
+          .catch((err) => {
+            alert("Invalid Credentials or Please Try Again!");
+          });
+      };
+
+
   return (
     <section className='bg-[#FEFAE0] h-screen f-screen'>
         <div className="flex items-center justify-center px-8 py-24">
@@ -32,6 +57,10 @@ function SignUp() {
                         type="text"
                         placeholder="Full Name"
                         id="name"
+                        onChange={(e) =>
+                            setData({ ...data, userName: e.target.value })
+                          }
+                          value={data.userName}
                     ></input>
                     </div>
                 </div>
@@ -46,6 +75,10 @@ function SignUp() {
                         type="email"
                         placeholder="Email"
                         id="email"
+                        onChange={(e) =>
+                            setData({ ...data, email: e.target.value })
+                          }
+                          value={data.email}
                     ></input>
                     </div>
                 </div>
@@ -62,6 +95,10 @@ function SignUp() {
                         type="password"
                         placeholder="Password"
                         id="password"
+                        onChange={(e) =>
+                            setData({ ...data, password: e.target.value })
+                          }
+                          value={data.password}
                     ></input>
                     </div>
                 </div>
@@ -69,6 +106,7 @@ function SignUp() {
             </form>
             <div className="mt-3 space-y-3">
                 <button
+                onClick={handleSubmit}
                 type="button"
                 className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-black px-3.5 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-slate-900 "
                 >

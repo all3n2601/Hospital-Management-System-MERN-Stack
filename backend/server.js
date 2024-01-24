@@ -8,8 +8,8 @@ const userController = require("./controllers/userController");
 const doctorController = require("./controllers/doctorController");
 const nurseController = require("./controllers/nurseController");
 const appointmentController = require("./controllers/appointmentController");
-const adminController = require("./controllers/adminController")
-
+const adminController = require("./controllers/adminController");
+const router = express.Router();
 const app = express();
 
 app.use(bodyParser.json());
@@ -22,13 +22,12 @@ app.use("/doctor", doctorController);
 app.use("/nurse", nurseController);
 app.use("/appointment", appointmentController);
 app.use("/admin", adminController);
-
 app.use(errorHandlerMiddleware);
 
 (async () => {
   try {
     await connectToDatabase();
-    const port = process.env.PORT || 4000;
+    const port = process.env.PORT || 4451;
     const server = app.listen(port, () => {
       console.log(`Server running on port: ${port}`);
     });

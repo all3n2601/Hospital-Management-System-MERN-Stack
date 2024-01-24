@@ -8,8 +8,7 @@ const appointmentSchema = new Schema({
     required: true,
   },
   patient: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
     required: true,
   },
   appointmentDate: {
@@ -18,6 +17,10 @@ const appointmentSchema = new Schema({
   },
   reason: {
     type: String,
+  },
+  phone:{
+    type: String,
+    required: true,
   },
   status: {
     type: String,

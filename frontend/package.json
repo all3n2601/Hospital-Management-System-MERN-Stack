@@ -4,17 +4,24 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "vite --host",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .tsx"
   },
   "dependencies": {
+    "axios": "^1.6.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2",
     "react-slick": "^0.29.0",
-    "slick-carousel": "^1.8.1"
+    "redux-persist": "^6.0.0",
+    "redux-toolkit": "^1.1.2",
+    "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.10.3",
+    "url": "^0.11.3",
+    "util": "^0.12.5",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

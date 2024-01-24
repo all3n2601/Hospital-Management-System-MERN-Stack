@@ -23,6 +23,7 @@
     "mongoose": "^8.0.0",
     "node": "^21.1.0",
     "nodemon": "^3.0.2",
+    "sweetalert2": "^11.10.3",
     "validator": "^13.11.0"
   }
 }

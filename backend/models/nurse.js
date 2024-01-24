@@ -22,6 +22,11 @@ const nurseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Department",
       },
+      role: {
+        type: String,
+        enum: ["admin", "doctor", "nurse", "receptionist", "patient"],
+        default: "nurse",
+      },
 });
 
 const Nurse = mongoose.model("Nurse", nurseSchema, "nurses");

@@ -17,6 +17,10 @@ const doctorSchema = new mongoose.Schema({
       specialization: {
         type: String,
         required: true,
+      },role: {
+        type: String,
+        enum: ["admin", "doctor", "nurse", "receptionist", "patient"],
+        default: "doctor",
       },
 });
 
