@@ -70,7 +70,7 @@ const verifyUser = (req, res, next) => {
             expiresIn: "2d",
           });
           res.cookie('token', token)
-          return res.json({ status: "Success", token, role: user.role });
+          return res.json({ status: "Success", token, role: user.role ,user:user});
         }
       }
     } catch (error) {

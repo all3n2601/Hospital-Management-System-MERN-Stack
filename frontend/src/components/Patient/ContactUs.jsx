@@ -3,17 +3,19 @@ import Navbar from "../Shared/Navbar";
 import axios from "axios";
 
 function ContactUs() {
-  const [contactUs, setContactUs] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [phone, setPhoneNo] = useState();
+  const [message, setComment] = useState();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
     await axios
-      .post("http://localhost:4451/user/add-contact-us", contactUs)
+      .post("http://localhost:4451/user/add-contact-us", {
+        name:name,
+        phone:phone,
+        email:email,   
+        message:message
+      })
       .then((res) => {
         alert('Your message has been sent successfully')
       })
@@ -75,27 +77,27 @@ function ContactUs() {
               type="text"
               placeholder="Name *"
               onChange={(e) =>
-                setContactUs({ ...contactUs, name: e.target.value })
+                setName(e.target.value)
               }
-              value={contactUs.name}
+          
             />
             <input
               className="flex h-10 w-2/3 rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
               type="number"
               placeholder="Phone / Mobile *"
               onChange={(e) =>
-                setContactUs({ ...contactUs, phone: e.target.value })
+                setPhoneNo(e.target.value)
               }
-              value={contactUs.phone}
+       
             />
             <input
               className="flex h-10 w-2/3 rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
               type="email"
               placeholder="Email Address *"
               onChange={(e) =>
-                setContactUs({ ...contactUs, email: e.target.value })
+                setEmail(e.target.value)
               }
-              value={contactUs.email}
+
             />
             <textarea
               id="message"
@@ -103,9 +105,9 @@ function ContactUs() {
               className="flex h-30 w-2/3 rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="Message *"
               onChange={(e) =>
-                setContactUs({ ...contactUs, message: e.target.value })
+                setComment(e.target.value)
               }
-              value={contactUs.message}
+
             ></textarea>
             <button
               onClick={handleSubmit}

@@ -14,15 +14,15 @@ router.get("/get-appointments", async (req, res) => {
   });
 
 router.post("/add-appointment", async (req, res) => {
-  const {doctorId , patientId, appointmentDate,reason,status} = req.body;
+  const {doctor , patient, appointmentDate,reason,phone} = req.body;
 
   try {
     const newAppointment = new Appointment({
-      doctor: doctorId,
-      patient: patientId,
-      appointmentDate: appointmentDate,
+      doctor,
+      patient,
+      appointmentDate,
       reason,
-      status,
+      phone
     });
 
     const savedAppointment = await newAppointment.save();

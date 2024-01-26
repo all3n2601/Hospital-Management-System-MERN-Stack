@@ -14,6 +14,9 @@ function SignIn() {
     axios
       .post("http://localhost:4451/auth/login", data)
       .then((res) => {
+        const user = res.data.user;
+        localStorage.setItem('user', JSON.stringify(user));
+        
         if (res.data.role === "patient") {
           navigate("/user-profile");
         } else if (res.data.role === "admin") {

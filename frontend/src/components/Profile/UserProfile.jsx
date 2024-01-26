@@ -10,47 +10,71 @@ function UserProfile() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [dateofBirth, setdateofBirth] = useState("");
+  const [dateOfBirth, setdateofBirth] = useState("");
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-
 
   useEffect(() => {
     const fetchInfo = async (e) => {
-      try {
-        const res = await axios.get("http://localhost:4451/user/profile", w);
-        setuserData(res.data);
-      } catch (error) {
-        console.error("Error fetching Data:", error);
-      }
-
-    };
-
-    const setProfileData = (e) => {
-      setName(userData.name);
-      setMobileNumber(userData.mobileNumber);
-      setAddress(userData.address); 
-      setCity(userData.city);
-      setState(userData.state);
-      setdateofBirth(userData.dateofBirth);
-      setGender(userData.gender);
-      setEmail(userData.email);
+      const user = JSON.parse(localStorage.getItem("user"));
+      setuserData(user);
+      setName(user.userName);
+      setMobileNumber(user.phoneNumber);
+      setAddress(user.address.street);
+      setCity(user.address.city);
+      setState(user.address.state);
+      const formattedDateOfBirth = user.dateOfBirth
+        ? user.dateOfBirth.split("T")[0]
+        : "";
+      setdateofBirth(formattedDateOfBirth);
+      setGender(user.gender);
+      setEmail(user.email);
     };
 
     fetchInfo();
-    setProfileData();
   }, []);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       axios
-        .put("http://localhost:4451/user/profile-update", userData)
+        .put("http://localhost:4451/user/profile-update", {
+          userId: userData._id,
+          updatedProfile: {
+            email: email,
+            userName: userName,
+            phoneNumber: mobileNumber,
+            address: {
+              street: address,
+              city: city,
+              state: state,
+            },
+            gender: gender,
+            dateOfBirth: dateOfBirth,
+          },
+        })
         .then((res) => {
-          if (res.data.message === "Success") {
+          if (res.data.status === "Success") {
+            alert("Profile Updated");
+            const user = res.data.user;
+            localStorage.setItem("user", JSON.stringify(user));
+            window.location.href = "/user-profile";
           }
         });
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      axios.get("http://localhost:4451/user/sign-out").then((res) => {
+        if (res.data.message === "Success") {
+          localStorage.removeItem("user");
+          window.location.href = "/";
+        }
+      });
     } catch (err) {
       alert(err);
     }
@@ -109,7 +133,10 @@ function UserProfile() {
             </div>
           </div>
           <div className="w-full text-center  h-[80px] p-2">
-            <button className="bg-black text-white rounded-full text-md font-medium p-2 cursor-pointer hover:scale-110 duration-200 active:scale-90 ">
+            <button
+              onClick={handleSignOut}
+              className="bg-black text-white rounded-full text-md font-medium p-2 cursor-pointer hover:scale-110 duration-200 active:scale-90 "
+            >
               Sign Out
             </button>
           </div>
@@ -121,7 +148,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your Name:</p>
                 <input
-                onChange={(e) => setName(e.target.value)}
+                  value={userName}
+                  onChange={(e) => setName(e.target.value)}
                   className="flex h-10 w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="Name"
@@ -130,7 +158,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your Email:</p>
                 <input
-                onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="email"
                   placeholder="Email"
@@ -141,7 +170,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your Phone:</p>
                 <input
-                onChange={(e) => setMobileNumber(e.target.value)}
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
                   className="flex h-10 w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="Phone"
@@ -150,7 +180,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your DOB:</p>
                 <input
-                onChange={(e) => setdateofBirth(e.target.value)}
+                  value={dateOfBirth}
+                  onChange={(e) => setdateofBirth(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="date"
                   placeholder="Name"
@@ -162,7 +193,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your Gender:</p>
                 <input
-                onChange={(e) => setGender(e.target.value)}
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
                   className="flex h-10 w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="Male/Female/Others"
@@ -171,7 +203,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your City:</p>
                 <input
-                onChange={(e) => setCity(e.target.value)}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="City"
@@ -182,7 +215,8 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your State:</p>
                 <input
-                onChange={(e) => setState(e.target.value)}
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
                   className="flex h-10 w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="State"
@@ -191,14 +225,18 @@ function UserProfile() {
               <div className="flex flex-col w-[50%] justify-start">
                 <p>Enter Your Address:</p>
                 <input
-                onChange={(e) => setAddress(e.target.value)}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
                   placeholder="Address"
                 ></input>
               </div>
             </div>
-            <button onClick={handleUpdate} className="bg-black w-[95%] text-white p-2 rounded-full">
+            <button
+              onClick={handleUpdate}
+              className="bg-black w-[95%] text-white p-2 rounded-full"
+            >
               Update
             </button>
           </form>

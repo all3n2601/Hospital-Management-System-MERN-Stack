@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { User,ContactUs } = require("../models/user");
+const User  = require("../models/user");
+const ContactUs = require("../models/contactUs");
 
   router.post("/add-contact-us", async (req, res) => {
     const { name, phone, email, message } = req.body;
@@ -21,15 +22,16 @@ const { User,ContactUs } = require("../models/user");
     }
   });
 
-  router.get("/profile", async (req, res) => {
-    const{userId , email} = req.query;
+  router.get("/sign-out", async (req, res) => {
+    res.clearCookie("token").json("User signed out successfully");
+  
   });
 
   router.put("/profile-update",async(req,res)=>{
-    const { email, updatedProfile } = req.body;
+    const { userId, updatedProfile } = req.body;
     try {
       const updatedUser = await User.findByIdAndUpdate(
-        email,
+        userId,
         { $set: updatedProfile },
         { new: true, runValidators: true }
       );
