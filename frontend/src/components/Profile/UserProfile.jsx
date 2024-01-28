@@ -68,13 +68,10 @@ function UserProfile() {
 
   const handleSignOut = async (e) => {
     e.preventDefault();
+
     try {
-      axios.get("http://localhost:4451/user/sign-out").then((res) => {
-        if (res.data.message === "Success") {
-          localStorage.removeItem("user");
-          window.location.href = "/";
-        }
-      });
+      localStorage.removeItem("user");
+      window.location.href = "/";
     } catch (err) {
       alert(err);
     }

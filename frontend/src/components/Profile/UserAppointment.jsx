@@ -1,45 +1,91 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom';
-import profiePic from '../../assets/human6.jpg'
-function UserAppointment() {
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import profiePic from "../../assets/human6.jpg";
+import axios from "axios";
 
-    const navLinkStyle = ({ isActive }) => {
-        return {
-          fontWeight: isActive ? '600' : '400',
-          color: isActive ? 'white' : 'black',
-          backgroundColor: isActive ? "black":"white",
-          
-        };
-      };
+function UserAppointment() {
+  const [appointments, setAppointments] = useState([]);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const _id = user._id;
+    const fetchAppointments = async (_id) => {
+      await axios
+        .get(`http://localhost:4451/appointment/get-appointment/${_id}`)
+        .then((res) => {
+          console.log(res.data);
+          setAppointments(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    fetchAppointments(_id);
+  }, []);
+
+  const navLinkStyle = ({ isActive }) => {
+    return {
+      fontWeight: isActive ? "600" : "400",
+      color: isActive ? "white" : "black",
+      backgroundColor: isActive ? "black" : "white",
+    };
+  };
 
   return (
-    <section className='bg-slate-300 flex justify-center items-center'>
-        <div className='h-[80%] w-[80%] bg-white shadow-xl p-2 flex'>
-            <div className='bg-slate- h-full w-[18%] flex flex-col justify-between p-2 '>
-                <div className='flex flex-col gap-16'>
-                    <div className='w-full flex flex-col items-center g'>
-                        <img src={profiePic} className='size-24 rounded-full' alt="profile" />
-                        <p>Name</p>
-                    </div>
-                    <div className='flex flex-col items-start w-full gap-4 '>
-                        <NavLink style={navLinkStyle} className={'w-full   p-2 h-[40px] '} to="/user-profile">Settings</NavLink>
-                        <NavLink style={navLinkStyle} className={'w-full  p-2 h-[40px] '} to="/user-appointments">History</NavLink>
-                        <NavLink style={navLinkStyle}  className={'w-full p-2 h-[40px] '} to="/user-book-appointment">Book Appointment</NavLink>
-                        <NavLink style={navLinkStyle}  className={'w-full p-2 h-[40px] '} to="/user-medication">Medication</NavLink>
-                    </div>
-                </div>
-                <div className='w-full text-center  h-[80px] p-2'>
-                    <button className='bg-black text-white rounded-full text-md font-medium p-2 cursor-pointer hover:scale-110 duration-200 active:scale-90 '>Sign Out</button>
-                </div>
+    <section className="flex items-center justify-center bg-slate-300">
+      <div className="flex h-[80%] w-[80%] bg-white p-2 shadow-xl">
+        <div className="bg-slate- flex h-full w-[18%] flex-col justify-between p-2 ">
+          <div className="flex flex-col gap-16">
+            <div className="g flex w-full flex-col items-center">
+              <img
+                src={profiePic}
+                className="size-24 rounded-full"
+                alt="profile"
+              />
+              <p>Name</p>
             </div>
-            <div className='overflow-auto  w-[70%] ms-24 p-4 flex flex-col  '>
-                {/* main content comes here */}
-                
+            <div className="flex w-full flex-col items-start gap-4 ">
+              <NavLink
+                style={navLinkStyle}
+                className={"h-[40px]   w-full p-2 "}
+                to="/user-profile"
+              >
+                Settings
+              </NavLink>
+              <NavLink
+                style={navLinkStyle}
+                className={"h-[40px]  w-full p-2 "}
+                to="/user-appointments"
+              >
+                History
+              </NavLink>
+              <NavLink
+                style={navLinkStyle}
+                className={"h-[40px] w-full p-2 "}
+                to="/user-book-appointment"
+              >
+                Book Appointment
+              </NavLink>
+              <NavLink
+                style={navLinkStyle}
+                className={"h-[40px] w-full p-2 "}
+                to="/user-medication"
+              >
+                Medication
+              </NavLink>
             </div>
+          </div>
+          <div className="h-[80px] w-full  p-2 text-center">
+            <button className="text-md cursor-pointer rounded-full bg-black p-2 font-medium text-white duration-200 hover:scale-110 active:scale-90 ">
+              Sign Out
+            </button>
+          </div>
         </div>
-        
+       
+      </div>
     </section>
-  )
+  );
 }
 
-export default UserAppointment
+export default UserAppointment;

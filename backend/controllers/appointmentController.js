@@ -4,17 +4,31 @@ const Appointment = require("../models/appointment");
 const checkAccess = require("../middlewares/checkAccess");
 
 router.get("/get-appointments", async (req, res) => {
-    try {
-      const appointments = await Appointment.find({});
-  
-      res.json(appointments);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const appointments = await Appointment.find({});
+
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/get-appointment/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const appointment = await Appointment.findById(id);
+    if (appointment == null) {
+      res.json({ message: "No Appointments Booked!" });
+    } else {
+      res.json(appointment);
     }
-  });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.post("/add-appointment", async (req, res) => {
-  const {doctor , patient, appointmentDate,reason,phone} = req.body;
+  const { doctor, patient, appointmentDate, reason, phone } = req.body;
 
   try {
     const newAppointment = new Appointment({
@@ -22,7 +36,7 @@ router.post("/add-appointment", async (req, res) => {
       patient,
       appointmentDate,
       reason,
-      phone
+      phone,
     });
 
     const savedAppointment = await newAppointment.save();
@@ -30,8 +44,6 @@ router.post("/add-appointment", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-
-
 });
 
 module.exports = router;
