@@ -68,13 +68,12 @@ function UserProfile() {
 
   const handleSignOut = async (e) => {
     e.preventDefault();
-
-    try {
-      localStorage.removeItem("user");
-      window.location.href = "/";
-    } catch (err) {
-      alert(err);
-    }
+    await axios.get("http://localhost:4451/auth/logout").then((res) => {
+      if (res.data.message === "User Logged Out") {
+        localStorage.removeItem("user");
+        window.location.href = "/";
+      }
+    });
   };
 
   const navLinkStyle = ({ isActive }) => {

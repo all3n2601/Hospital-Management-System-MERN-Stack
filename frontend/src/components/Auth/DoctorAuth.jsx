@@ -16,6 +16,8 @@ function DoctorAuth() {
     .then((res)=>{
       
       if(res.data.role === "doctor"){
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
         navigate('/doctor-profile')
       }else if(res.data.role === "user" || res.data.role === "admin" || res.data.role === "nurse"){
         alert("Wrong Login Page!")

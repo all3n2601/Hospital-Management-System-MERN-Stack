@@ -5,6 +5,11 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      doctorId: {
+        type: String,
+        required: true,
+        unique: true,
+      },
       email: {
         type: String,
         required: true,
@@ -17,7 +22,8 @@ const doctorSchema = new mongoose.Schema({
       specialization: {
         type: String,
         required: true,
-      },role: {
+      },
+      role: {
         type: String,
         enum: ["admin", "doctor", "nurse", "receptionist", "patient"],
         default: "doctor",

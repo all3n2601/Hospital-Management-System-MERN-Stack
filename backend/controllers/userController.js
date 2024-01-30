@@ -22,11 +22,6 @@ const ContactUs = require("../models/contactUs");
     }
   });
 
-  router.get("/sign-out", async (req, res) => {
-    res.clearCookie("token").json("User signed out successfully");
-  
-  });
-
   router.put("/profile-update",async(req,res)=>{
     const { userId, updatedProfile } = req.body;
     try {

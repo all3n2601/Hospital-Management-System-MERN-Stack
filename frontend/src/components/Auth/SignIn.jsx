@@ -13,13 +13,16 @@ function SignIn() {
     e.preventDefault();
     axios
       .post("http://localhost:4451/auth/login", data)
-      .then((res) => {
-        const user = res.data.user;
-        localStorage.setItem('user', JSON.stringify(user));
-        
+      .then((res) => { 
         if (res.data.role === "patient") {
+          const user = res.data.user;
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('user', JSON.stringify(user));
           navigate("/user-profile");
         } else if (res.data.role === "admin") {
+          const user = res.data.user;
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('user', JSON.stringify(user));
           navigate("/admin-dashboard");
         } else if (res.data.role === "doctor" || res.data.role === "nurse") {
           alert("Wrong Login Page!");
