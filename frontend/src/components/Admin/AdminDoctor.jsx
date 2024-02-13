@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import profiePic from "../../assets/human6.jpg";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function AdminDoctor() {
   const [doctors, setDoctors] = useState([]);
@@ -20,9 +21,12 @@ function AdminDoctor() {
           "http://localhost:4451/doctor/get-doctors"
         );
         setDoctors(response.data);
-        console.log(response.data);
       } catch (error) {
-        console.error("Error fetching doctors:", error);
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          text: "Error Fetching Data!",
+        });
       }
     };
 
@@ -37,13 +41,20 @@ function AdminDoctor() {
     try {
       const res = await axios.post("http://localhost:4451/doctor/add-doctor",{
         name:docname,
-        doctorId:docid,
         specialization:docdept,
         email:docemail
-
+      });
+      Swal.fire({
+        title: "Success",
+        icon: "success",
+        text: "Doctor Added Successfully!",
       });
     } catch (err) {
-      console.log(err);
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        text: "Error Adding Doctor!",
+      });
     }
   };
 
@@ -61,21 +72,37 @@ function AdminDoctor() {
     await axios
       .put(`http://localhost:4451/doctor/update-doctor/${id}`, {})
       .then((res) => {
-        console.log(res);
+        Swal.fire({
+          title: "Success",
+          icon: "success",
+          text: "Doctor Updated Successfully!",
+        });
       })
       .catch((err) => {
-        console.log(err);
+        Swal.fire({
+          title: "Error",
+          icon: "warning",
+          text: "Could not update Doctor!",
+        });
       });
   };
 
   const deletePatient = async (id) => {
     await axios
-      .delete(`http://localhost:4451/doctor/delete-doctor/${id}`, {})
+      .delete(`http://localhost:4451/doctor/delete-doctor/${id}`,)
       .then((res) => {
-        console.log(res);
+        Swal.fire({
+          title: "Success",
+          icon: "success",
+          text: "Patient Deleted Successfully!",
+        });
       })
       .catch((err) => {
-        console.log(err);
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          text: "Error Deleting Patient!",
+        });
       });
   };
 
@@ -178,7 +205,7 @@ function AdminDoctor() {
                 <tbody>
                   {doctors &&
                     doctors.map((item, index) => (
-                      <tr key={item.id}>
+                      <tr key={item._id}>
                         <td scope="col" className="px-6 py-3">
                           {item.doctorId}
                         </td>
@@ -194,7 +221,7 @@ function AdminDoctor() {
                         <td scope="col" className="d-flex gap-3 ">
                           <button
                             onClick={() => {
-                              editPatient(item.id);
+                              editPatient(item._id);
                             }}
                             className="btn btn-success"
                           >
@@ -203,7 +230,7 @@ function AdminDoctor() {
                           <br />
                           <button
                             onClick={() => {
-                              deletePatient(item.id);
+                              deletePatient(item._id);
                             }}
                             className="btn btn-danger"
                           >
@@ -235,15 +262,7 @@ function AdminDoctor() {
                   placeholder="Doctor Name"
                 ></input>
               </div>
-              <div className="flex flex-col w-[40%] items-center ">
-                <p className="">Enter Doctors ID:</p>
-                <input
-                  onChange={(e) => setDocId(e.target.value)}
-                  className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                  type="text"
-                  placeholder="ID"
-                ></input>
-              </div>
+
               <div className="flex flex-col w-[40%] items-center ">
                 <p className="">Enter Doctors Email:</p>
                 <input

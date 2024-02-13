@@ -5,7 +5,9 @@ const checkAccess = require("../middlewares/checkAccess");
 
 router.get("/get-appointments", async (req, res) => {
   try {
-    const appointments = await Appointment.find({});
+    const appointments = await Appointment.find({
+
+    });
 
     res.json(appointments);
   } catch (error) {
@@ -13,10 +15,10 @@ router.get("/get-appointments", async (req, res) => {
   }
 });
 
-router.get("/get-appointment/:id", async (req, res) => {
-  const { id } = req.params;
+router.get("/get-appointment/:email", async (req, res) => {
+  const { email } = req.params;
   try {
-    const appointment = await Appointment.findById(id);
+    const appointment = await Appointment.find({email});
     if (appointment == null) {
       res.json({ message: "No Appointments Booked!" });
     } else {
@@ -28,7 +30,7 @@ router.get("/get-appointment/:id", async (req, res) => {
 });
 
 router.post("/add-appointment", async (req, res) => {
-  const { doctor, patient, appointmentDate, reason, phone } = req.body;
+  const { doctor, patient, appointmentDate, reason, phone,email } = req.body;
 
   try {
     const newAppointment = new Appointment({
@@ -37,6 +39,7 @@ router.post("/add-appointment", async (req, res) => {
       appointmentDate,
       reason,
       phone,
+      email
     });
 
     const savedAppointment = await newAppointment.save();

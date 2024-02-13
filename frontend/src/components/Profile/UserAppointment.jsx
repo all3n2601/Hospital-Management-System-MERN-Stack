@@ -8,20 +8,24 @@ function UserAppointment() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const _id = user._id;
-    const fetchAppointments = async (_id) => {
+    const email = user.email;
+    const fetchAppointments = async (email) => {
       await axios
-        .get(`http://localhost:4451/appointment/get-appointment/${_id}`)
+        .get(`http://localhost:4451/appointment/get-appointment/${email}`)
         .then((res) => {
-          console.log(res.data);
           setAppointments(res.data);
         })
         .catch((err) => {
-          console.log(err);
+          Swal.fire({
+            title: "Error",
+            icon: "error",
+            confirmButtonText: "Ok",
+            text: "Error Fetching Appointments! Please Try Again!",
+          });
         });
     };
 
-    fetchAppointments(_id);
+    fetchAppointments(email);
   }, []);
 
   const navLinkStyle = ({ isActive }) => {

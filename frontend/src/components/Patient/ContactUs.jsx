@@ -1,27 +1,45 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Shared/Navbar";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function ContactUs() {
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [phone, setPhoneNo] = useState();
-  const [message, setComment] = useState();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhoneNo] = useState("");
+  const [message, setComment] = useState("");
+
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPhoneNo("");
+    setComment("");
+  };
 
   const handleSubmit = async (e) => {
-    await axios
-      .post("http://localhost:4451/user/add-contact-us", {
-        name:name,
-        phone:phone,
-        email:email,   
-        message:message
-      })
-      .then((res) => {
-        alert('Your message has been sent successfully')
-      })
-      .catch((err) => {
-        console.log(err);
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:4451/user/add-contact-us", {
+        name: name,
+        phone: phone,
+        email: email,
+        message: message
       });
+      Swal.fire({
+        title: "Success",
+        icon: "success",
+        confirmButtonText: "Ok",
+        text: "Message Sent Successfully! We will get back to you soon!",
+      });
+      resetForm();
+    } catch (err) {
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        confirmButtonText: "Ok",
+        text: "Error Sending Message! Please Try Again!",
+      });
+    }
   };
 
   return (

@@ -7,26 +7,26 @@ const User = require("../models/user.js");
 const config = require("config");
 
 
-const verifyUser = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.json("The Token is Not Available");
-    } else {
-      jwt.verify(token, "jwt-secret-key", (err, decoded) => {
-        if (err) {
-          return res.json("The Token is Not Valid");
-        } else {
-          req.email = decoded.email;
-          req.username = decoded.username;
-          next();
-        }
-      });
-    }
-  };
+// const verifyUser = (req, res, next) => {
+//     const token = req.cookies.token;
+//     if (!token) {
+//       return res.json("The Token is Not Available");
+//     } else {
+//       jwt.verify(token, "jwt-secret-key", (err, decoded) => {
+//         if (err) {
+//           return res.json("The Token is Not Valid");
+//         } else {
+//           req.email = decoded.email;
+//           req.username = decoded.username;
+//           next();
+//         }
+//       });
+//     }
+//   };
   
-  router.get("/", verifyUser, (req, res) => {
-    return res.json({ email: req.email, username: req.username });
-  });
+//   router.get("/", verifyUser, (req, res) => {
+//     return res.json({ email: req.email, username: req.username });
+//   });
   
   router.post("/register", async (req, res) => {
     const { userName, email, password } = req.body;

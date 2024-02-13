@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import profiePic from "../../assets/human6.jpg";
 import axios from "axios";
+import Swal from "sweetalert2";
 function AdminDashboard() {
   const [docount, setdocount] = React.useState(0);
   const [nursecount, setnursecount] = React.useState(0);
@@ -22,7 +23,11 @@ function AdminDashboard() {
           setDepts(res.data.deptcou);
         })
         .catch((err) => {
-          console.log(err);
+          Swal.fire({
+            title: "Error",
+            icon: "error",
+            text: "Error Fetching Data!",
+          });
         });
     };
     fetchInfo();

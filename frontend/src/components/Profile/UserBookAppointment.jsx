@@ -51,13 +51,23 @@ function UserBookAppointment() {
         doctor: doctor,
         appointmentDate: appointmentDate,
         reason: reason,
+        email: email,
       })
       .then((res) => {
-        console.log(res.data);
-        alert("Appointment Request Sent Successfully");
+        Swal.fire({
+          title: "Success",
+          icon: "success",
+          confirmButtonText: "Ok",
+          text: "Appointment Request Sent Successfully! We will get back to you soon!",
+        });
       })
       .catch((err) => {
-        alert(err);
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          confirmButtonText: "Ok",
+          text: "Error Sending Appointment Request! Please Try Again!",
+        });
       });
   };
 

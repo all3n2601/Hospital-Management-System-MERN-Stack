@@ -7,10 +7,11 @@ const Nurse = require("../models/nurse");
 const User = require("../models/user");
 const Department = require("../models/department");
 const ContactUs = require("../models/contactUs");
+const newsLetter = require("../models/newsLetter");
 
 router.get("/get-users", async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({role:"patient"});
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -101,5 +102,28 @@ router.get("/get-count", async (req, res) => {
 });
 
 
+router.post("/new-letter",async(req,res)=>{
+  const {subject,message}=req.body
+  try {
+    const newletter = new newsLetter({
+      subject,
+      message
+    });
+    const savedletter = await newletter.save();
+    res.json({status:"Saved",savedletter});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
+
+
+router.get("/get-sent-newsletter",async(req,res)=>{
+  try {
+    const sentnews = await newsLetter.find({});
+    res.json(sentnews);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+})
 
 module.exports = router;

@@ -53,11 +53,14 @@ router.post("/add-doctor", async (req, res) => {
         .status(400)
         .json({ error: "Doctor with this email already exists" });
     }
-
-    const latestDoctor = await Doctor.findOne({}, {}, { sort: { 'createdAt' : -1 } });
-    const latestId = latestDoctor ? parseInt(latestDoctor.doctorId) : 0;
-    const doctorId = (latestId + 1).toString();
-
+    const lastDoctor = await Doctor.findOne().sort({ doctorId: -1 });
+    let doctorId;
+    if (lastDoctor) {
+      const lastDoctorId = parseInt(lastDoctor.doctorId, 10);
+      doctorId = (lastDoctorId + 1).toString();
+    } else {
+      doctorId = "1";
+    }
     const firstemail = email.split('@')[0];
     const password = firstemail + '@123' ;
 

@@ -18,7 +18,7 @@
     "redux-persist": "^6.0.0",
     "redux-toolkit": "^1.1.2",
     "slick-carousel": "^1.8.1",
-    "sweetalert2": "^11.10.3",
+    "sweetalert2": "^11.10.5",
     "url": "^0.11.3",
     "util": "^0.12.5",
     "validator": "^13.11.0"

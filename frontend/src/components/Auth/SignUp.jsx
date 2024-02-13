@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function SignUp() {
 
@@ -21,7 +22,12 @@ function SignUp() {
             }
           })
           .catch((err) => {
-            alert("Invalid Credentials or Please Try Again!");
+            Swal.fire({
+              title: "Error",
+              icon: "error",
+              text: "Error Registering User! Please Try Again!",
+              button: "Ok",
+            });
           });
       };
 

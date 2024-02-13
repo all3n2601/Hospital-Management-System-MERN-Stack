@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function NurseAuth() {
   const [data, setData] = React.useState({
@@ -23,13 +24,28 @@ function NurseAuth() {
           res.data.role === "admin" ||
           res.data.role === "user"
         ) {
-          alert("Wrong Login Page!");
+          Swal.fire({
+            title: "Invalid Role!",
+            icon: "error",
+            confirmButtonText: "Ok",
+            text: "Login Through Your Respective Page!",
+          });
         } else {
-          alert("Invalid Role!");
+          Swal.fire({
+            title: "Invalid Access!",
+            icon: "error",
+            confirmButtonText: "Ok",
+            text: "You are not authorized to access this page!",
+          });
         }
       })
       .catch((err) => {
-        alert("Invalid Credentials or Please Try Again!");
+        Swal.fire({
+          title: "Invalid Credentials!",
+          icon: "error",
+          confirmButtonText: "Ok",
+          text: "Please Check Your Credentials and Try Again!",
+        });
       });
   };
 

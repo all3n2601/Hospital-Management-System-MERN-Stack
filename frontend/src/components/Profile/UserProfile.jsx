@@ -55,14 +55,24 @@ function UserProfile() {
         })
         .then((res) => {
           if (res.data.status === "Success") {
-            alert("Profile Updated");
+            Swal.fire({
+              title: "Success",
+              icon: "success",
+              confirmButtonText: "Ok",
+              text: "Profile Updated Successfully!",
+            });
             const user = res.data.user;
             localStorage.setItem("user", JSON.stringify(user));
             window.location.href = "/user-profile";
           }
         });
     } catch (err) {
-      alert(err);
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        confirmButtonText: "Ok",
+        text: "Error Updating Profile! Please Try Again!",
+      });
     }
   };
 

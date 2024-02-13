@@ -30,6 +30,11 @@ const appointmentSchema = new Schema({
   notes: {
     type: String,
   },
+
+  email:{
+    type: String,
+    required: true,
+  }
 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema, 'appointments');
