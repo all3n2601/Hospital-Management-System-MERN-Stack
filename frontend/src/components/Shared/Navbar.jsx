@@ -22,7 +22,7 @@ function Navbar() {
     
 
   return (
-    <div className='bg-[#FEFAE0] h-[80px] w-full fixed'>
+    <div className='bg-[#FEFAE0] h-[80px] w-full fixed z-20'>
         <div className='flex max-w-7xl items-center justify-between m-auto h-full'>
             <div className='text-5xl'>HMS</div>
             <div className=' justify-center items-center gap-6 text-xl hidden md:flex'>

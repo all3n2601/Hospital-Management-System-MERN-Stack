@@ -96,12 +96,12 @@ function Home() {
             </div>
         </section>
         <section>
-            <div className='h-full w-full flex flex-col justify-center items-center'>
+            <div className='h-full max-w-7xl flex flex-col m-auto justify-center items-center overflow-auto'>
                 <p className='font-semibold text-3xl pt-16'>Meet Our Specialist</p>
                 <div className='flex flex-col gap-2'>
                     {/* from here */}
 
-                    <div className='flex gap-3'>
+                    <div className='flex gap-3 '>
                     
                         <div className="w-[270px] h-[300px] border border-gray-200 rounded-lg bg-[#D4A373] shadow flex justify-center">
                             <div className="flex flex-col items-center justify-center ">
@@ -193,7 +193,7 @@ function Home() {
             </div>
         </section>
         <section>
-            <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full  '>
+            <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full overflow-auto '>
                 <div className='flex flex-col justify-center items-center'>
                     <p className='text-3xl font-semibold'>Our Patients Feedback About Us</p>
                     <p className='text-sm text-center'>A hospital is a healthcare institution providing patient treatment with specialized health science and auxiliary healthcare staff and medical equipment.</p>
@@ -219,7 +219,7 @@ function Home() {
                         <div>
                             <p className=''>I have visited many hospitals but HMS has to be one of the finest anywhere in the world. </p>
                             <p>From the International desk to the private executive room, service and hospitality has been excellent.</p>
-                            <p> I would highly recommend KIMS to all. Once again many thanks for your help.</p>
+                            <p> I would highly recommend HMS to all. Once again many thanks for your help.</p>
                         </div>
                     </div>
                 </div>
@@ -227,7 +227,7 @@ function Home() {
             
         </section>
         <section>
-            <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20'>
+            <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20 overflow-hidden'>
                 {/* newsletter */}
                 <div className="mx-auto max-w-7xl px-2 py-10 lg:px-0 z-10 ">
                             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">

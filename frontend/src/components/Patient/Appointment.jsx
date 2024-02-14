@@ -61,14 +61,14 @@ function Appointment() {
       <Navbar />
       <div className="h-screen f-screen  flex justify-center items-center">
         <div className=" h-[80%] w-full mt-[80px] flex justify-center items-center gap-5 rounded-xl">
-          <div>
+          <div className="hidden lg:block">
             <img src={appoint} className="size-80" alt="nurse" />
           </div>
-          <div className=" shadow-xl bg-[#FAEDCD] shadow-black md:w-[50%]">
-            <form className="flex flex-col w-full h-full  gap-4 p-5 justify-center items-center">
+          <div className=" shadow-xl bg-[#FAEDCD] shadow-black lg:w-[50%] w-full overflow-auto">
+            <form className="flex flex-col w-full h-full  gap-4 p-5 justify-center lg:ps-14 items-center">
               <p className="text-2xl font-semibold">Book Appointment</p>
-              <div className="w-full flex m-2 justify-center items-center">
-                <div className="w-full">
+              <div className="w-full flex m-2 justify-center items-center ">
+                <div className="w-full flex flex-col">
                   Name:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -76,7 +76,7 @@ function Appointment() {
                     placeholder="Name"
                   />
                 </div>
-                <div className="w-full">
+                <div className="w-full flex flex-col">
                   Phone Number:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -86,7 +86,7 @@ function Appointment() {
                 </div>
               </div>
               <div className="w-full flex m-2 justify-center items-center">
-                <div className="w-[90%]">
+                <div className="w-[90%] flex flex-col">
                   Date Of Appointment:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -94,7 +94,7 @@ function Appointment() {
                     placeholder="Date"
                   />
                 </div>
-                <div className="w-[90%]">
+                <div className="w-[90%] flex flex-col">
                   Time Of Appointment:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -104,7 +104,7 @@ function Appointment() {
                 </div>
               </div>
               <div className="w-full flex m-2 justify-center items-center">
-                <div className="w-full">
+                <div className="w-full flex flex-col">
                   Choose Doctor Name:
                   <select
                     id="doctors"
@@ -120,7 +120,7 @@ function Appointment() {
                     ))}
                   </select>
                 </div>
-                <div className="w-full ">
+                <div className="w-full flex flex-col">
                   Enter Reason:
                   <textarea
                     className="h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -130,7 +130,7 @@ function Appointment() {
                 </div>
               </div>
               <div className="w-full flex m-2 justify-center items-center">
-                <div className="w-full">
+                <div className="w-full flex flex-col">
                   Email:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -138,7 +138,7 @@ function Appointment() {
                     placeholder="Enter Email"
                   />
                 </div>
-                <div className="w-full">
+                <div className="w-full flex flex-col">
                   Email:
                   <input
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -148,7 +148,7 @@ function Appointment() {
                 </div>
               </div>
               <button
-                className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
+                className="inline-flex w-[95%]  items-center justify-center lg:me-10 rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
                 onClick={(e) => handleSubmit(e)}
               >
                 Submit
