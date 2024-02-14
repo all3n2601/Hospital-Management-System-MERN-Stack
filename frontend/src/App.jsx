@@ -22,6 +22,10 @@ import AdminDoctor from './components/Admin/AdminDoctor';
 import AdminNurse from './components/Admin/AdminNurse';
 import AdminPatient from './components/Admin/AdminPatient';
 import AdminQuery from './components/Admin/AdminQuery';
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider } from "react-redux";
+import { persistor, store } from "./redux/store.js";
+
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AdminNewsletter from './components/Admin/AdminNewsletter';
@@ -31,6 +35,8 @@ function App() {
   
 
   return (
+    <Provider store={store}>
+      <PersistGate  persistor={persistor}>
     <Router>
       <Routes>
         <Route path="/" element={<HomePage/>}/>
@@ -39,6 +45,8 @@ function App() {
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/sign-in" element={<SignInPage/>}/>
         <Route path="/sign-up" element={<SignUpPage/>}/>
+
+        
 
         <Route path="/doctor-sign-in" element={<DoctorAuthPage/>}/>
         <Route path="/doctor-profile" element={<DoctorProfilePage/>}/>
@@ -61,11 +69,13 @@ function App() {
         <Route path="/admin-patient" element={<AdminPatient/>}/>
         <Route path="/admin-query" element={<AdminQuery/>}/>
         <Route path="/admin-newsletter" element={<AdminNewsletter/>}/>
-
-
+        
+        
 
       </Routes>
     </Router> 
+    </PersistGate>
+    </Provider>
   )
 }
 
