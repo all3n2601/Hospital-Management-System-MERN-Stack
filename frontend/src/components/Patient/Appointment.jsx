@@ -61,13 +61,13 @@ function Appointment() {
       <Navbar />
       <div className="h-screen f-screen  flex justify-center items-center">
         <div className=" h-[80%] w-full mt-[80px] flex justify-center items-center gap-5 rounded-xl">
-          <div>
+          <div className="hidden lg:block">
             <img src={appoint} className="size-80" alt="nurse" />
           </div>
-          <div className=" shadow-xl bg-[#FAEDCD] shadow-black md:w-[50%]">
-            <form className="flex flex-col w-full h-full  gap-4 p-5 justify-center items-center">
+          <div className=" shadow-xl bg-[#FAEDCD] shadow-black lg:w-[50%] w-full overflow-auto">
+            <form className="flex flex-col w-full h-full  gap-4 p-5 justify-center lg:ps-14 items-center">
               <p className="text-2xl font-semibold">Book Appointment</p>
-              <div className="w-full flex m-2 justify-center items-center">
+              <div className="w-full flex m-2 justify-center items-center ">
                 <div className="w-full flex flex-col">
                   Name:
                   <input
@@ -148,7 +148,7 @@ function Appointment() {
                 </div>
               </div>
               <button
-                className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
+                className="inline-flex w-[95%]  items-center justify-center lg:me-10 rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80"
                 onClick={(e) => handleSubmit(e)}
               >
                 Submit
