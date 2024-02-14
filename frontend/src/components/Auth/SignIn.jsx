@@ -17,7 +17,7 @@ function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.user.loading);
-  const { currentUser } = useSelector((state) => state.user);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(loginProgress());
@@ -71,6 +71,7 @@ function SignIn() {
   const handleDoctor = () => {
     navigate("/doctor-sign-in");
   };
+  
 
   const handleNurse = () => {
     navigate("/nurse-sign-in");
