@@ -2,30 +2,45 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+  login,
+  loginFailure,
+  loginProgress,
+  loginSuccess,
+} from "../../redux/UserSlice.js";
 function SignIn() {
   const [data, setData] = React.useState({
     email: "",
     password: "",
   });
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(loginProgress());
     axios
       .post("http://localhost:4451/auth/login", data)
       .then((res) => { 
         if (res.data.role === "patient") {
           const user = res.data.user;
+          dispatch(login(user));
+          console.log(user)
           localStorage.setItem('token', res.data.token);
           localStorage.setItem('user', JSON.stringify(user));
           navigate("/user-profile");
+          dispatch(loginSuccess());
         } else if (res.data.role === "admin") {
           const user = res.data.user;
+          dispatch(login(user));
           localStorage.setItem('token', res.data.token);
           localStorage.setItem('user', JSON.stringify(user));
           navigate("/admin-dashboard");
+          dispatch(loginSuccess());
         } else if (res.data.role === "doctor" || res.data.role === "nurse") {
+          dispatch(loginFailure());
           Swal.fire({
             title: "Invalid Role!",
             icon: "error",
@@ -33,6 +48,7 @@ function SignIn() {
             text: "Login Through Your Respective Page!",
           });
         } else {
+          dispatch(loginFailure());
           Swal.fire({
             title: "Invalid Access!",
             icon: "error",
@@ -42,6 +58,7 @@ function SignIn() {
         }
       })
       .catch((err) => {
+        dispatch(loginFailure());
         Swal.fire({
           title: "Invalid Credentials!",
           icon: "error",
@@ -54,6 +71,7 @@ function SignIn() {
   const handleDoctor = () => {
     navigate("/doctor-sign-in");
   };
+  
 
   const handleNurse = () => {
     navigate("/nurse-sign-in");
