@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const User = require("../models/user.js");
 const config = require("config");
+const Doctor = require("../models/doctor.js");
+const Nurse = require("../models/nurse.js");
 
 
 // const verifyUser = (req, res, next) => {
@@ -60,18 +62,51 @@ const config = require("config");
     const { email, password } = req.body;
   
     try {
-      const user = await User.findOne({ email });
+      let user, doctor, nurse;
+      let isPasswordValid = false;
   
-      if (user) {
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+      user = await User.findOne({ email });
+      doctor = await Doctor.findOne({ email });
+      nurse = await Nurse.findOne({ email });
+  
+      if (user || doctor || nurse) {
+
+        if (user) {
+          isPasswordValid = await bcrypt.compare(password, user.password);
+        } else if (doctor) {
+          isPasswordValid = await bcrypt.compare(password, doctor.password);
+        } else if (nurse) {
+          isPasswordValid = await bcrypt.compare(password, nurse.password);
+        }
   
         if (isPasswordValid) {
-          const token = jwt.sign({ id: user._id, role: user.role }, config.get("jwtsecret"), {
-            expiresIn: "2d",
-          });
-          res.cookie('token', token)
-          return res.json({ status: "Success", token, role: user.role ,user:user});
+          let token, role, loggedInUser;
+          if (user) {
+            token = jwt.sign({ id: user._id, role: user.role }, config.get("jwtsecret"), {
+              expiresIn: "2d",
+            });
+            role = user.role;
+            loggedInUser = user;
+          } else if (doctor) {
+            token = jwt.sign({ id: doctor._id, role: doctor.role }, config.get("jwtsecret"), {
+              expiresIn: "2d",
+            });
+            role = doctor.role;
+            loggedInUser = doctor;
+          } else if (nurse) {
+            token = jwt.sign({ id: nurse._id, role: nurse.role }, config.get("jwtsecret"), {
+              expiresIn: "2d",
+            });
+            role = nurse.role;
+            loggedInUser = nurse;
+          }
+          res.cookie('token', token);
+          res.json({ status: "Success", token, role, user: loggedInUser });
+        } else {
+          res.status(401).json({ error: "Invalid email or password" });
         }
+      } else {
+        res.status(404).json({ error: "User not found" });
       }
     } catch (error) {
       res.status(500).json({ error: error.message });

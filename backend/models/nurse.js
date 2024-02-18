@@ -14,9 +14,37 @@ const nurseSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      ward: {
+      phoneno: {
         type: String,
         required: true,
+        unique: true,
+      },
+      dob: {
+        type: Date,
+        required: true,
+        
+      },
+      gender:{
+        type: String,
+        required: true,
+      },
+      address:{
+        city: {
+          type: String,
+          required: true,
+        },
+        state: {
+          type: String,
+          required: true,
+        },
+        street: {
+          type: String,
+          required: true,
+        },
+      },
+      ward: {
+        type: String,
+        default: "General",
       },
       department: {
         type: mongoose.Schema.Types.ObjectId,

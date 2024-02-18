@@ -2,25 +2,41 @@ import React,{useState} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  login,
+  loginFailure,
+  loginProgress,
+  loginSuccess,
+} from "../../redux/UserSlice.js";
 
 function DoctorAuth() {
 
-  const[data,setData]= React.useState({
+  const[data,setData]= useState({
     email:"",
     password:""
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.user.loading);
+  
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
-    axios.post("http://localhost:4451/auth/login", data)
+    dispatch(loginProgress());
+    axios.
+    post("http://localhost:4451/auth/login", data)
     .then((res)=>{
-      
+      console.log(res);
       if(res.data.role === "doctor"){
+        const user = res.data.user;
+          dispatch(login(user));
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         navigate('/doctor-profile')
+        dispatch(loginSuccess());
       }else if(res.data.role === "user" || res.data.role === "admin" || res.data.role === "nurse"){
+        dispatch(loginFailure());
         Swal.fire({
           title: "Invalid Role!",
           icon: "error",
@@ -28,6 +44,7 @@ function DoctorAuth() {
           text: "Login Through Your Respective Page!",
         });
       }else{
+        dispatch(loginFailure());
         Swal.fire({
           title: "Invalid Access!",
           icon: "error",
@@ -37,11 +54,12 @@ function DoctorAuth() {
       }
 
     }).catch((err)=>{
+      dispatch(loginFailure());
       Swal.fire({
         title: "Invalid Credentials!",
         icon: "error",
         confirmButtonText: "Ok",
-        text: "Please Check Your Credentials and Try Again!",
+        text: err,
       });
     })
   }

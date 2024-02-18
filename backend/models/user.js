@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const appointmentSchema = require("./appointment").schema;
 
 
 const medicationSchema = new Schema({
@@ -96,7 +95,6 @@ const userSchema = new Schema({
       },
 
   medicalHistory: { type: [medicalHistorySchema], default: [] },
-  appointments: { type: [appointmentSchema], default: [] },
 });
 
 const User = mongoose.model("User", userSchema, "users");
