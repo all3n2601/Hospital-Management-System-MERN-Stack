@@ -30,7 +30,7 @@ function DoctorAuth() {
       console.log(res);
       if(res.data.role === "doctor"){
         const user = res.data.user;
-          dispatch(login(user));
+        dispatch(login(user));
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         navigate('/doctor-profile')
