@@ -26,6 +26,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store.js";
 
+import PrivateRoute from './components/Routes/PrivateRoute.jsx';
+
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AdminNewsletter from './components/Admin/AdminNewsletter';
@@ -46,31 +48,31 @@ function App() {
         <Route path="/sign-in" element={<SignInPage/>}/>
         <Route path="/sign-up" element={<SignUpPage/>}/>
 
+        <Route element={<PrivateRoute/>}>
+
+          <Route path="/doctor-sign-in" element={<DoctorAuthPage/>}/>
+          <Route path="/doctor-profile" element={<DoctorProfilePage/>}/>
+          <Route path="/doctor-review" element={<DoctorReview/>}/>
+          <Route path="/doctor-appointments" element={<DoctorAppointmen/>}/>
+
+          <Route path="/nurse-sign-in" element={<NurseAuthPage/>}/>
+          <Route path="/nurse-profile" element={<NurseProfilePage/>}/>
+          <Route path="/nurse-medication" element={<NurseMedication/>}/>
+          <Route path="/nurse-bed" element={<NurseBed/>}/>
+
+          <Route path="/user-profile" element={<UserProfilePage/>}/>
+          <Route path="/user-appointments" element={<UserAppointment/>}/>
+          <Route path="/user-book-appointment" element={<UserBookAppointment/>}/>
+          <Route path="/user-medication" element={<UserMedication/>}/>
+
+          <Route path="/admin-dashboard" element={<AdminDashPage/>}/>
+          <Route path="/admin-doctor" element={<AdminDoctor/>}/>
+          <Route path="/admin-nurse" element={<AdminNurse/>}/>
+          <Route path="/admin-patient" element={<AdminPatient/>}/>
+          <Route path="/admin-query" element={<AdminQuery/>}/>
+          <Route path="/admin-newsletter" element={<AdminNewsletter/>}/>
         
-
-        <Route path="/doctor-sign-in" element={<DoctorAuthPage/>}/>
-        <Route path="/doctor-profile" element={<DoctorProfilePage/>}/>
-        <Route path="/doctor-review" element={<DoctorReview/>}/>
-        <Route path="/doctor-appointments" element={<DoctorAppointmen/>}/>
-
-        <Route path="/nurse-sign-in" element={<NurseAuthPage/>}/>
-        <Route path="/nurse-profile" element={<NurseProfilePage/>}/>
-        <Route path="/nurse-medication" element={<NurseMedication/>}/>
-        <Route path="/nurse-bed" element={<NurseBed/>}/>
-
-        <Route path="/user-profile" element={<UserProfilePage/>}/>
-        <Route path="/user-appointments" element={<UserAppointment/>}/>
-        <Route path="/user-book-appointment" element={<UserBookAppointment/>}/>
-        <Route path="/user-medication" element={<UserMedication/>}/>
-
-        <Route path="/admin-dashboard" element={<AdminDashPage/>}/>
-        <Route path="/admin-doctor" element={<AdminDoctor/>}/>
-        <Route path="/admin-nurse" element={<AdminNurse/>}/>
-        <Route path="/admin-patient" element={<AdminPatient/>}/>
-        <Route path="/admin-query" element={<AdminQuery/>}/>
-        <Route path="/admin-newsletter" element={<AdminNewsletter/>}/>
-        
-        
+        </Route>
 
       </Routes>
     </Router> 

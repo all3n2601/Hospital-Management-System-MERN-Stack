@@ -115,7 +115,7 @@ function Appointment() {
                     </option>
                     {doctors.map((doctors) => (
                       <option key={doctors._id} value={doctors.name}>
-                        {bike.model}
+                        {doctors.name}
                       </option>
                     ))}
                   </select>
