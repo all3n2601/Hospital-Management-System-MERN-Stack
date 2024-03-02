@@ -11,10 +11,12 @@ function Appointment() {
     patient: "",
     phone: "",
     appointmentDate: "",
+    date:new Date(),
     time: "",
     doctor: "",
     reason: "",
     email: "",
+    city:"",
   });
 
   useEffect(() => {
@@ -28,12 +30,13 @@ function Appointment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(appointment)
     await axios
       .post(`http://localhost:4451/appointment/add-appointment`, {
         patient: appointment.patient,
         phone: appointment.phone,
         doctor: appointment.doctor,
-        appointmentDate: appointment.appointmentDate + " " + appointment.time,
+        appointmentDate: appointment.appointmentDate ,
         reason: appointment.reason,
         email: appointment.email,
       })
@@ -74,6 +77,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="text"
                     placeholder="Name"
+                    onChange={(e) => setAppointment({ ...appointment, patient: e.target.value })}
                   />
                 </div>
                 <div className="w-full flex flex-col">
@@ -82,6 +86,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="number"
                     placeholder="Phone/Mobile"
+                    onChange={(e) => setAppointment({ ...appointment, phone: e.target.value })}
                   />
                 </div>
               </div>
@@ -92,6 +97,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="date"
                     placeholder="Date"
+                    onChange={(e) => setAppointment({ ...appointment, appointmentDate: e.target.value })}
                   />
                 </div>
                 <div className="w-[90%] flex flex-col">
@@ -100,6 +106,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="time"
                     placeholder="Time"
+                    onChange={(e) => setAppointment({ ...appointment, time: e.target.value })}
                   />
                 </div>
               </div>
@@ -109,6 +116,7 @@ function Appointment() {
                   <select
                     id="doctors"
                     className="h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                    onChange={(e) => setAppointment({ ...appointment, doctor: e.target.value })}
                   >
                     <option value="Choose you Consultant">
                       Choose you Consultant
@@ -126,6 +134,7 @@ function Appointment() {
                     className="h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     rows="10"
                     placeholder="Reason"
+                    onChange={(e) => setAppointment({ ...appointment, reason: e.target.value })}
                   ></textarea>
                 </div>
               </div>
@@ -136,6 +145,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="email"
                     placeholder="Enter Email"
+                    onChange={(e) => setAppointment({ ...appointment, email: e.target.value })}
                   />
                 </div>
                 <div className="w-full flex flex-col">
@@ -144,6 +154,7 @@ function Appointment() {
                     className=" h-10 w-[300px] rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     type="email"
                     placeholder="Enter Email"
+                    onChange={(e) => setAppointment({ ...appointment, city: e.target.value })}
                   />
                 </div>
               </div>

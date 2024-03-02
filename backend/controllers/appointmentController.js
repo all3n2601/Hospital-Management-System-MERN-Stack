@@ -36,7 +36,7 @@ router.post("/add-appointment", async (req, res) => {
     const newAppointment = new Appointment({
       doctor,
       patient,
-      appointmentDate,
+      appointmentDate ,
       reason,
       phone,
       email
