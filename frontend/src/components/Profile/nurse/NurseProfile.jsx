@@ -20,17 +20,17 @@ function NurseProfile() {
     const fetchInfo = async (e) => {
       const user = JSON.parse(localStorage.getItem("user"));
       setuserData(user);
-      setName(user.name);
-      setMobileNumber(user.phoneno);
-      setAddress(user.address.street);
-      setCity(user.address.city);
-      setState(user.address.state);
+      setName(user.name || "");
+      setMobileNumber(user.phoneno || "");
+      setAddress(user.address ? user.address.street || "" : "");
+      setCity(user.address ? user.address.city || "" : "");
+      setState(user.address ? user.address.state || "" : "");
       const formattedDateOfBirth = user.dob
         ? user.dob.split("T")[0]
         : "";
       setdateofBirth(formattedDateOfBirth);
-      setGender(user.gender);
-      setEmail(user.email);
+      setGender(user.gender || "");
+      setEmail(user.email || "");
     };
 
     fetchInfo();

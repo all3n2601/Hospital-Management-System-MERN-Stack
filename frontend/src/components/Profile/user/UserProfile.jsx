@@ -20,17 +20,17 @@ function UserProfile() {
     const fetchInfo = async (e) => {
       const user = JSON.parse(localStorage.getItem("user"));
       setuserData(user);
-      setName(user.userName);
-      setMobileNumber(user.phoneNumber);
-      setAddress(user.address.street);
-      setCity(user.address.city);
-      setState(user.address.state);
+      setName(user.userName || "");
+      setMobileNumber(user.phoneNumber || "");
+      setAddress(user.address ? user.address.street || "" : "");
+      setCity(user.address ? user.address.city || "" : "");
+      setState(user.address ? user.address.state || "" : "");
       const formattedDateOfBirth = user.dateOfBirth
         ? user.dateOfBirth.split("T")[0]
         : "";
       setdateofBirth(formattedDateOfBirth);
-      setGender(user.gender);
-      setEmail(user.email);
+      setGender(user.gender || "");
+      setEmail(user.email || "");
     };
 
     fetchInfo();
@@ -81,7 +81,7 @@ function UserProfile() {
   return (
     <section className="bg-slate-300 flex justify-center items-center">
       <div className="h-[80%] w-[80%] bg-white shadow-xl p-2 flex">
-       <UserSidebar profiePic={profiePic} userName={userData.userName} />
+        <UserSidebar profiePic={profiePic} userName={userData.userName} />
         <div className=" w-[70%] ms-24 p-4 flex flex-col justify-around ">
           <p className="font-semibold text-3xl">Account Settings</p>
           <form action="" className="flex flex-col h-[80%] justify-between">
