@@ -53,6 +53,7 @@ function AdminNurse() {
   }, []);
 
   const handleAddNurse = async (e) => {
+    console.log(nurdept);
      await axios
       .post("http://localhost:4451/nurse/add-nurse", {
         name: nurname,
@@ -189,14 +190,15 @@ function AdminNurse() {
               <div className="flex flex-col w-[40%] items-center ">
                 <p className="">Enter Nurse Department:</p>
                 <select
+                 onChange={(e) => setNurDept(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   id="departmentSelect"
                 >
                   <option value="">Select Department</option>
                   {departments.map((department) => (
                     <option
-                      key={department._id.$oid}
-                      value={department._id.$oid}
+                      key={department._id}
+                      value={department._id}
                     >
                       {department.name}
                     </option>
