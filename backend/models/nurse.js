@@ -16,30 +16,23 @@ const nurseSchema = new mongoose.Schema({
       },
       phoneno: {
         type: String,
-        required: true,
         unique: true,
       },
       dob: {
-        type: Date,
-        required: true,
-        
+        type: Date, 
       },
       gender:{
         type: String,
-        required: true,
       },
       address:{
         city: {
           type: String,
-          required: true,
         },
         state: {
           type: String,
-          required: true,
         },
         street: {
           type: String,
-          required: true,
         },
       },
       ward: {

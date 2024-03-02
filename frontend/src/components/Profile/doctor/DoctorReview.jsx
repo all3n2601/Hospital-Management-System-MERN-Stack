@@ -1,6 +1,7 @@
 import React, {useState , useEffect} from 'react'
 import { NavLink } from 'react-router-dom';
 import profiePic from '../../../assets/doct2.jpg'
+import DoctorSidebar from './DoctorSidebar';
 
 function DoctorReview() {
     const [userData , setuserData] = useState([]);

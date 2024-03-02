@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import profiePic from "../../../assets/doct2.jpg";
 import axios from "axios";
 import Swal from "sweetalert2";
+import DoctorSidebar from "./DoctorSidebar";
 
 function DoctorProfile() {
   const [userData, setuserData] = useState([]);

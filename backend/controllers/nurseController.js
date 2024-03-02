@@ -8,7 +8,7 @@ const { error } = require("console");
 
 router.get("/get-nurses", async (req, res) => {
     try {
-      const nurses = await Nurse.find({});
+      const nurses = await Nurse.find({}).populate("department" , "name");
   
       res.json(nurses);
     } catch (error) {
@@ -26,14 +26,6 @@ router.post("/add-nurse", async (req, res) => {
         .status(400)
         .json({ error: "Nurse with this email already exists" });
     }
-    const lastNurse = await Nurse.findOne().sort({ doctorId: -1 });
-    let nurseId;
-    if (lastNurse) {
-      const lastNurseId = parseInt(lastNurse.nurseId, 10);
-      nurseId = (lastNurseId + 1).toString();
-    } else {
-      doctorId = "2000";
-    }
     const firstemail = email.split('@')[0];
     const password = firstemail + '@123' ;
     const salt = await bcrypt.genSalt(10);
@@ -42,16 +34,15 @@ router.post("/add-nurse", async (req, res) => {
     const newUser = new Nurse({
       name,
       email,
-      nurseId:nurseId,
       password: hashedPassword,
       department
     });
 
     const savedUser = await newUser.save();
 
-    res.json(savedUser);
+    res.json({savedUser,message:"Success"});
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({error: error.message });
   }
 
 });
