@@ -11,7 +11,7 @@ function AdminDoctor() {
   const userString = localStorage.getItem("user");
 
   const [docname, setDocName] = useState("");
-  const [docdept, setDocDept] = useState("");
+  const [docspec, setDocSpecialization] = useState("");
   const [docemail, setDocEmail] = useState("");
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function AdminDoctor() {
     try {
       const res = await axios.post("http://localhost:4451/doctor/add-doctor",{
         name:docname,
-        specialization:docdept,
+        specialization:docspec,
         email:docemail
       });
       Swal.fire({
@@ -205,12 +205,13 @@ function AdminDoctor() {
                 ></input>
               </div>
               <div className="flex flex-col w-[40%] items-center ">
-                <p className="">Enter Doctors Department:</p>
+                <p className="">Enter Doctors Specialization:</p>
                 <input
-                  onChange={(e) => setDocDept(e.target.value)}
+
+                  onChange={(e) => setDocSpecialization(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                   type="text"
-                  placeholder="Department"
+                  placeholder="Specialization"
                 ></input>
               </div>
 

@@ -30,7 +30,7 @@ const NurseSidebar = ({ profilePic, userName }) => {
                 className="size-24 rounded-full"
                 alt="profile"
               />
-              <p>{userData.name}</p>
+              <p>{userName}</p>
             </div>
             <div className="flex flex-col items-start w-full gap-4 ">
               <NavLink
