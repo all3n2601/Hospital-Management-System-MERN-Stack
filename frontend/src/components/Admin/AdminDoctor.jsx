@@ -38,24 +38,27 @@ function AdminDoctor() {
   }
 
   const handleAddDoctor = async (e) => {
-    try {
-      const res = await axios.post("http://localhost:4451/doctor/add-doctor",{
+    
+    await axios.post("http://localhost:4451/doctor/add-doctor",{
         name:docname,
         specialization:docspec,
         email:docemail
-      });
-      Swal.fire({
-        title: "Success",
-        icon: "success",
-        text: "Doctor Added Successfully!",
-      });
-    } catch (err) {
-      Swal.fire({
-        title: "Error",
-        icon: "error",
-        text: "Error Adding Doctor!",
-      });
-    }
+      }).then((res)=>{
+        if(res.data.message === "Success"){
+          Swal.fire({
+            title: "Success",
+            icon: "success",
+            text: "Doctor Added Successfully!",
+          });
+        }
+
+      }).catch((e)=>{
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          text: "Error Adding Doctor!",
+        });
+      })
   };
 
   const [isCreate, setIsCreate] = useState(false);
