@@ -40,8 +40,8 @@ function Home() {
             className='flex flex-col lg:flex-row h-screen w-screen justify-center items-center max-w-7xl m-auto'>
                 <motion.div
                 ref={ref}
-                initial={{ opacity: 0, x: -50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: inView ? 1 : 0 }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}
                 className='flex flex-col justify-center'> 
@@ -73,8 +73,8 @@ function Home() {
                     <div className=' w-[350px] h-[300px] md:h-[350px] flex flex-col  justify-evenly md:justify-between'>
                                 <motion.div  
                                 ref={ref}
-                initial={{ opacity: 0, x: -50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                initial={{ opacity: 0,}} 
+                animate={{ opacity: inView ? 1 : 0,  }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}>
                             <div>
@@ -90,8 +90,8 @@ function Home() {
                         </motion.div>
                                 <motion.div  
                                 ref={ref}
-                initial={{ opacity: 0, x: -50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                initial={{ opacity: 0,  }} 
+                animate={{ opacity: inView ? 1 : 0,  }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}>
                             <div>
@@ -109,8 +109,8 @@ function Home() {
                     <div className=' md:ms-3 w-[350px] h-[250px] md:h-[350px]  flex flex-col  justify-evenly md:justify-between'>
                                 <motion.div  
                                 ref={ref}
-                initial={{ opacity: 0, x: 50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                initial={{ opacity: 0,  }} 
+                animate={{ opacity: inView ? 1 : 0,  }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}>
                             <div>
@@ -126,8 +126,8 @@ function Home() {
                         </motion.div>
                                 <motion.div  
                                 ref={ref}
-                initial={{ opacity: 0, x: 50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: inView ? 1 : 0, }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}>
                             <div>
@@ -149,8 +149,8 @@ function Home() {
         
         
         ref={ref}
-        initial={{ opacity: 0, y: 50 }} 
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: inView ? 1 : 0 }} 
         transition={{ duration: 1.5 }}
         whileInView={{ opacity: 1 }}
         >
@@ -250,7 +250,7 @@ function Home() {
                 </div>
             </div>
         </motion.section>
-        <motion.section  
+        <section  
         
         
 
@@ -258,8 +258,8 @@ function Home() {
             <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full overflow-auto '>
                 <motion.div
                 ref={ref}
-                initial={{ opacity: 0, x: 50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: inView ? 1 : 0 }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}
                  className='flex flex-col justify-center items-center'>
@@ -268,8 +268,8 @@ function Home() {
                 </motion.div>
                 <motion.div
                 ref={ref}
-                initial={{ opacity: 0, x: -50 }} 
-                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                initial={{ opacity: 0}} 
+                animate={{ opacity: inView ? 1 : 0 }} 
                 transition={{ duration: 1.5 }}
                 whileInView={{ opacity: 1 }}
                  className='flex items-center gap-4 '>
@@ -299,7 +299,7 @@ function Home() {
                 </motion.div>
             </div>
             
-        </motion.section>
+        </section>
         <section
          >
             <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20 overflow-hidden'>

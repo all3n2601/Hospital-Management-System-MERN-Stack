@@ -15,6 +15,8 @@ function DoctorAppointmen() {
       setuserData(user);
     };
 
+    console.log(userData);
+
     const fetchAppointments = async (e) => {
     await axios.get(
         `http://localhost:4451/doctor/get-appointments/${userData._id}`

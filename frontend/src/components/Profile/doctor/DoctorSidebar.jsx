@@ -1,7 +1,9 @@
 import axios from "axios";
 import React from "react";
 import { NavLink } from "react-router-dom";
-
+import {useDispatch} from 'react-redux';
+import { logout } from "../../../redux/UserSlice.js";
+import docProfile from "../../../assets/doct2.jpg";
 const DoctorSidebar = ({ profilePic, userName }) => {
   const navLinkStyle = ({ isActive }) => {
     return {
@@ -11,11 +13,14 @@ const DoctorSidebar = ({ profilePic, userName }) => {
     };
   };
 
+  const dispatch = useDispatch();
+
   const handleSignOut = async (e) => {
     e.preventDefault();
     await axios.get("http://localhost:4451/auth/logout").then((res) => {
       if (res.data.message === "User Logged Out") {
         localStorage.removeItem("user");
+        dispatch(logout());
         window.location.href = "/";
       }
     });
@@ -25,7 +30,7 @@ const DoctorSidebar = ({ profilePic, userName }) => {
     <div className='bg-slate- h-full w-[18%] flex flex-col justify-between p-2 '>
     <div className='flex flex-col gap-16'>
         <div className='w-full flex flex-col items-center gap-3'>
-            <img src={profilePic} className='size-24 rounded-full' alt="profile" />
+            <img src={docProfile} className='size-24 rounded-full' alt="profile" />
             <p>{userName}</p>
         </div>
         <div className='flex flex-col items-start w-full gap-4 '>

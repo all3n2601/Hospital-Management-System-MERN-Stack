@@ -53,8 +53,8 @@ function AboutUs() {
     className=' bg-[#FEFAE0] pt-5'>
     <motion.div
     ref={ref}
-    initial={{ opacity: 0, x: -50 }} 
-    animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: inView ? 1 : 0 }} 
     transition={{ duration: 1.5 }}
     whileInView={{ opacity: 1 }}
      className='h-screen max-w-7xl flex flex-col m-auto justify-center text-justify gap-1'>
@@ -74,8 +74,8 @@ function AboutUs() {
     
     className=' bg-[#FEFAE0] lg:pt-5'>
     <motion.div ref={ref}
-        initial={{ opacity: 0, x: -50 }} 
-        animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: inView ? 1 : 0 }} 
         transition={{ duration: 1.5 }}
         whileInView={{ opacity: 1 }}
          className='h-screen max-w-7xl flex flex-col m-auto justify-center text-justify gap-1'>
@@ -93,8 +93,8 @@ function AboutUs() {
     className='bg-[#FEFAE0] '>
       <motion.div  
       ref={ref}
-      initial={{ opacity: 0, x: -50 }} 
-      animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: inView ? 1 : 0 }} 
       transition={{ duration: 1.5 }}
       whileInView={{ opacity: 1 }}
       className='max-w-7xl m-auto h-full flex flex-col justify-center items-center gap-3  '>
