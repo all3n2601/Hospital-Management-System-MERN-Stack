@@ -2,6 +2,8 @@ import React,{useState} from 'react'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import {motion } from "framer-motion";
+import { useInView } from 'react-intersection-observer';
 
 function SignUp() {
 
@@ -12,6 +14,12 @@ function SignUp() {
       });
       const navigate = useNavigate();
     
+
+      const { ref, inView } = useInView({
+        triggerOnce: true, 
+        threshold: 0.3, 
+      });
+
       const handleSubmit = async (e) => {
         e.preventDefault();
         axios
@@ -33,8 +41,15 @@ function SignUp() {
 
 
   return (
-    <section className='bg-[#FEFAE0] h-screen f-screen'>
-        <div className="flex items-center justify-center px-8 py-24">
+    <motion.section className='bg-[#FEFAE0]'
+    >
+        <motion.div
+        ref={ref}
+        initial={{ opacity: 0, x: -50 }} 
+        animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+        transition={{ duration: 1.5 }}
+        whileInView={{ opacity: 1 }}
+         className="flex items-center  justify-center px-8 py-24">
             <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md bg-[#CCD5AE] shadow-xl shadow-black p-5 rounded-lg mt-6">
             
             <h2 className="text-center text-2xl font-bold leading-tight text-black">
@@ -120,8 +135,8 @@ function SignUp() {
                 </button>
             </div>
             </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   )
 }
 

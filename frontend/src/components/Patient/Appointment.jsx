@@ -3,9 +3,16 @@ import Navbar from "../Shared/Navbar";
 import appoint from "../../assets/appoint.png";
 import axios from "axios";
 import Swal from "sweetalert2";
+import {motion } from "framer-motion";
+import { useInView } from 'react-intersection-observer';
 
 function Appointment() {
   const [doctors, setDoctors] = useState([]);
+
+  const { ref, inView } = useInView({
+    triggerOnce: true, 
+    threshold: 0.3, 
+  });
 
   const [appointment, setAppointment] = useState({
     patient: "",
@@ -60,14 +67,30 @@ function Appointment() {
   };
 
   return (
-    <section className="bg-[#FEFAE0]">
+    <motion.section
+    
+
+    className="bg-[#FEFAE0]">
       <Navbar />
       <div className="h-screen f-screen  flex justify-center items-center">
         <div className=" h-[80%] w-full mt-[80px] flex justify-center items-center gap-5 rounded-xl">
-          <div className="hidden lg:block">
+          <motion.div
+          ref={ref}
+          initial={{ opacity: 0, x: -50 }} 
+          animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+          transition={{ duration: 1.5 }}
+          whileInView={{ opacity: 1 }}
+           className="hidden lg:block">
             <img src={appoint} className="size-80" alt="nurse" />
-          </div>
-          <div className=" shadow-xl bg-[#FAEDCD] shadow-black lg:w-[50%] w-full overflow-auto">
+          </motion.div>
+          <motion.div
+          ref={ref}
+          initial={{ opacity: 0, x: 50 }} 
+          animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+          transition={{ duration: 1.5 }}
+          whileInView={{ opacity: 1 }}
+          
+          className=" shadow-xl bg-[#FAEDCD] shadow-black lg:w-[50%] w-full overflow-auto">
             <form className="flex flex-col w-full h-full  gap-4 p-5 justify-center lg:ps-14 items-center">
               <p className="text-2xl font-semibold">Book Appointment</p>
               <div className="w-full flex m-2 justify-center items-center ">
@@ -165,10 +188,10 @@ function Appointment() {
                 Submit
               </button>
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
