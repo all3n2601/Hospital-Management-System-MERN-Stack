@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import adminProfile from "../../assets/human6.jpg";
 
 const AdminSidebar = ({ profilePic, userName }) => {
   const navLinkStyle = ({ isActive }) => {
@@ -26,7 +27,7 @@ const AdminSidebar = ({ profilePic, userName }) => {
       <div className="flex flex-col gap-6">
         <div className="w-full flex flex-col items-center ">
           <img
-            src={profilePic}
+            src={adminProfile}
             className="size-24 rounded-full"
             alt="profile"
           />
