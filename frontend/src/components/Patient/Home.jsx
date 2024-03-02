@@ -12,6 +12,9 @@ import doct5 from "../../assets/doct5.jpg"
 import feedback from "../../assets/feedback.png"
 import review from "../../assets/review.jpg"
 import Footer from '../Shared/Footer';
+import {motion } from "framer-motion";
+import { useInView } from 'react-intersection-observer';
+
 
 
 
@@ -20,11 +23,22 @@ function Home() {
     const handleNewsletter = ()=>{
         alert("Thanks for subscribing to our newsletter");
     }
+    const { ref, inView } = useInView({
+        triggerOnce: true, 
+        threshold: 0.3, 
+      });
 
   return (
-    <div className='bg-[#FEFAE0]'>
+    <div className='bg-[#FEFAE0] '   >
 
-        <section>
+        <motion.section 
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }} 
+        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
+        transition={{ duration: 1.5 }}
+        whileInView={{ opacity: 1 }}
+        
+        >
             <div className='flex flex-col lg:flex-row h-screen w-screen justify-center items-center max-w-7xl m-auto'>
                 <div className='flex flex-col justify-center'> 
                     <p className='text-3xl font-semibold text-center'>The Power to Heal </p> 
@@ -35,8 +49,16 @@ function Home() {
                 <div className='w-full md:w-[80%] lg:w-[100%]'><img src={banner} alt="hero"  className='h-[400px]  shadow-black'/></div>
             </div>
         
-        </section>
-        <section>
+        </motion.section>
+        <motion.section 
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }} 
+        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
+        transition={{ duration: 1 }}
+        whileInView={{ opacity: 1 }}
+>
+
+        
             <div className='w-full h-full flex flex-col justify-center items-center'>
                 <p className='font-semibold text-3xl'>Why Choose Us?</p>
                 <div className='flex flex-col md:flex-row justify-center  items-center'>
@@ -94,8 +116,16 @@ function Home() {
                     </div>
                 </div>
             </div>
-        </section>
-        <section>
+        </motion.section>
+        <motion.section
+        
+        
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }} 
+        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
+        transition={{ duration: 1 }}
+        whileInView={{ opacity: 1 }}
+        >
             <div className='h-full max-w-7xl flex flex-col m-auto justify-center items-center overflow-auto'>
                 <p className='font-semibold text-3xl pt-16'>Meet Our Specialist</p>
                 <div className='flex flex-col gap-2'>
@@ -191,8 +221,16 @@ function Home() {
                     
                 </div>
             </div>
-        </section>
-        <section>
+        </motion.section>
+        <motion.section  
+        
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }} 
+        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
+        transition={{ duration: 1.5 }}
+        whileInView={{ opacity: 1 }}
+
+         >
             <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full overflow-auto '>
                 <div className='flex flex-col justify-center items-center'>
                     <p className='text-3xl font-semibold'>Our Patients Feedback About Us</p>
@@ -225,7 +263,7 @@ function Home() {
                 </div>
             </div>
             
-        </section>
+        </motion.section>
         <section>
             <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20 overflow-hidden'>
                 {/* newsletter */}

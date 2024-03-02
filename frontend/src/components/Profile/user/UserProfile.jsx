@@ -3,6 +3,7 @@ import profiePic from "../../../assets/human6.jpg";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import UserSidebar from "./UserSidebar";
+import Swal from "sweetalert2";
 
 function UserProfile() {
   const [userData, setuserData] = useState([]);
