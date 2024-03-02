@@ -53,7 +53,6 @@ function AdminNurse() {
   }, []);
 
   const handleAddNurse = async (e) => {
-    console.log(nurdept);
      await axios
       .post("http://localhost:4451/nurse/add-nurse", {
         name: nurname,
@@ -71,12 +70,11 @@ function AdminNurse() {
         }
       })
       .catch((e) => {
-        console.log(e);
-        // Swal.fire({
-        //   title: "Error",
-        //   icon: "error",
-        //   text: e,
-        // });
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          text: e,
+        });
       });
   };
 
