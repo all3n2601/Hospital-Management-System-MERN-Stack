@@ -31,39 +31,52 @@ function Home() {
   return (
     <div className='bg-[#FEFAE0] '   >
 
-        <motion.section 
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }} 
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
-        transition={{ duration: 1.5 }}
-        whileInView={{ opacity: 1 }}
+        <section 
         
         >
-            <div className='flex flex-col lg:flex-row h-screen w-screen justify-center items-center max-w-7xl m-auto'>
-                <div className='flex flex-col justify-center'> 
+            <div
+            
+            
+            className='flex flex-col lg:flex-row h-screen w-screen justify-center items-center max-w-7xl m-auto'>
+                <motion.div
+                ref={ref}
+                initial={{ opacity: 0, x: -50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}
+                className='flex flex-col justify-center'> 
                     <p className='text-3xl font-semibold text-center'>The Power to Heal </p> 
                     <p className='text-lg text-center'>To Undertake Specialized And holistic healthcare
                         services of world standard and to provide them to all sections....
                     </p>
-                </div>
-                <div className='w-full md:w-[80%] lg:w-[100%]'><img src={banner} alt="hero"  className='h-[400px]  shadow-black'/></div>
+                </motion.div>
+                <motion.div
+                
+                ref={ref}
+                initial={{ opacity: 0, x: 50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}
+                className='w-full md:w-[80%] lg:w-[100%]'><img src={banner} alt="hero"  className='h-[400px]  shadow-black'/></motion.div>
             </div>
         
-        </motion.section>
+        </section>
         <motion.section 
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }} 
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
-        transition={{ duration: 1 }}
-        whileInView={{ opacity: 1 }}
 >
 
         
-            <div className='w-full h-full flex flex-col justify-center items-center'>
+            <div 
+        
+        className='w-full h-full flex flex-col justify-center items-center'>
                 <p className='font-semibold text-3xl'>Why Choose Us?</p>
                 <div className='flex flex-col md:flex-row justify-center  items-center'>
                     <div className=' w-[350px] h-[300px] md:h-[350px] flex flex-col  justify-evenly md:justify-between'>
-                        <div>
+                                <motion.div  
+                                ref={ref}
+                initial={{ opacity: 0, x: -50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}>
                             <div>
                                 <div className='flex justify-start  gap-2 items-center '>
                                     
@@ -74,8 +87,13 @@ function Home() {
                                 </div>
                                 <p className='text-sm'>Great doctors demonstrate professionalism through their ethical conduct, reliability, punctuality, and accountability</p>
                             </div>
-                        </div>
-                        <div>
+                        </motion.div>
+                                <motion.div  
+                                ref={ref}
+                initial={{ opacity: 0, x: -50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}>
                             <div>
                                 <div className='flex justify-start gap-2 items-center'>
                                     <div className='bg-white w-12 rounded-full p-1'>
@@ -85,11 +103,16 @@ function Home() {
                                 </div>
                             </div>
                             <p className='text-sm'>Quality in clinical research may be defined as compliance with requirements together with credibility and reliability of the data obtained.</p>
-                        </div>
+                        </motion.div>
                     </div>
                     <div className='hidden md:block'><img src={service} alt="services" className='h-[400px]' /></div>
                     <div className=' md:ms-3 w-[350px] h-[250px] md:h-[350px]  flex flex-col  justify-evenly md:justify-between'>
-                        <div>
+                                <motion.div  
+                                ref={ref}
+                initial={{ opacity: 0, x: 50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}>
                             <div>
                                 <div className='flex justify-start  gap-2 items-center '>
                                     
@@ -100,8 +123,13 @@ function Home() {
                                 </div>
                                 <p className='text-sm'>Nurses are responsible for recognizing patients' symptoms, taking measures within their scope of practice to administer medications</p>
                             </div>
-                        </div>
-                        <div>
+                        </motion.div>
+                                <motion.div  
+                                ref={ref}
+                initial={{ opacity: 0, x: 50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}>
                             <div>
                                 <div className='flex justify-start  gap-2 items-center '>
                                     
@@ -112,7 +140,7 @@ function Home() {
                                 </div>
                                 <p className='text-sm'>Great doctors demonstrate professionalism through their ethical conduct, reliability, punctuality, and accountability</p>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
@@ -123,7 +151,7 @@ function Home() {
         ref={ref}
         initial={{ opacity: 0, y: 50 }} 
         animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.5 }}
         whileInView={{ opacity: 1 }}
         >
             <div className='h-full max-w-7xl flex flex-col m-auto justify-center items-center overflow-auto'>
@@ -224,19 +252,27 @@ function Home() {
         </motion.section>
         <motion.section  
         
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }} 
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
-        transition={{ duration: 1.5 }}
-        whileInView={{ opacity: 1 }}
+        
 
          >
             <div className=' max-w-7xl m-auto flex flex-col justify-center gap-8 items-center w-full h-full overflow-auto '>
-                <div className='flex flex-col justify-center items-center'>
+                <motion.div
+                ref={ref}
+                initial={{ opacity: 0, x: 50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}
+                 className='flex flex-col justify-center items-center'>
                     <p className='text-3xl font-semibold'>Our Patients Feedback About Us</p>
                     <p className='text-sm text-center'>A hospital is a healthcare institution providing patient treatment with specialized health science and auxiliary healthcare staff and medical equipment.</p>
-                </div>
-                <div className='flex items-center gap-4 '>
+                </motion.div>
+                <motion.div
+                ref={ref}
+                initial={{ opacity: 0, x: -50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}
+                 className='flex items-center gap-4 '>
                     <img className='h-[300px] hidden md:block' src={feedback} alt="" />
                     <div className='flex flex-col items-start py-5 p-5 w-[450px] shadow-xl bg-[#E9EDC9] shadow-violet-400 rounded-lg'>
                         <div className='flex justify-center items-center'>
@@ -260,14 +296,21 @@ function Home() {
                             <p> I would highly recommend HMS to all. Once again many thanks for your help.</p>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
             
         </motion.section>
-        <section>
+        <section
+         >
             <div className='absolute lg:m-56 md:m-36 sm:m-24 m-20 overflow-hidden'>
                 {/* newsletter */}
-                <div className="mx-auto max-w-7xl px-2 py-10 lg:px-0 z-10 ">
+                <motion.div 
+                ref={ref}
+                initial={{ opacity: 0, x: -50 }} 
+                animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+                transition={{ duration: 1.5 }}
+                whileInView={{ opacity: 1 }}
+                 className="mx-auto max-w-7xl px-2 py-10 lg:px-0 z-10 ">
                             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                                 <div className="w-full md:w-2/3 lg:w-1/2">
                                 <h2 className="text-3xl font-bold text-black">Sign up for our weekly newsletter</h2>
@@ -316,7 +359,7 @@ function Home() {
                                 </p>
                                 </div>
                             </div>
-                            </div>
+                            </motion.div>
 
                 {/* newsletter */}
             </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Shared/Navbar";
 import axios from "axios";
 import Swal from "sweetalert2";
+import {motion } from "framer-motion";
+import { useInView } from 'react-intersection-observer';
 
 function ContactUs() {
   const [name, setName] = useState("");
@@ -15,6 +17,10 @@ function ContactUs() {
     setPhoneNo("");
     setComment("");
   };
+  const { ref, inView } = useInView({
+    triggerOnce: true, 
+    threshold: 0.3, 
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,9 +49,19 @@ function ContactUs() {
   };
 
   return (
-    <section className="h-screen w-screen bg-[#FEFAE0]">
+    <section
+    
+  
+        
+        className="h-screen w-screen bg-[#FEFAE0]">
       <Navbar />
-      <div className="h-screen w-screen flex justify-center items-center pt-24">
+      <motion.div 
+      ref={ref}
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: inView ? 1 : 0 }} 
+      transition={{ duration: 1.5 }}
+      whileInView={{ opacity: 1 }}
+       className="h-screen w-screen flex justify-center items-center pt-24">
         <div className="flex gap-10 mx-14 py-14">
           <div className="flex-col hidden md:flex">
             <span className="text-zinc-650 text-4xl">Locate Us</span>
@@ -86,7 +102,13 @@ function ContactUs() {
               <span className="text-zinc-500 text-base">feedback@hms.org</span>
             </div>
           </div>
-          <div className="flex flex-col w-[500px] h-4/5 p-4 justify-center items-center bg-[#FAEDCD] gap-10 border border-solid rounded-lg border-transparent shadow-xl shadow-slate-950">
+          <motion.div
+          ref={ref}
+          initial={{ opacity: 0, x: 50 }} 
+          animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : 50 }} 
+          transition={{ duration: 1.5 }}
+          whileInView={{ opacity: 1 }}
+           className="flex flex-col w-[500px] h-4/5 p-4 justify-center items-center bg-[#FAEDCD] gap-10 border border-black broder-2 rounded-lg border-transparent shadow-xl shadow-slate-950">
             <span className="text-zinc-650 text-3xl font-medium">
               Get in touch
             </span>
@@ -134,9 +156,9 @@ function ContactUs() {
             >
               Submit
             </button>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
