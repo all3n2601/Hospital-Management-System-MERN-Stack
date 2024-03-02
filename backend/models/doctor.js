@@ -17,6 +17,7 @@ const doctorSchema = new mongoose.Schema({
       },
       phoneno: {
         type: String,
+        default:"",
       },
       dob: {
         type: Date,

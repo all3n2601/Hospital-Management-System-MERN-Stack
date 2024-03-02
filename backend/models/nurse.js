@@ -16,6 +16,8 @@ const nurseSchema = new mongoose.Schema({
       },
       phoneno: {
         type: String,
+        default:"",
+        unique: false,
       },
       dob: {
         type: Date, 

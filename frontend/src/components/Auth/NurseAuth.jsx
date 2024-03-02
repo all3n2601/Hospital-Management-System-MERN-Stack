@@ -81,16 +81,16 @@ function NurseAuth() {
   };
 
   return (
-    <motion.section 
-    
-    ref={ref}
-        initial={{ opacity: 0, y: 50 }} 
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 50 }} 
-        transition={{ duration: 1.5 }}
-        whileInView={{ opacity: 1 }}
+    <section 
 
     className="bg-[#FEFAE0] h-screen w-screen">
-      <div className="flex items-center justify-center h-full max-w-7xl m-auto md:w-[60%] rounded-xl lg:w-[40%]  ">
+      <motion.div
+       ref={ref}
+       initial={{ opacity: 0, x: -50 }} 
+       animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : -50 }} 
+       transition={{ duration: 1.5 }}
+       whileInView={{ opacity: 1 }}
+        className="flex items-center justify-center h-full max-w-7xl m-auto md:w-[60%] rounded-xl lg:w-[40%]  ">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md bg-[#CCD5AE] shadow-xl shadow-black p-4 rounded-lg">
           <h2 className="text-center text-2xl font-bold leading-tight text-black">
             Nurse SignIn
@@ -164,8 +164,8 @@ function NurseAuth() {
             </div>
           </form>
         </div>
-      </div>
-    </motion.section>
+      </motion.div>
+    </section>
   );
 }
 
