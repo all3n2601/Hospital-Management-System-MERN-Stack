@@ -71,13 +71,13 @@ function AboutUs() {
         <div className='absolute  w-[59%] h-full flex justify-between items-center pt-5'>
           <button 
           onClick={prevSlide}
-          className='bg-black rounded-full p-1 ms-1'>
-            <svg className='size-10' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path></svg>
+          className='bg-black rounded-full p-1 ms-1 flex justify-center items-center'>
+            <svg xmlns="http://www.w3.org/2000/svg" className='size-10' viewBox="0 0 24 24" fill="white"><path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z"></path></svg>
           </button>
           <button 
           onClick={nextSlide}
-          className='bg-black rounded-full p-1 me-2'>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='size-10' fill="white"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+          className='bg-black rounded-full p-1 me-2 flex justify-center items-center'>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='size-10' fill="white"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"></path></svg>
           </button>
         </div>
       </div>
