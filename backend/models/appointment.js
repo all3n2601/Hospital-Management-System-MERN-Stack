@@ -14,6 +14,10 @@ const appointmentSchema = new Schema({
     type: String,
     required: true,
   },
+  time:{
+    type: String,
+    default: "",
+  },
   reason: {
     type: String,
   },

@@ -4,77 +4,91 @@ import profiePic from "../../../assets/doct2.jpg";
 import axios from "axios";
 import Swal from "sweetalert2";
 import DoctorSidebar from "./DoctorSidebar";
+import {  useSelector } from "react-redux";
 
 function DoctorAppointmen() {
-  const [userData, setuserData] = useState([]);
   const [appointments, setAppointments] = useState([]);
 
+  const {currentUser} = useSelector((state) => state.user)
+  console.log(currentUser._id)
+
+
   useEffect(() => {
-    const fetchInfo = async (e) => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setuserData(user);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4451/appointment/get-appointment/${currentUser._id}`);
+        console.log(response.data);
+       setAppointments(response.data);
+        
+      } catch (error) {
+        console.error('Error fetching users:', error);
+
+      }
     };
+  
+    fetchData();
+  
+  }, []); 
 
-    console.log(userData);
+    
 
-    const fetchAppointments = async (e) => {
-    await axios.get(
-        `http://localhost:4451/doctor/get-appointments/${userData._id}`
-      ).then((response) => {
-        if(response.data.message === "No appointments found"){
-            Swal.fire({
-                icon: "info",
-                title: "Oops...",
-                text: "No appointments found!",
-            });
-        }else{
-            setAppointments(response.data);
-        }
-      }).catch((error) => {
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong!"+error.message,
-        })
-      });
-    };
-
-    fetchInfo();
-    fetchAppointments();
-  }, []);
+   
 
   return (
     <section className="bg-slate-300 flex justify-center items-center">
       <div className="h-[80%] w-[80%] bg-white shadow-xl p-2 flex">
-        <DoctorSidebar userName={userData.name} profiePic={profiePic} />
-        <div className=" w-[70%] ms-24 p-4 flex flex-col overflow-auto ">
-         {appointments.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="p-2">Patient Name</th>
-                  <th className="p-2">Date</th>
-                  <th className="p-2">Time</th>
-                  <th className="p-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((appointment, index) => (
-                  <tr key={index}>
-                    <td className="p-2">{appointment.patientName}</td>
-                    <td className="p-2">{appointment.date}</td>
-                    <td className="p-2">{appointment.time}</td>
-                    <td className="p-2">{appointment.status}</td>
+        <DoctorSidebar userName={currentUser.name} profiePic={profiePic} />
+        <div className=" w-[70%] ms-24 p-4 flex flex-col justify-start gap-5 ">
+          <p className="font-semibold text-3xl">Appointments</p>
+          <div className="w-full">
+            <div className="relative overflow-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      #
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Patient Name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Appointment Date
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Appointment Time
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Status
+                    </th>
+                    
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="w-full h-full flex justify-center items-center">
-              <p>No appointments found</p>
+                </thead>
+                <tbody>
+                  {appointments ?
+                    appointments.map((item, index) => (
+                      <tr key={item._id} className="text-black">
+                        <td scope="col" className="px-6 py-3">
+                          {index+1}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {item.patient}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {item.appointmentDate}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {item.time}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {item.status}
+                        </td>    
+                      </tr>
+                    )):<p>Sorry You have No appointments !!</p>}
+                </tbody>
+              </table>
             </div>
-          )
-         }
+          </div>
+          
         </div>
       </div>
     </section>

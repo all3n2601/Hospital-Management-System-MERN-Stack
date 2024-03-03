@@ -11,6 +11,7 @@ function UserProfile() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+ 
   const [state, setState] = useState("");
   const [dateOfBirth, setdateofBirth] = useState("");
   const [gender, setGender] = useState("");

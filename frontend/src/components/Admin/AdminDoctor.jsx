@@ -140,7 +140,7 @@ function AdminDoctor() {
                 <tbody>
                   {doctors &&
                     doctors.map((item, index) => (
-                      <tr key={item._id}>
+                      <tr key={item._id} className="text-black">
                         <td scope="col" className="px-6 py-3">
                           {item.doctorId}
                         </td>

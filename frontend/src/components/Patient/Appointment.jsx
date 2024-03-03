@@ -46,6 +46,7 @@ function Appointment() {
         appointmentDate: appointment.appointmentDate ,
         reason: appointment.reason,
         email: appointment.email,
+        time: appointment.time,
       })
       .then((res) => {
         Swal.fire({

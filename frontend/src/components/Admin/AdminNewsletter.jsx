@@ -56,7 +56,7 @@ function AdminNewsletter() {
                 <tbody>
                   {subscribers.map((email , index) =>{
                     return(
-                      <tr key={index}>
+                      <tr key={index} className="text-black">
                         <td scope="col" className="px-6 py-3">
                           {index + 1}
                         </td>
