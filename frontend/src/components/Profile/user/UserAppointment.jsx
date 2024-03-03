@@ -32,7 +32,7 @@ function UserAppointment() {
     const email = user.email;
     const fetchAppointments = async (email) => {
       await axios
-        .get(`http://localhost:4451/appointment/get-appointment/${email}`)
+        .get(`http://localhost:4451/appointment/get-appointments/${email}`)
         .then((res) => {
           setAppointments(res.data);
         })
@@ -69,7 +69,7 @@ function UserAppointment() {
                   second: "numeric"
                 });
                 return (
-                  <div className="flex flex-col m-5 ml-10 gap-4">
+                  <div className="flex flex-col m-5 ml-10 gap-4" key={index}>
                     <div className="flex gap-4 justify-between">
                       <p className="text-lg font-medium">
                         Doctor : {appointment.doctor.name}

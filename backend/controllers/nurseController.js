@@ -15,6 +15,15 @@ router.get("/get-nurses", async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   });
+router.get("/get-allNurses", async (req, res) => {
+    try {
+      const nurses = await Nurse.find()
+  
+      res.json(nurses);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
 router.post("/add-nurse", async (req, res) => {
   const {name, email,department} = req.body;

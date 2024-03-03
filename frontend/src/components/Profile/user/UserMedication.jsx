@@ -15,8 +15,15 @@ function UserMedication() {
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:4451/user/get-medications/${userData.email}`);
-          console.log(response.data[0].medications);
-          setMedicines(response.data[0].medications);
+           
+          const data = response.data;
+          const medicationsArray = data.map(({ medications }) => medications);
+
+  
+          const detailsArray = medicationsArray.map(medications => medications.map(({ name, dosage, frequency }) => ({name , dosage, frequency })));
+
+
+          setMedicines(detailsArray);
           
         } catch (error) {
           console.error('Error fetching users:', error);
@@ -56,18 +63,18 @@ function UserMedication() {
                   <tbody>
                     {medicines.map((value , index) =>{
                       return(
-                        <tr key={value._id}>
+                        <tr key={index}>
                           <td scope="col" className="px-6 py-3">
                             {index+1}
                           </td>
                           <td scope="col" className="px-6 py-3">
-                            {value.name}
+                            {value[0].name}
                           </td>
                           <td scope="col" className="px-6 py-3">
-                            {value.dosage}
+                            {value[0].dosage}
                           </td>
                           <td scope="col" className="px-6 py-3">
-                            {value.frequency}
+                            {value[0].frequency}
                           </td>
                         </tr>
                       )

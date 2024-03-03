@@ -111,15 +111,13 @@ function AdminNurse() {
                     <th scope="col" className="px-6 py-3">
                       Department
                     </th>
-                    <th scope="col" className="px-6 py-3">
-                      <span className="sr-only">Edit</span>
-                    </th>
+                    
                   </tr>
                 </thead>
                 <tbody>
                   {nurses &&
                     nurses.map((item, index) => (
-                      <tr key={item._id}>
+                      <tr key={item._id} className="text-black">
                         <td scope="col" className="px-6 py-3">
                           {index + 1}
                         </td>
@@ -132,25 +130,7 @@ function AdminNurse() {
                         <td scope="col" className="px-6 py-3">
                           {item.department.name}
                         </td>
-                        <td scope="col" className="d-flex gap-3 ">
-                          <button
-                            onClick={() => {
-                              editPatient(item._id);
-                            }}
-                            className="btn btn-success"
-                          >
-                            Edit
-                          </button>
-                          <br />
-                          <button
-                            onClick={() => {
-                              deletePatient(item._id);
-                            }}
-                            className="btn btn-danger"
-                          >
-                            Remove
-                          </button>
-                        </td>
+                        
                       </tr>
                     ))}
                 </tbody>

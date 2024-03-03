@@ -103,11 +103,10 @@ router.get("/get-count", async (req, res) => {
 
 
 router.post("/new-letter",async(req,res)=>{
-  const {subject,message}=req.body
+  const {email}=req.body
   try {
     const newletter = new newsLetter({
-      subject,
-      message
+      email,
     });
     const savedletter = await newletter.save();
     res.json({status:"Saved",savedletter});
@@ -119,7 +118,7 @@ router.post("/new-letter",async(req,res)=>{
 
 router.get("/get-sent-newsletter",async(req,res)=>{
   try {
-    const sentnews = await newsLetter.find({});
+    const sentnews = await newsLetter.find();
     res.json(sentnews);
   } catch (error) {
     res.status(500).json({ error: error.message });

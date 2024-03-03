@@ -1,14 +1,12 @@
 const mongoose = require("mongoose");
 
 const newsletterSchema = new mongoose.Schema({
-      subject: {
+      email: {
         type: String,
-        required:true
+        required:true,
+        unique: true
       },
-      message:{
-        type:String,
-        required:true
-      }
+      
 });
 
 const newsLetter = mongoose.model("newsLetter", newsletterSchema, "newsletter");

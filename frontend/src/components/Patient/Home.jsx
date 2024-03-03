@@ -14,19 +14,41 @@ import review from "../../assets/review.jpg"
 import Footer from '../Shared/Footer';
 import {motion } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
+import axios from "axios"
+import { useState } from "react"
 
-
+import Swal from "sweetalert2";
 
 
 function Home() {
 
-    const handleNewsletter = ()=>{
-        alert("Thanks for subscribing to our newsletter");
-    }
+    
     const { ref, inView } = useInView({
         triggerOnce: true, 
         threshold: 0.3, 
       });
+
+    const [email , setEmail] = useState("");
+    const handleNewsletter = async(e) =>{
+        e.preventDefault ; 
+        await axios.post("http://localhost:4451/admin/new-letter", {email})
+        .then(() =>{
+            Swal.fire({
+                title: "Success",
+                icon: "success",
+                confirmButtonText: "OK",
+                text: "Thanks For Subscribing The Newletter!",
+              });
+        })
+        .catch(() =>{
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                confirmButtonText: "OK",
+                text: "Failed!",
+              });
+        })
+    }
 
   return (
     <div className='bg-[#FEFAE0] '   >
@@ -342,6 +364,7 @@ function Home() {
                                         className="flex h-10 w-full rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="email"
                                         placeholder="Email"
+                                        onChange={(e) => setEmail(e.target.value)}
                                     ></input>
                                     <button
                                         type="button"

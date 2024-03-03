@@ -16,6 +16,7 @@ function UserBookAppointment() {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
+  const [time, setTime] = useState("");
   const [doctors, setDoctors] = useState([]);
   
   const getDay = () => {
@@ -55,6 +56,7 @@ function UserBookAppointment() {
         appointmentDate: appointmentDate,
         reason: reason,
         email: email,
+        time: time,
       })
       .then((res) => {
         Swal.fire({
@@ -169,13 +171,12 @@ function UserBookAppointment() {
                 ></input>
               </div>
               <div className="flex flex-col w-[50%] justify-start">
-                <p>Enter Your Address:</p>
+                <p>Enter Appointment Time:</p>
                 <input
-                value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  onChange={(e) => setTime(e.target.value)}
                   className="flex h-10  w-[90%] rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                  type="text"
-                  placeholder="Address"
+                  type="time"
+                  placeholder="Time"
                 ></input>
               </div>
             </div>
