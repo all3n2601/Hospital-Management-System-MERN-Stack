@@ -13,7 +13,6 @@ function NurseMedication() {
   const [dosage , setDosage] = useState("");
   const [changePatient , setChangePatient] = useState("");
 
-  console.log(patients)
 
 
   useEffect(() => {
@@ -25,13 +24,10 @@ function NurseMedication() {
     fetchInfo();
   }, []);
 
-  console.log(changePatient)
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:4451/user/get-users");
-        console.log(response);
         setPatients(response.data);
         
       } catch (error) {
@@ -56,7 +52,6 @@ function NurseMedication() {
       });
     })
     .catch((error) =>{
-      console.log(error)
       Swal.fire({
         title: "Invalid Credentials!",
         icon: "error",

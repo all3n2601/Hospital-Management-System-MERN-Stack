@@ -10,14 +10,13 @@ function DoctorAppointmen() {
   const [appointments, setAppointments] = useState([]);
 
   const {currentUser} = useSelector((state) => state.user)
-  console.log(currentUser._id)
+
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:4451/appointment/get-appointment/${currentUser._id}`);
-        console.log(response.data);
        setAppointments(response.data);
         
       } catch (error) {

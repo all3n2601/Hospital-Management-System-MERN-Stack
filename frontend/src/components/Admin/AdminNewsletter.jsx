@@ -15,7 +15,6 @@ function AdminNewsletter() {
         "http://localhost:4451/admin/get-sent-newsletter"
       )
       .then((res) =>{
-        console.log(res.data)
         setSubscribers(res.data);
       })
       

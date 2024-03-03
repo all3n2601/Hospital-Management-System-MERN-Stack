@@ -38,7 +38,6 @@ function DoctorAuth() {
     axios.
     post("http://localhost:4451/auth/login", data)
     .then((res)=>{
-      console.log(res);
       if(res.data.role === "doctor"){
         const user = res.data.user;
         dispatch(login(user));

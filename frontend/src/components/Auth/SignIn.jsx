@@ -34,11 +34,10 @@ function SignIn() {
     axios
       .post("http://localhost:4451/auth/login", data)
       .then((res) => { 
-        console.log(res);
+  
         if (res.data.role === "patient") {
           const user = res.data.user;
           dispatch(login(user));
-          console.log(user)
           localStorage.setItem('token', res.data.token);
           localStorage.setItem('user', JSON.stringify(user));
           navigate("/user-profile");

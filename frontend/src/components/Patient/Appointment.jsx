@@ -37,7 +37,7 @@ function Appointment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(appointment)
+
     await axios
       .post(`http://localhost:4451/appointment/add-appointment`, {
         patient: appointment.patient,

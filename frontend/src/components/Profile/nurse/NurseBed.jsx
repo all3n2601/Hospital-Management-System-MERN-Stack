@@ -26,7 +26,7 @@ function NurseBed() {
         await axios.get(`http://localhost:4451/doctor/get-message/${currentUser.email}`)
         .then((res) =>{
           setMessage(res.data);
-          console.log(message)
+
         })  
         
       } catch (error) {
