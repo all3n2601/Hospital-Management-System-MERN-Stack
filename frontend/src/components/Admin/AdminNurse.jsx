@@ -53,6 +53,7 @@ function AdminNurse() {
   }, []);
 
   const handleAddNurse = async (e) => {
+    e.preventDefault();
      await axios
       .post("https://hmsmern.onrender.com/nurse/add-nurse", {
         name: nurname,
