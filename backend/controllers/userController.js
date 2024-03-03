@@ -16,7 +16,7 @@ router.post("/add-contact-us", async (req, res) => {
 
     const savedContactUs = await newContactUs.save();
 
-    res.json(savedContactUs);
+    res.status(200).json(savedContactUs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

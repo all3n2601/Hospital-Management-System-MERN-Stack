@@ -48,7 +48,7 @@ router.post("/add-appointment", async (req, res) => {
     });
 
     const savedAppointment = await newAppointment.save();
-    res.json(savedAppointment);
+    res.status(200).json(savedAppointment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

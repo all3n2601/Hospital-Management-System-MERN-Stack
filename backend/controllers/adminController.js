@@ -55,7 +55,7 @@ router.post("/add-department", async (req, res) => {
     });
 
     const savedDept = await newDept.save();
-    res.json(savedDept);
+    res.status(200).json(savedDept);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -109,7 +109,7 @@ router.post("/new-letter",async(req,res)=>{
       email,
     });
     const savedletter = await newletter.save();
-    res.json({status:"Saved",savedletter});
+    res.status(200).json({status:"Saved",savedletter});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

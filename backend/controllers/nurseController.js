@@ -49,7 +49,7 @@ router.post("/add-nurse", async (req, res) => {
 
     const savedUser = await newUser.save();
 
-    res.json({savedUser,message:"Success"});
+    res.status(200).json({savedUser,message:"Success"});
   } catch (error) {
     res.status(500).json({error: error.message });
   }

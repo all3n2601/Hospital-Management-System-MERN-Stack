@@ -77,7 +77,7 @@ router.post("/add-doctor", async (req, res) => {
 
     const savedUser = await newUser.save();
 
-    res.json({savedUser,message:"Success"});
+    res.status(200).json({savedUser,message:"Success"});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -108,7 +108,7 @@ router.post("/add-message" , async (req , res) => {
 
   try {
     await newEntry.save();
-    res.json("Successfully sent");
+    res.status(200).json("Successfully sent");
   } catch (error) {
     res.json("couldnt sent the message");
   }
