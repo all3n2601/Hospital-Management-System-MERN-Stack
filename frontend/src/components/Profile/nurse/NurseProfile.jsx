@@ -40,7 +40,7 @@ function NurseProfile() {
     e.preventDefault();
     try {
       axios
-        .put("http://localhost:4451/nurse/profile-update", {
+        .put("https://hmsmern.onrender.com/nurse/profile-update", {
           userId: userData._id,
           updatedProfile: {
             email: email,

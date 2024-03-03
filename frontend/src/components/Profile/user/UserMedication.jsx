@@ -14,7 +14,7 @@ function UserMedication() {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get(`http://localhost:4451/user/get-medications/${userData.email}`);
+          const response = await axios.get(`https://hmsmern.onrender.com/user/get-medications/${userData.email}`);
            
           const data = response.data;
           const medicationsArray = data.map(({ medications }) => medications);

@@ -32,7 +32,7 @@ function UserAppointment() {
     const email = user.email;
     const fetchAppointments = async (email) => {
       await axios
-        .get(`http://localhost:4451/appointment/get-appointments/${email}`)
+        .get(`https://hmsmern.onrender.com/appointment/get-appointments/${email}`)
         .then((res) => {
           setAppointments(res.data);
         })

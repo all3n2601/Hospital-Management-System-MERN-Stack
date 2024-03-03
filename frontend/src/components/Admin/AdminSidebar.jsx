@@ -17,7 +17,7 @@ const AdminSidebar = ({ profilePic, userName }) => {
   const dispatch = useDispatch();
   const handleSignOut = async (e) => {
     e.preventDefault();
-    await axios.get("http://localhost:4451/auth/logout").then((res) => {
+    await axios.get("https://hmsmern.onrender.com/auth/logout").then((res) => {
       if (res.data.message === "User Logged Out") {
         localStorage.removeItem("user");
         dispatch(logout());

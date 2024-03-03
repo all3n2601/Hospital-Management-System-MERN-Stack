@@ -28,7 +28,7 @@ function Appointment() {
 
   useEffect(() => {
     const fetchDoctors = async (e) => {
-      const res = await axios.get("http://localhost:4451/doctor/get-doctors");
+      const res = await axios.get("https://hmsmern.onrender.com/doctor/get-doctors");
       setDoctors(res.data);
     };
 
@@ -39,7 +39,7 @@ function Appointment() {
     e.preventDefault();
 
     await axios
-      .post(`http://localhost:4451/appointment/add-appointment`, {
+      .post(`https://hmsmern.onrender.com/appointment/add-appointment`, {
         patient: appointment.patient,
         phone: appointment.phone,
         doctor: appointment.doctor,

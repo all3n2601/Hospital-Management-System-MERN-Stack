@@ -25,7 +25,7 @@ function ContactUs() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:4451/user/add-contact-us", {
+      await axios.post("https://hmsmern.onrender.com/user/add-contact-us", {
         name: name,
         phone: phone,
         email: email,

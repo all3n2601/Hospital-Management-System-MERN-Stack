@@ -16,7 +16,7 @@ function DoctorAppointmen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:4451/appointment/get-appointment/${currentUser._id}`);
+        const response = await axios.get(`https://hmsmern.onrender.com/appointment/get-appointment/${currentUser._id}`);
        setAppointments(response.data);
         
       } catch (error) {

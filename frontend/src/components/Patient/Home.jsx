@@ -31,7 +31,7 @@ function Home() {
     const [email , setEmail] = useState("");
     const handleNewsletter = async(e) =>{
         e.preventDefault ; 
-        await axios.post("http://localhost:4451/admin/new-letter", {email})
+        await axios.post("https://hmsmern.onrender.com/admin/new-letter", {email})
         .then(() =>{
             Swal.fire({
                 title: "Success",

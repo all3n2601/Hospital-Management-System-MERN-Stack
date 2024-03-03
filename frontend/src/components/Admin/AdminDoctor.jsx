@@ -18,7 +18,7 @@ function AdminDoctor() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4451/doctor/get-doctors"
+          "https://hmsmern.onrender.com/doctor/get-doctors"
         );
         setDoctors(response.data);
       } catch (error) {
@@ -39,7 +39,7 @@ function AdminDoctor() {
 
   const handleAddDoctor = async (e) => {
     
-    await axios.post("http://localhost:4451/doctor/add-doctor",{
+    await axios.post("https://hmsmern.onrender.com/doctor/add-doctor",{
         name:docname,
         specialization:docspec,
         email:docemail
@@ -65,7 +65,7 @@ function AdminDoctor() {
 
   const editPatient = async (id) => {
     await axios
-      .put(`http://localhost:4451/doctor/update-doctor/${id}`, {})
+      .put(`https://hmsmern.onrender.com/doctor/update-doctor/${id}`, {})
       .then((res) => {
         Swal.fire({
           title: "Success",
@@ -84,7 +84,7 @@ function AdminDoctor() {
 
   const deletePatient = async (id) => {
     await axios
-      .delete(`http://localhost:4451/doctor/delete-doctor/${id}`,)
+      .delete(`https://hmsmern.onrender.com/doctor/delete-doctor/${id}`,)
       .then((res) => {
         Swal.fire({
           title: "Success",
