@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import {motion } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
+import { Link } from 'react-router-dom';
 
 function SignUp() {
     const [data, setData] = useState({
@@ -54,13 +55,13 @@ function SignUp() {
             </h2>
             <p className="mt-2 text-center text-base text-gray-600">
                 Already have an account?{' '}
-                <a
+                <Link
                 to="/sign-in"
                 title=""
                 className="font-medium text-black transition-all duration-200 hover:underline"
                 >
                 Sign In
-                </a>
+                </Link>
             </p>
             <form  className="mt-8">
                 <div className="space-y-5">
