@@ -38,7 +38,7 @@ function AdminDoctor() {
   }
 
   const handleAddDoctor = async (e) => {
-    
+    e.preventDefault();
     await axios.post("https://hmsmern.onrender.com/doctor/add-doctor",{
         name:docname,
         specialization:docspec,
