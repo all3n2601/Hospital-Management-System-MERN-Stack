@@ -55,9 +55,7 @@ function AdminPatient() {
                     <th scope="col" className="px-6 py-3">
                       Role
                     </th>
-                    <th scope="col" className="px-6 py-3">
-                      Action
-                    </th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -76,25 +74,7 @@ function AdminPatient() {
                         <td scope="col" className="px-6 py-3">
                           {item.role}
                         </td>
-                        <td scope="col" className="d-flex gap-3 ">
-                          <button
-                            onClick={() => {
-                              editPatient(item._id);
-                            }}
-                            className="btn btn-success"
-                          >
-                            Edit
-                          </button>
-                          <br />
-                          <button
-                            onClick={() => {
-                              deletePatient(item._id);
-                            }}
-                            className="btn btn-danger"
-                          >
-                            Remove
-                          </button>
-                        </td>
+                        
                       </tr>
                     ))}
                 </tbody>

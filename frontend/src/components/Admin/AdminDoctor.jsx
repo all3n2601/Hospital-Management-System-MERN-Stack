@@ -154,15 +154,8 @@ function AdminDoctor() {
                           {item.specialization}
                         </td>
                         <td scope="col" className="d-flex gap-3 ">
-                          <button
-                            onClick={() => {
-                              editPatient(item._id);
-                            }}
-                            className="btn btn-success"
-                          >
-                            Edit
-                          </button>
-                          <br />
+                          
+                          
                           <button
                             onClick={() => {
                               deletePatient(item._id);

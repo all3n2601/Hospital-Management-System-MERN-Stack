@@ -15,16 +15,13 @@ function UserMedication() {
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:4451/user/get-medications/${userData.email}`);
-           console.log(response.data);
+           
           const data = response.data;
           const medicationsArray = data.map(({ medications }) => medications);
 
-          const medicineArray = medicationsArray.map((value) => value )
-          console.log(medicineArray)
-          
+  
           const detailsArray = medicationsArray.map(medications => medications.map(({ name, dosage, frequency }) => ({name , dosage, frequency })));
 
-          console.log(detailsArray)
 
           setMedicines(detailsArray);
           
