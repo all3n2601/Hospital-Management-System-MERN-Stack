@@ -7,6 +7,7 @@ const User = require("../models/user.js");
 const config = require("config");
 const Doctor = require("../models/doctor.js");
 const Nurse = require("../models/nurse.js");
+require("dotenv/config");
 
 
 // const verifyUser = (req, res, next) => {
@@ -83,19 +84,19 @@ const Nurse = require("../models/nurse.js");
         if (isPasswordValid) {
           let token, role, loggedInUser;
           if (user) {
-            token = jwt.sign({ id: user._id, role: user.role }, config.get("jwtsecret"), {
+            token = jwt.sign({ id: user._id, role: user.role }, process.env.jwtsecret, {
               expiresIn: "2d",
             });
             role = user.role;
             loggedInUser = user;
           } else if (doctor) {
-            token = jwt.sign({ id: doctor._id, role: doctor.role }, config.get("jwtsecret"), {
+            token = jwt.sign({ id: doctor._id, role: doctor.role }, process.env.jwtsecret, {
               expiresIn: "2d",
             });
             role = doctor.role;
             loggedInUser = doctor;
           } else if (nurse) {
-            token = jwt.sign({ id: nurse._id, role: nurse.role }, config.get("jwtsecret"), {
+            token = jwt.sign({ id: nurse._id, role: nurse.role }, process.env.jwtsecret, {
               expiresIn: "2d",
             });
             role = nurse.role;

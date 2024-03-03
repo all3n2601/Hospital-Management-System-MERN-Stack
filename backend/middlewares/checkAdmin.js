@@ -7,7 +7,7 @@ const checkAdmin = ()=>(req, res, next) => {
         return res.status(401).json({ error: "You are not logged in!!!" });
      }  
      try {
-        const verified = jwt.verify(token, config.get("jwtsecret"));
+        const verified = jwt.verify(token,process.env.jwtsecret);
         
         if (!verified) {
             return res.status(401).json({ error: "You are not logged in!!!" });
