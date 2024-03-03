@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const Doctor = require("../models/doctor");
 const checkAdmin = require("../middlewares/checkAdmin");
 const Appointment = require("../models/appointment");
+  const Communication = require("../models/communication");
 
 router.get("/get-doctors", async (req, res) => {
 
@@ -98,5 +99,31 @@ router.get("/get-appointments/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.post("/add-message" , async (req , res) => {
+
+  const{email , message ,from} = req.body ;
+  
+  const newEntry = await new Communication({email , message ,from});
+
+  try {
+    await newEntry.save();
+    res.json("Successfully sent");
+  } catch (error) {
+    res.json("couldnt sent the message");
+  }
+});
+router.get("/get-message/:email" , async (req , res) => {
+
+  const email = req.params.email; // Correct way to access email from request parameters
+  
+  try {
+    const message = await Communication.find({email});
+    res.json(message);
+  } catch (error) {
+    res.status(500).json({ error: "Could not get the message" }); // Set proper status code and error response
+  }
+});
+
 
   module.exports = router;
