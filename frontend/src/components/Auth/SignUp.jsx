@@ -6,15 +6,12 @@ import {motion } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
 
 function SignUp() {
-
     const [data, setData] = useState({
         userName:"",
         email: "",
         password: "",
       });
       const navigate = useNavigate();
-    
-
       const { ref, inView } = useInView({
         triggerOnce: true, 
         threshold: 0.3, 
@@ -58,7 +55,7 @@ function SignUp() {
             <p className="mt-2 text-center text-base text-gray-600">
                 Already have an account?{' '}
                 <a
-                href="/sign-in"
+                to="/sign-in"
                 title=""
                 className="font-medium text-black transition-all duration-200 hover:underline"
                 >

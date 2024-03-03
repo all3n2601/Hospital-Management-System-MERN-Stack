@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -97,13 +97,13 @@ function NurseAuth() {
           </h2>
           <p className="mt-2 text-center text-sm text-slate-900 ">
             Login As A Patient?{" "}
-            <a
-              href="/sign-in"
+            <Link
+              to="/sign-in"
               title=""
               className="font-semibold text-black transition-all duration-200 hover:underline"
             >
               Click Here
-            </a>
+            </Link>
           </p>
           <form className="mt-8">
             <div className="space-y-5">

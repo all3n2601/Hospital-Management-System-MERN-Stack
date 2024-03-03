@@ -11,6 +11,7 @@ import {
 } from "../../redux/UserSlice.js";
 import {motion } from "framer-motion";
 import { useInView } from 'react-intersection-observer';
+import { Link } from "react-router-dom";
 
 function SignIn() {
   const [data, setData] = React.useState({
@@ -109,13 +110,13 @@ function SignIn() {
           </h2>
           <p className="mt-2 text-center text-sm text-black">
             Don&apos;t have an account?{" "}
-            <a
-              href="/sign-up"
+            <Link
+              to="/sign-up"
               title=""
               className="font-semibold text-black transition-all duration-200 hover:underline"
             >
               Create a free account
-            </a>
+            </Link>
           </p>
           <form className="mt-8">
             <div className="space-y-5">
