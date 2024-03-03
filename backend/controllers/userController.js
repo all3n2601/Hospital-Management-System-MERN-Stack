@@ -37,17 +37,22 @@ router.put("/profile-update", async (req, res) => {
   }
 });
 
-router.get("/get-medications/:userId", async (req, res) => {
-  const userId = req.params.userId;
+router.get("/get-medications/:userEmail", async (req, res) => {
+  const userEmail = req.params.userEmail;
   try {
-    const user = await User.findById(userId);
-    if (user.medications != null) {
-      res.status(200).json(user.medications);
+    const user = await User.findOne({ email: userEmail });
+    if (user) {
+      if (user.medicalHistory && user.medicalHistory.length > 0) {
+        res.status(200).json(user.medicalHistory);
+      } else {
+        res.status(200).json([]);
+      }
     } else {
-      res.status(200).json([]);
+      res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Error!" });
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
