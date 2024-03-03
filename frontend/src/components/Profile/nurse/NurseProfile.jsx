@@ -45,7 +45,7 @@ function NurseProfile() {
           updatedProfile: {
             email: email,
             name: name,
-            phoneno: mobileNumber,
+            phoneno: phoneno,
             address: {
               street: address,
               city: city,
