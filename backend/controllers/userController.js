@@ -22,6 +22,20 @@ router.post("/add-contact-us", async (req, res) => {
   }
 });
 
+router.get("/get-users" , async (req ,res) =>{
+
+  try {
+    const findUser =  await User.find();
+    if(!findUser) res.json("No user found");
+    res
+    .status(200)
+    .json(findUser);
+  } catch (error) {
+    
+  }
+
+} );
+
 router.put("/profile-update", async (req, res) => {
   const { userId, updatedProfile } = req.body;
   try {
