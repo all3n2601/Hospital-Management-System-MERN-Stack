@@ -33,6 +33,8 @@ function NurseMedication() {
 
     fetchInfo();
   }, []);
+
+  
   return (
     <section className="bg-slate-300 flex justify-center items-center">
       <div className="h-[80%] w-[80%] bg-white shadow-xl p-2 flex">

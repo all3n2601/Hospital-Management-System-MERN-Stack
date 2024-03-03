@@ -51,4 +51,29 @@ router.get("/get-medications/:userId", async (req, res) => {
   }
 });
 
+router.post('/add-medications/:userEmail', async (req, res) => {
+  try {
+    const { userEmail } = req.params;
+    const { name, dosage, frequency } = req.body;
+
+
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.medicalHistory.push({
+      medications: [{ name, dosage, frequency }],
+    });
+
+    await user.save();
+
+    res.status(201).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
 module.exports = router;
