@@ -17,7 +17,7 @@ const medicationSchema = new Schema({
 const medicalHistorySchema = new Schema({
   condition: {
     type: String,
-    required: true,
+    default:""
   },
   diagnosisDate: {
     type: Date,
