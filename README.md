@@ -12,7 +12,7 @@ This Hospital Management System is a web application developed using the MERN (M
 - **Inventory Management**: Keep track of medical supplies and equipment inventory.
 - **Billing System**: Generate and manage invoices for patient services.
 - **Reports and Analytics**: Generate insightful reports and analytics for better decision-making.
-- **Responsive Design**: Bootstrap is used for a mobile-friendly and responsive user interface.
+- **Responsive Design**: Taileing is used for a desktop-friendly and responsive user interface.
 
 ## Prerequisites
 
