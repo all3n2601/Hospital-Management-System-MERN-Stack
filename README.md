@@ -6,6 +6,8 @@
 
 This Hospital Management System is a web application developed using the MERN (MongoDB, Express.js, React, Node.js) stack with Redux for state management and TailwindCSS for responsive UI design. The system aims to streamline hospital operations, improve patient care, and enhance overall efficiency.
 
+<img src="images/2.jpg">
+<img src="images/3.jpg">
 ## Features
 
 - **User Authentication**: Secure user authentication system for administrators, doctors, and staff members.
