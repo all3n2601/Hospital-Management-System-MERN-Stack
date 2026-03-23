@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,7 @@ export function KpiCard({
   title, value, subtitle, trend, trendDir = 'neutral',
   color, icon, sparklineData, isLoading,
 }: KpiCardProps) {
+  const uid = useId();
   const cfg = COLOR_CONFIG[color];
   const sparkData = (sparklineData ?? []).map((v, i) => ({ i, v }));
 
@@ -59,7 +61,7 @@ export function KpiCard({
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={sparkData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <defs>
-                <linearGradient id={`kpi-spark-${color}`} x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={`kpi-spark-${uid}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%"  stopColor={cfg.spark} stopOpacity={0.2} />
                   <stop offset="95%" stopColor={cfg.spark} stopOpacity={0} />
                 </linearGradient>
@@ -67,7 +69,7 @@ export function KpiCard({
               <Area
                 type="monotone" dataKey="v"
                 stroke={cfg.spark} strokeWidth={1.5}
-                fill={`url(#kpi-spark-${color})`}
+                fill={`url(#kpi-spark-${uid})`}
                 dot={false} isAnimationActive={false}
               />
             </AreaChart>

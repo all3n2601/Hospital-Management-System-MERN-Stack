@@ -32,7 +32,7 @@ interface AppointmentRowProps {
 }
 
 export function AppointmentRow({ initials, name, meta, time, status }: AppointmentRowProps) {
-  const gradient = GRADIENTS[initials.charCodeAt(0) % GRADIENTS.length];
+  const gradient = GRADIENTS[(initials.charCodeAt(0) || 0) % GRADIENTS.length];
   const statusStyle = STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-500';
   const statusLabel = STATUS_LABELS[status] ?? (status.charAt(0).toUpperCase() + status.slice(1));
 

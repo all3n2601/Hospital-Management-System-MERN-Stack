@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+/** dotColor must be a valid CSS color string (e.g. '#ef4444', 'rgb(...)') — not a Tailwind class */
 interface AlertItemProps {
   dotColor: string;
   children: ReactNode;
