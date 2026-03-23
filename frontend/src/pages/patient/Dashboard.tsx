@@ -47,12 +47,12 @@ export function PatientDashboard() {
 
   const apptQ = useQuery<{ success: boolean; data: Appointment[] }>({
     queryKey: ['patient-dashboard', 'appointments'],
-    queryFn: () => api.get('/appointments?status=confirmed,scheduled&limit=3').then(r => r.data),
+    queryFn: () => api.get('/appointments?status=completed,confirmed,scheduled&limit=5').then(r => r.data),
   });
 
   const billsQ = useQuery<{ success: boolean; data: Invoice[] }>({
     queryKey: ['patient-dashboard', 'billing'],
-    queryFn: () => api.get('/billing?limit=5').then(r => r.data),
+    queryFn: () => api.get('/billing?status=unpaid&limit=20').then(r => r.data),
   });
 
   const rxQ = useQuery<{ success: boolean; data: Prescription[] }>({
@@ -73,6 +73,9 @@ export function PatientDashboard() {
   const unpaidBills     = allBills.filter(b => b.status === 'unpaid' || b.status === 'pending');
   const outstandingAmt  = unpaidBills.reduce((sum, b) => sum + (b.totalAmount ?? 0), 0);
 
+  const labResultsQ = labQ;
+  const newLabCount = labResultsQ.data?.data?.filter((l: LabResult) => l.status === 'resulted' || l.status === 'pending').length ?? 0;
+
   const nextAppt = upcomingAppts[0];
   const nextApptLabel = nextAppt?.date
     ? `Next appointment: ${new Date(nextAppt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`
@@ -89,7 +92,7 @@ export function PatientDashboard() {
     })),
     ...upcomingAppts.map(a => ({
       kind: 'appt' as const, _id: a._id,
-      title: 'Upcoming Appointment',
+      title: a.status === 'completed' ? 'Appointment Completed' : 'Upcoming Appointment',
       sub: a.doctor?.userId
         ? `Dr. ${a.doctor.userId.firstName} ${a.doctor.userId.lastName} · ${a.doctor.specialization ?? ''}`
         : a.reason ?? 'Scheduled visit',
@@ -143,7 +146,7 @@ export function PatientDashboard() {
         />
         <KpiCard
           title="Lab Results"          value={labQ.isLoading ? '…' : labResults.length}
-          trend={labResults.length > 0 ? '1 new' : 'Up to date'} trendDir="neutral"
+          trend={newLabCount > 0 ? `${newLabCount} new` : 'Up to date'} trendDir="neutral"
           color="purple" icon="🔬" isLoading={labQ.isLoading}
         />
         <KpiCard
@@ -159,7 +162,7 @@ export function PatientDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
             <h2 className="text-[13px] font-bold text-slate-900">My Appointments</h2>
-            <Link to="/patient/appointments" className="text-[11px] font-semibold text-indigo-600 hover:underline">View all →</Link>
+            <Link to="/patient/appointments/new" className="text-xs font-medium text-indigo-600 hover:text-indigo-800">Book new →</Link>
           </div>
           <div className="px-4 divide-y divide-slate-50">
             {apptQ.isLoading && (
@@ -211,7 +214,7 @@ export function PatientDashboard() {
             <div className="grid grid-cols-2 gap-2">
               {[
                 { icon: '📅', label: 'Book Appt',   sub: 'Schedule visit',   to: '/patient/book-appointment' },
-                { icon: '💊', label: 'Prescriptions', sub: 'View active Rx',  to: '/patient/prescriptions' },
+                { icon: '💊', label: 'Refill Rx',     sub: 'Request refill',  to: '/patient/prescriptions' },
                 { icon: '💰', label: 'Pay Bill',     sub: outstandingAmt > 0 ? `$${outstandingAmt} due` : 'All paid', to: '/patient/billing' },
                 { icon: '📄', label: 'My Records',   sub: 'Documents',        to: '/patient/documents' },
               ].map(({ icon, label, sub, to }) => (
@@ -253,14 +256,16 @@ export function PatientDashboard() {
       </div>
 
       {/* Health Activity Timeline */}
-      {timeline.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
-            <h2 className="text-[13px] font-bold text-slate-900">Recent Health Activity</h2>
-          </div>
-          <div className="px-4 divide-y divide-slate-50">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
+          <h3 className="text-[13px] font-bold text-slate-900">Health Activity Timeline</h3>
+        </div>
+        {timeline.length === 0 ? (
+          <p className="text-sm text-slate-400 py-6 text-center">No recent activity</p>
+        ) : (
+          <div className="divide-y divide-slate-100">
             {timeline.map(event => (
-              <div key={event._id} className="flex items-center gap-3 py-3">
+              <div key={event._id} className="flex items-center gap-3 py-3 px-4">
                 <div className={`w-8 h-8 ${event.iconBg} rounded-xl flex items-center justify-center text-base flex-shrink-0`}>
                   {event.icon}
                 </div>
@@ -272,8 +277,8 @@ export function PatientDashboard() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
