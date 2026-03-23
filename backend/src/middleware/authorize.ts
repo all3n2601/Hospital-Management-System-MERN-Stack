@@ -131,7 +131,7 @@ const MATRIX: PermissionMatrix = {
   prescriptions: {
     admin:         "all",
     doctor:        ["read", "write"],
-    nurse:         ["dispense"],
+    nurse:         ["read", "dispense"],
     receptionist:  false,
     patient:       "own-read",
   },

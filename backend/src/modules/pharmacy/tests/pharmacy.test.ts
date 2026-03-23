@@ -29,7 +29,6 @@ import { User } from '../../../models/User';
 import { Patient } from '../../../models/Patient';
 import { Doctor } from '../../../models/Doctor';
 import { Drug } from '../../../models/Drug';
-import { Prescription } from '../../../models/Prescription';
 
 // Import the mocked socket module so we can check calls
 import { emitToRole } from '../../../socket';
@@ -40,12 +39,10 @@ let adminToken = '';
 let doctorToken = '';
 let nurseToken = '';
 let patientToken = '';
-let secondPatientToken = '';
 
 let patientProfileId = '';
 let secondPatientProfileId = '';
 let doctorProfileId = '';
-let nurseUserId = '';
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
@@ -80,14 +77,13 @@ beforeAll(async () => {
   doctorProfileId = doctorProfile._id.toString();
 
   // Create nurse user
-  const nurseUser = await User.create({
+  await User.create({
     firstName: 'Nurse',
     lastName: 'Jones',
     email: 'nurse@pharmacy.test',
     password: 'NursePass1!',
     role: 'nurse',
   });
-  nurseUserId = nurseUser._id.toString();
 
   // Create first patient user + Patient profile
   const patUser = await User.create({
@@ -132,10 +128,9 @@ beforeAll(async () => {
     .send({ email: 'patient@pharmacy.test', password: 'PatPass1!' });
   patientToken = patLoginRes.body?.data?.accessToken ?? '';
 
-  const secondPatLoginRes = await request(app)
+  await request(app)
     .post('/api/v1/auth/login')
     .send({ email: 'other.patient@pharmacy.test', password: 'OtherPass1!' });
-  secondPatientToken = secondPatLoginRes.body?.data?.accessToken ?? '';
 });
 
 afterAll(async () => {
@@ -619,7 +614,7 @@ describe('Pharmacy Routes', () => {
       .get(`/api/v1/pharmacy/prescriptions/${otherPrescriptionId}`)
       .set('Authorization', `Bearer ${patientToken}`);
 
-    expect([403, 404]).toContain(res.status);
+    expect(res.status).toBe(403);
   });
 
   it('24. GET /api/v1/pharmacy/drugs/:id — get single drug', async () => {

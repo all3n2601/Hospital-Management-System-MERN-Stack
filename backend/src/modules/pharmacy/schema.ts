@@ -57,7 +57,7 @@ export const ListDrugsQuerySchema = z.object({
 
 export const ListPrescriptionsQuerySchema = z.object({
   patientId: z.string().optional(),
-  status: z.string().optional(),
+  status: z.enum(['draft', 'active', 'dispensed', 'cancelled']).optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });

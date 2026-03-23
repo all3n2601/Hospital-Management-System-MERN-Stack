@@ -78,7 +78,7 @@ export async function updateDrug(id: string, input: UpdateDrugInput) {
 // Prescription services
 // ---------------------------------------------------------------------------
 
-export async function createPrescription(input: CreatePrescriptionInput, requestingUserId: string) {
+export async function createPrescription(input: CreatePrescriptionInput) {
   const patient = await Patient.findById(input.patientId);
   if (!patient) throw new NotFoundError('Patient');
 
@@ -130,8 +130,7 @@ export async function listPrescriptions(
   }
 
   if (query.status && requestingRole !== 'nurse') {
-    const statuses = query.status.split(',').map(s => s.trim()).filter(Boolean);
-    filter.status = statuses.length === 1 ? statuses[0] : { $in: statuses };
+    filter.status = query.status;
   }
 
   const [data, total] = await Promise.all([
@@ -173,8 +172,7 @@ export async function getPrescriptionById(
 
 export async function activatePrescription(
   id: string,
-  input: ActivatePrescriptionInput,
-  requestingUserId: string
+  input: ActivatePrescriptionInput
 ) {
   const prescription = await Prescription.findById(id);
   if (!prescription) throw new NotFoundError('Prescription');
@@ -224,22 +222,29 @@ export async function dispensePrescription(
     );
   }
 
-  // Deduct stock for each line item
+  // Deduct stock for each line item atomically
   for (const item of prescription.lineItems) {
-    const drug = await Drug.findById(item.drugId);
-    if (!drug) throw new NotFoundError(`Drug ${item.drugName}`);
-
     const deductQty = item.quantity ?? 1;
-    drug.stockQuantity = Math.max(0, drug.stockQuantity - deductQty);
-    await drug.save();
-
+    const updated = await Drug.findOneAndUpdate(
+      { _id: item.drugId, stockQuantity: { $gte: deductQty } },
+      { $inc: { stockQuantity: -deductQty } },
+      { new: true }
+    );
+    if (!updated) {
+      // Either drug not found or insufficient stock
+      const drug = await Drug.findById(item.drugId);
+      if (!drug) throw new NotFoundError(`Drug ${item.drugId} not found`);
+      throw new ValidationError(
+        `Insufficient stock for '${drug.name}'. Available: ${drug.stockQuantity}, required: ${deductQty}`
+      );
+    }
     // Emit low stock alert if stock drops below or equals reorder level
-    if (drug.stockQuantity <= drug.reorderLevel) {
+    if (updated.stockQuantity <= updated.reorderLevel) {
       emitToRole('admin', 'pharmacy:low-stock', {
-        drugId: drug._id.toString(),
-        drugName: drug.name,
-        currentStock: drug.stockQuantity,
-        reorderLevel: drug.reorderLevel,
+        drugId: updated._id.toString(),
+        drugName: updated.name,
+        currentStock: updated.stockQuantity,
+        reorderLevel: updated.reorderLevel,
       });
     }
   }
@@ -259,8 +264,7 @@ export async function dispensePrescription(
 
 export async function cancelPrescription(
   id: string,
-  input: CancelPrescriptionInput,
-  requestingUserId: string
+  input: CancelPrescriptionInput
 ) {
   const prescription = await Prescription.findById(id);
   if (!prescription) throw new NotFoundError('Prescription');

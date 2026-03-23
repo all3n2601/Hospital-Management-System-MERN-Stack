@@ -88,7 +88,7 @@ export async function createPrescription(req: Request, res: Response, next: Next
     if (!req.user) return next(new AuthError());
     const parsed = CreatePrescriptionSchema.safeParse(req.body);
     if (!parsed.success) return next(parseZodError(parsed.error));
-    const prescription = await PharmacyService.createPrescription(parsed.data, req.user._id);
+    const prescription = await PharmacyService.createPrescription(parsed.data);
     res.status(201).json(successResponse(prescription));
   } catch (err) {
     next(err);
@@ -140,8 +140,7 @@ export async function activatePrescription(req: Request, res: Response, next: Ne
     if (!parsed.success) return next(parseZodError(parsed.error));
     const prescription = await PharmacyService.activatePrescription(
       req.params.id,
-      parsed.data,
-      req.user._id
+      parsed.data
     );
     res.json(successResponse(prescription));
   } catch (err) {
@@ -172,8 +171,7 @@ export async function cancelPrescription(req: Request, res: Response, next: Next
     if (!parsed.success) return next(parseZodError(parsed.error));
     const prescription = await PharmacyService.cancelPrescription(
       req.params.id,
-      parsed.data,
-      req.user._id
+      parsed.data
     );
     res.json(successResponse(prescription));
   } catch (err) {
