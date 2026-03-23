@@ -37,6 +37,8 @@ import { NurseInventoryView } from '@/pages/nurse/InventoryView';
 import { AdminDocumentManagement } from '@/pages/admin/DocumentManagement';
 import { DoctorDocuments } from '@/pages/doctor/Documents';
 import { PatientDocuments } from '@/pages/patient/Documents';
+import { AdminAnalytics } from '@/pages/admin/Analytics';
+import { AdminSettings } from '@/pages/admin/Settings';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -104,6 +106,8 @@ export default function App() {
                       <Route path="inventory" element={<AdminInventoryManagement />} />
                       <Route path="documents" element={<AdminDocumentManagement />} />
                       <Route path="documents/:id" element={<AdminDocumentManagement />} />
+                      <Route path="analytics" element={<AdminAnalytics />} />
+                      <Route path="settings" element={<AdminSettings />} />
                     </Routes>
                   </ProtectedRoute>
                 }
