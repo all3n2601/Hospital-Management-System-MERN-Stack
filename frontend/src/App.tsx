@@ -13,6 +13,8 @@ import { SignUp } from '@/pages/public/SignUp';
 import { Unauthorized } from '@/pages/public/Unauthorized';
 import { NotFound } from '@/pages/public/NotFound';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
+import { AdminPatients } from '@/pages/admin/Patients';
+import { AdminStaff } from '@/pages/admin/Staff';
 import { DoctorDashboard } from '@/pages/doctor/Dashboard';
 import { NurseDashboard } from '@/pages/nurse/Dashboard';
 import { PatientDashboard } from '@/pages/patient/Dashboard';
@@ -66,6 +68,8 @@ export default function App() {
                   <ProtectedRoute allowedRoles={['admin', 'receptionist']}>
                     <Routes>
                       <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="patients" element={<AdminPatients />} />
+                      <Route path="staff" element={<AdminStaff />} />
                     </Routes>
                   </ProtectedRoute>
                 }
