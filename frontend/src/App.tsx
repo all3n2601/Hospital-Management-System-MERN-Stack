@@ -21,6 +21,8 @@ import { NurseDashboard } from '@/pages/nurse/Dashboard';
 import { PatientDashboard } from '@/pages/patient/Dashboard';
 import { BookAppointment } from '@/pages/patient/BookAppointment';
 import { PatientAppointments } from '@/pages/patient/Appointments';
+import { PatientBilling } from '@/pages/patient/Billing';
+import { PatientInvoiceDetail } from '@/pages/patient/InvoiceDetail';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -109,6 +111,8 @@ export default function App() {
                       <Route path="dashboard" element={<PatientDashboard />} />
                       <Route path="book-appointment" element={<BookAppointment />} />
                       <Route path="appointments" element={<PatientAppointments />} />
+                      <Route path="billing" element={<PatientBilling />} />
+                      <Route path="billing/:id" element={<PatientInvoiceDetail />} />
                     </Routes>
                   </ProtectedRoute>
                 }
