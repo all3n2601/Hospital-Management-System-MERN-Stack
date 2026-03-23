@@ -58,7 +58,7 @@ export async function listDocuments(req: Request, res: Response, next: NextFunct
 export async function getDocumentById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const doc = await DocumentService.getDocumentById(req.params.id, req.user._id, req.ownOnly);
+    const doc = await DocumentService.getDocumentById(req.params.id, req.user._id, req.user.role, req.ownOnly);
     res.json(successResponse(doc));
   } catch (err) {
     next(err);

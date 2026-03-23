@@ -407,7 +407,7 @@ describe('Documents Routes', () => {
       .get(`/api/v1/documents/${docId}`)
       .set('Authorization', `Bearer ${patientToken}`);
 
-    expect([403, 404]).toContain(res.status);
+    expect(res.status).toBe(403);
   });
 
   it('17. POST /api/v1/documents/:id/issue — admin issues document → 200', async () => {
@@ -421,6 +421,20 @@ describe('Documents Routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.status).toBe('issued');
+  });
+
+  it('19. GET /api/v1/documents/:id — Doctor A cannot access Doctor B\'s document → 403', async () => {
+    // Doctor 2 creates a document
+    const createRes = await createDraftDocument(doctorToken2, patientProfileId2, doctorProfileId2);
+    expect(createRes.status).toBe(201);
+    const docId = createRes.body.data._id;
+
+    // Doctor 1 tries to access Doctor 2's document
+    const res = await request(app)
+      .get(`/api/v1/documents/${docId}`)
+      .set('Authorization', `Bearer ${doctorToken}`);
+
+    expect(res.status).toBe(403);
   });
 
   it('18. POST /api/v1/documents/:id/void — doctor cannot void another doctor\'s document → 403', async () => {

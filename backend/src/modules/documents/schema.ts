@@ -21,6 +21,6 @@ export const ListDocumentsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
   patientId: z.string().optional(),
-  type: z.string().optional(),
-  status: z.string().optional(),
+  type: z.enum(['medical_certificate', 'discharge_summary', 'referral', 'lab_report']).optional(),
+  status: z.enum(['draft', 'issued', 'void']).optional(),
 });

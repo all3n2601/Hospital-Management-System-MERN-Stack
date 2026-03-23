@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { z } from 'zod';
+import { logger } from '../../middleware/requestLogger';
 import { Document } from '../../models/Document';
 import { Patient } from '../../models/Patient';
 import { Doctor } from '../../models/Doctor';
@@ -108,6 +109,7 @@ export async function listDocuments(
 export async function getDocumentById(
   documentId: string,
   requestingUserId: string,
+  requestingRole?: string,
   ownOnly?: boolean
 ) {
   const doc = await Document.findById(documentId)
@@ -126,6 +128,18 @@ export async function getDocumentById(
 
     if (!patientUserId || patientUserId !== requestingUserId) {
       throw new ForbiddenError('You can only view your own documents');
+    }
+  } else if (requestingRole === 'doctor') {
+    // Doctor: can only access documents they issued
+    const doctorProfile = await Doctor.findOne({ userId: requestingUserId });
+    // issuedBy may be populated (full Doctor object) or a raw ObjectId — extract _id either way
+    const issuedByRaw = doc.issuedBy as unknown as { _id?: Types.ObjectId } | Types.ObjectId;
+    const issuedById =
+      issuedByRaw && typeof issuedByRaw === 'object' && '_id' in issuedByRaw && issuedByRaw._id
+        ? issuedByRaw._id.toString()
+        : (issuedByRaw as Types.ObjectId).toString();
+    if (!doctorProfile || doctorProfile._id.toString() !== issuedById) {
+      throw new ForbiddenError('Doctors can only view their own documents');
     }
   }
 
@@ -158,14 +172,14 @@ export async function issueDocument(
     doc.notes = input.notes;
   }
 
+  // Generate PDF first — if this throws, the document remains in draft (no inconsistent state)
+  const pdfBuffer = await generateDocumentPdf(doc);
+
   doc.status = 'issued';
   doc.issuedAt = new Date();
   doc.pdfUrl = `documents/${doc.documentId}.pdf`;
 
   await doc.save();
-
-  // Generate PDF
-  const pdfBuffer = await generateDocumentPdf(doc);
 
   // Send email to patient
   try {
@@ -177,8 +191,8 @@ export async function issueDocument(
         await sendDocumentEmail(patientUser.email, doc.type, patientName, pdfBuffer);
       }
     }
-  } catch {
-    // Non-fatal: email errors should not block the response
+  } catch (emailErr) {
+    logger.warn('Email delivery failed for document %s: %o', doc.documentId, emailErr);
   }
 
   return doc;

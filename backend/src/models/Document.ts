@@ -23,7 +23,7 @@ export interface IDocument {
 
 const DocumentSchema = new Schema<IDocument>(
   {
-    documentId: { type: String, unique: true, index: true },
+    documentId: { type: String, unique: true, index: true, required: true },
     type: {
       type: String,
       enum: ['medical_certificate', 'discharge_summary', 'referral', 'lab_report'],
@@ -48,8 +48,8 @@ const DocumentSchema = new Schema<IDocument>(
   { timestamps: true }
 );
 
-// Auto-generate documentId before save
-DocumentSchema.pre('save', async function (next) {
+// Auto-generate documentId before validation so `required: true` is satisfied
+DocumentSchema.pre('validate', async function (next) {
   if (!this.documentId) {
     const count = await (this.constructor as typeof Document).countDocuments();
     this.documentId = `DOC-${String(count + 1).padStart(4, '0')}`;
