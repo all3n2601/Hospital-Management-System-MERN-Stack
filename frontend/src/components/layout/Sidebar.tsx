@@ -19,7 +19,8 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'doctor', 'nurse', 'receptionist', 'patient'] },
   { label: 'Patients', href: '/admin/patients', icon: Users, roles: ['admin', 'doctor', 'nurse', 'receptionist'] },
-  { label: 'Appointments', href: '/appointments', icon: Calendar, roles: ['admin', 'doctor', 'receptionist', 'patient'] },
+  { label: 'Appointments', href: '/patient/appointments', icon: Calendar, roles: ['patient'] },
+  { label: 'Schedule',     href: '/doctor/schedule',      icon: Calendar, roles: ['doctor'] },
   { label: 'Billing', href: '/admin/billing', icon: FileText, roles: ['admin', 'receptionist'] },
   { label: 'My Bills', href: '/patient/billing', icon: FileText, roles: ['patient'] },
   { label: 'Lab Orders', href: '/doctor/lab', icon: FlaskConical, roles: ['doctor'] },
