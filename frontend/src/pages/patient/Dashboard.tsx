@@ -70,11 +70,14 @@ export function PatientDashboard() {
   const activePrescriptions = rxQ.data?.data ?? [];
   const labResults      = labQ.data?.data ?? [];
 
-  const unpaidBills     = allBills.filter(b => b.status === 'unpaid' || b.status === 'pending');
+  const unpaidBills     = allBills.filter((b: Invoice) => b.status === 'unpaid');
   const outstandingAmt  = unpaidBills.reduce((sum, b) => sum + (b.totalAmount ?? 0), 0);
 
-  const labResultsQ = labQ;
-  const newLabCount = labResultsQ.data?.data?.filter((l: LabResult) => l.status === 'resulted' || l.status === 'pending').length ?? 0;
+  const newLabCount = labQ.data?.data?.filter((l: LabResult) => l.status === 'resulted' || l.status === 'pending').length ?? 0;
+
+  const upcomingCount = upcomingAppts.filter(
+    (a: Appointment) => a.status !== 'completed' && a.status !== 'cancelled'
+  ).length;
 
   const nextAppt = upcomingAppts[0];
   const nextApptLabel = nextAppt?.date
@@ -136,7 +139,7 @@ export function PatientDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="Upcoming Appointments" value={apptQ.isLoading ? '…' : upcomingAppts.length}
+          title="Upcoming Appointments" value={apptQ.isLoading ? '…' : upcomingCount}
           trend={nextAppt?.date ? `Next: ${new Date(nextAppt.date).toLocaleDateString('en-US', { weekday: 'short' })}` : 'None'}
           trendDir="neutral" color="blue" icon="📅" isLoading={apptQ.isLoading}
         />
@@ -215,7 +218,7 @@ export function PatientDashboard() {
               {[
                 { icon: '📅', label: 'Book Appt',   sub: 'Schedule visit',   to: '/patient/book-appointment' },
                 { icon: '💊', label: 'Refill Rx',     sub: 'Request refill',  to: '/patient/prescriptions' },
-                { icon: '💰', label: 'Pay Bill',     sub: outstandingAmt > 0 ? `$${outstandingAmt} due` : 'All paid', to: '/patient/billing' },
+                { icon: '💰', label: 'Pay Bill',     sub: outstandingAmt > 0 ? `$${outstandingAmt.toLocaleString()} due` : 'No balance due', to: '/patient/billing' },
                 { icon: '📄', label: 'My Records',   sub: 'Documents',        to: '/patient/documents' },
               ].map(({ icon, label, sub, to }) => (
                 <Link
@@ -265,7 +268,7 @@ export function PatientDashboard() {
         ) : (
           <div className="divide-y divide-slate-100">
             {timeline.map(event => (
-              <div key={event._id} className="flex items-center gap-3 py-3 px-4">
+              <div key={`${event.kind}-${event._id}`} className="flex items-center gap-3 py-3 px-4">
                 <div className={`w-8 h-8 ${event.iconBg} rounded-xl flex items-center justify-center text-base flex-shrink-0`}>
                   {event.icon}
                 </div>
