@@ -192,8 +192,10 @@ export function AdminInventoryManagement() {
   };
 
   const handleAdjustSubmit = () => {
-    if (adjustQuantity === '' || isNaN(Number(adjustQuantity)) || Number(adjustQuantity) <= 0) {
-      toast.error('Valid quantity is required');
+    const qty = Number(adjustQuantity);
+    const isAbsolute = adjustType === 'adjustment';
+    if (adjustQuantity === '' || isNaN(qty) || qty < 0 || (!isAbsolute && qty < 1)) {
+      toast.error(isAbsolute ? 'Quantity must be 0 or more' : 'Quantity must be at least 1');
       return;
     }
     adjustStockMutation.mutate();

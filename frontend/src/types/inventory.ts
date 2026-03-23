@@ -23,6 +23,6 @@ export interface StockMovement {
   previousQuantity: number;
   newQuantity: number;
   reason?: string;
-  performedBy: { _id: string; firstName: string; lastName: string };
+  performedBy: { _id: string; firstName: string; lastName: string } | null;
   createdAt: string;
 }
