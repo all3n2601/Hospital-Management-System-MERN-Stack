@@ -4,7 +4,7 @@ import { Doctor } from '../../models/Doctor';
 import { Nurse } from '../../models/Nurse';
 import { Receptionist } from '../../models/Receptionist';
 import { Department } from '../../models/Department';
-import { ConflictError, NotFoundError, ValidationError } from '../../middleware/errorHandler';
+import { AppError, ConflictError, NotFoundError, ValidationError } from '../../middleware/errorHandler';
 import { z } from 'zod';
 import { CreateStaffSchema, UpdateStaffSchema, CreateDepartmentSchema, UpdateDepartmentSchema } from './schema';
 
@@ -77,17 +77,28 @@ export async function createStaffMember(input: CreateStaffInput) {
   return { user, profile };
 }
 
-export async function getStaffMember(staffId: string, role: string) {
-  let profile;
-  if (role === 'doctor') {
-    profile = await Doctor.findById(staffId).populate('department').populate('userId');
-  } else if (role === 'nurse') {
-    profile = await Nurse.findById(staffId).populate('department').populate('userId');
-  } else if (role === 'receptionist') {
-    profile = await Receptionist.findById(staffId).populate('department').populate('userId');
+function getModelForRole(role: string) {
+  if (role === 'doctor') return Doctor;
+  if (role === 'nurse') return Nurse;
+  if (role === 'receptionist') return Receptionist;
+  throw new AppError(400, 'INVALID_ROLE', `Unknown staff role: ${role}`);
+}
+
+export async function getStaffMember(userId: string) {
+  const user = await User.findById(userId).select('-password').lean();
+  if (!user) throw new NotFoundError('Staff member');
+
+  // Find profile based on role
+  let profile = null;
+  if (user.role === 'doctor') {
+    profile = await Doctor.findOne({ userId }).populate('department').lean();
+  } else if (user.role === 'nurse') {
+    profile = await Nurse.findOne({ userId }).populate('department').lean();
+  } else if (user.role === 'receptionist') {
+    profile = await Receptionist.findOne({ userId }).populate('department').lean();
   }
-  if (!profile) throw new NotFoundError('Staff member');
-  return profile;
+
+  return { user, profile };
 }
 
 export async function listStaff(filters: {
@@ -97,60 +108,40 @@ export async function listStaff(filters: {
   page?: number;
   limit?: number;
 }) {
-  const page = filters.page ?? 1;
-  const limit = filters.limit ?? 20;
+  const { role, department, isActive = true, page = 1, limit = 20 } = filters;
   const skip = (page - 1) * limit;
 
-  // Determine which models to query
-  const roles = filters.role
-    ? [filters.role]
-    : ['doctor', 'nurse', 'receptionist'];
+  // Build profile filter
+  const profileFilter: Record<string, unknown> = { isActive };
+  if (department) profileFilter.department = new Types.ObjectId(department);
 
-  const profileFilter: Record<string, unknown> = {};
-  if (filters.isActive !== undefined) profileFilter.isActive = filters.isActive;
-  if (filters.department) profileFilter.department = new Types.ObjectId(filters.department);
-
-  const results: {
-    role: string;
-    profile: unknown;
-  }[] = [];
-
-  for (const role of roles) {
-    let Model: typeof Doctor | typeof Nurse | typeof Receptionist;
-    if (role === 'doctor') Model = Doctor;
-    else if (role === 'nurse') Model = Nurse;
-    else Model = Receptionist;
-
-    const docs = await (Model as typeof Doctor)
-      .find(profileFilter)
-      .populate('userId', '-password -failedLoginAttempts -lockedUntil')
-      .populate('department')
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    for (const doc of docs) {
-      results.push({ role, profile: doc });
-    }
+  if (role) {
+    // Single-role query — straightforward
+    const Model = getModelForRole(role) as typeof Doctor;
+    const [data, total] = await Promise.all([
+      Model.find(profileFilter)
+        .populate('userId', '-password')
+        .populate('department')
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Model.countDocuments(profileFilter),
+    ]);
+    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  // Get total count
-  let total = 0;
-  for (const role of roles) {
-    let Model: typeof Doctor | typeof Nurse | typeof Receptionist;
-    if (role === 'doctor') Model = Doctor;
-    else if (role === 'nurse') Model = Nurse;
-    else Model = Receptionist;
-    total += await (Model as typeof Doctor).countDocuments(profileFilter);
-  }
+  // Multi-role: fetch all, combine, then slice
+  const [doctors, nurses, receptionists] = await Promise.all([
+    Doctor.find(profileFilter).populate('userId', '-password').populate('department').lean(),
+    Nurse.find(profileFilter).populate('userId', '-password').populate('department').lean(),
+    Receptionist.find(profileFilter).populate('userId', '-password').populate('department').lean(),
+  ]);
 
-  return {
-    data: results,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-  };
+  const all = [...doctors, ...nurses, ...receptionists];
+  const total = all.length;
+  const data = all.slice(skip, skip + limit);
+
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 }
 
 export async function updateStaffMember(userId: string, input: UpdateStaffInput) {

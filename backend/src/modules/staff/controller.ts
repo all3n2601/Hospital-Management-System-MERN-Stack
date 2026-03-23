@@ -58,10 +58,7 @@ export async function createStaff(req: Request, res: Response, next: NextFunctio
 export async function getStaff(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
-    const { role } = req.query as { role?: string };
-    if (!role) return next(new ValidationError('role query parameter is required'));
-
-    const profile = await StaffService.getStaffMember(id, role);
+    const profile = await StaffService.getStaffMember(id);
     res.json(successResponse(profile));
   } catch (err) {
     next(err);
@@ -124,7 +121,7 @@ export async function getAvailableDoctors(req: Request, res: Response, next: Nex
 export async function getDoctorProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
-    const profile = await StaffService.getStaffMember(id, 'doctor');
+    const profile = await StaffService.getStaffMember(id);
     res.json(successResponse(profile));
   } catch (err) {
     next(err);

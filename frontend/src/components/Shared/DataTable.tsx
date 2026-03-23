@@ -23,16 +23,18 @@ interface DataTableProps<T> {
   emptyMessage?: string;
 }
 
-function getCellValue<T>(row: T, accessorKey: keyof T | string): React.ReactNode {
-  const keys = (accessorKey as string).split('.');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let value: any = row;
-  for (const key of keys) {
-    if (value == null) return '';
-    value = value[key];
+function getCellValue<T>(row: T, key: string): unknown {
+  const parts = key.split('.');
+  let value: unknown = row;
+  for (const part of parts) {
+    if (value !== null && value !== undefined && typeof value === 'object') {
+      value = (value as Record<string, unknown>)[part];
+    } else {
+      value = undefined;
+      break;
+    }
   }
-  if (value == null) return '';
-  return String(value);
+  return value;
 }
 
 export function DataTable<T>({ data, columns, isLoading = false, emptyMessage }: DataTableProps<T>) {
@@ -59,7 +61,7 @@ export function DataTable<T>({ data, columns, isLoading = false, emptyMessage }:
             <TableRow key={rowIdx}>
               {columns.map((col) => (
                 <TableCell key={String(col.accessorKey)}>
-                  {col.cell ? col.cell(row) : getCellValue(row, col.accessorKey)}
+                  {col.cell ? col.cell(row) : String(getCellValue(row, String(col.accessorKey)) ?? '')}
                 </TableCell>
               ))}
             </TableRow>

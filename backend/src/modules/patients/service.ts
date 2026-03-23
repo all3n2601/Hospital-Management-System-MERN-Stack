@@ -66,38 +66,32 @@ export async function createPatient(input: CreatePatientInput) {
   return { user, patient };
 }
 
-export async function listPatients(filters: { page?: number; limit?: number; search?: string }) {
-  const page = filters.page ?? 1;
-  const limit = filters.limit ?? 20;
+export async function listPatients(filters: { search?: string; page?: number; limit?: number }) {
+  const { search, page = 1, limit = 20 } = filters;
   const skip = (page - 1) * limit;
 
-  let userFilter: Record<string, unknown> = { role: 'patient' };
-  if (filters.search) {
-    const regex = new RegExp(filters.search, 'i');
-    userFilter = {
-      role: 'patient',
-      $or: [{ firstName: regex }, { lastName: regex }, { email: regex }],
-    };
+  const query: Record<string, unknown> = {};
+
+  if (search) {
+    // Find matching User IDs first (bounded by search, not unbounded)
+    const matchingUsers = await User.find({
+      $or: [
+        { firstName: new RegExp(search, 'i') },
+        { lastName: new RegExp(search, 'i') },
+        { email: new RegExp(search, 'i') },
+      ],
+    }).select('_id').limit(100).lean();
+
+    const userIds = matchingUsers.map(u => u._id);
+    query.userId = { $in: userIds };
   }
 
-  const users = await User.find(userFilter).select('-password -failedLoginAttempts -lockedUntil').lean();
-  const userIds = users.map((u) => u._id);
+  const [data, total] = await Promise.all([
+    Patient.find(query).populate('userId', '-password').skip(skip).limit(limit).lean(),
+    Patient.countDocuments(query),
+  ]);
 
-  const patients = await Patient.find({ userId: { $in: userIds } })
-    .populate('userId', '-password -failedLoginAttempts -lockedUntil')
-    .skip(skip)
-    .limit(limit)
-    .lean();
-
-  const total = await Patient.countDocuments({ userId: { $in: userIds } });
-
-  return {
-    data: patients,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-  };
+  return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 }
 
 export async function getPatient(patientProfileId: string, requestingUserId: string, requestingRole: string) {
