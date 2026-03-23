@@ -236,6 +236,19 @@ async function migrateDoctors(
 
     result.doctorsMigrated++;
   }
+
+  // Remove password and role fields from all doctor documents
+  if (!dryRun) {
+    await Doctor.updateMany(
+      {},
+      { $unset: { password: "", role: "" } },
+      { session }
+    );
+  } else {
+    console.log(
+      `[DRY-RUN] Would remove password/role fields from ${result.doctorsMigrated} doctor documents`
+    );
+  }
 }
 
 async function migrateNurses(
@@ -306,6 +319,19 @@ async function migrateNurses(
     }
 
     result.nursesMigrated++;
+  }
+
+  // Remove password and role fields from all nurse documents
+  if (!dryRun) {
+    await Nurse.updateMany(
+      {},
+      { $unset: { password: "", role: "" } },
+      { session }
+    );
+  } else {
+    console.log(
+      `[DRY-RUN] Would remove password/role fields from ${result.nursesMigrated} nurse documents`
+    );
   }
 }
 
