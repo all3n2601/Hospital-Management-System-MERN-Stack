@@ -1,4 +1,6 @@
 
 node_modules
 .env
-config
+dist
+# Legacy config package files (not src/config/)
+/config
