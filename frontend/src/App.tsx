@@ -15,6 +15,7 @@ import { NotFound } from '@/pages/public/NotFound';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminPatients } from '@/pages/admin/Patients';
 import { AdminStaff } from '@/pages/admin/Staff';
+import { AdminBilling } from '@/pages/admin/Billing';
 import { DoctorDashboard } from '@/pages/doctor/Dashboard';
 import { DoctorSchedule } from '@/pages/doctor/Schedule';
 import { NurseDashboard } from '@/pages/nurse/Dashboard';
@@ -75,6 +76,8 @@ export default function App() {
                       <Route path="dashboard" element={<AdminDashboard />} />
                       <Route path="patients" element={<AdminPatients />} />
                       <Route path="staff" element={<AdminStaff />} />
+                      <Route path="billing" element={<AdminBilling />} />
+                      <Route path="billing/:id" element={<AdminBilling />} />
                     </Routes>
                   </ProtectedRoute>
                 }
