@@ -28,6 +28,10 @@ import { PatientLabResults } from '@/pages/patient/LabResults';
 import { PatientLabResultDetail } from '@/pages/patient/LabResultDetail';
 import { DoctorLabOrders } from '@/pages/doctor/LabOrders';
 import { AdminLabManagement } from '@/pages/admin/LabManagement';
+import { DoctorPrescriptions } from '@/pages/doctor/Prescriptions';
+import { NurseDispensingQueue } from '@/pages/nurse/DispensingQueue';
+import { PatientPrescriptions } from '@/pages/patient/Prescriptions';
+import { AdminPharmacyManagement } from '@/pages/admin/PharmacyManagement';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -90,6 +94,8 @@ export default function App() {
                       <Route path="billing/:id" element={<AdminBilling />} />
                       <Route path="lab" element={<AdminLabManagement />} />
                       <Route path="lab/:id" element={<AdminLabManagement />} />
+                      <Route path="pharmacy" element={<AdminPharmacyManagement />} />
+                      <Route path="pharmacy/:id" element={<AdminPharmacyManagement />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -103,6 +109,7 @@ export default function App() {
                       <Route path="dashboard" element={<DoctorDashboard />} />
                       <Route path="schedule" element={<DoctorSchedule />} />
                       <Route path="lab" element={<DoctorLabOrders />} />
+                      <Route path="prescriptions" element={<DoctorPrescriptions />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -114,6 +121,7 @@ export default function App() {
                   <ProtectedRoute allowedRoles={['nurse']}>
                     <Routes>
                       <Route path="dashboard" element={<NurseDashboard />} />
+                      <Route path="dispensing" element={<NurseDispensingQueue />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -131,6 +139,7 @@ export default function App() {
                       <Route path="billing/:id" element={<PatientInvoiceDetail />} />
                       <Route path="lab" element={<PatientLabResults />} />
                       <Route path="lab/:id" element={<PatientLabResultDetail />} />
+                      <Route path="prescriptions" element={<PatientPrescriptions />} />
                     </Routes>
                   </ProtectedRoute>
                 }
