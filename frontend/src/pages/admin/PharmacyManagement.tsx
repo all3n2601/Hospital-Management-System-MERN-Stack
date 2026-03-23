@@ -202,15 +202,15 @@ export function AdminPharmacyManagement() {
     },
     {
       header: 'Patient',
-      accessorKey: 'patient',
+      accessorKey: 'patientId',
       cell: (row) =>
-        `${row.patient?.userId?.firstName ?? ''} ${row.patient?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.patientId?.userId?.firstName ?? ''} ${row.patientId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Doctor',
-      accessorKey: 'doctor',
+      accessorKey: 'doctorId',
       cell: (row) =>
-        `${row.doctor?.userId?.firstName ?? ''} ${row.doctor?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.doctorId?.userId?.firstName ?? ''} ${row.doctorId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Date',
@@ -413,11 +413,11 @@ export function AdminPharmacyManagement() {
                       <span>Date: {new Date(detailPrescription.createdAt).toLocaleDateString()}</span>
                       <span>
                         Patient:{' '}
-                        {`${detailPrescription.patient?.userId?.firstName ?? ''} ${detailPrescription.patient?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.patientId?.userId?.firstName ?? ''} ${detailPrescription.patientId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                       <span>
                         Doctor:{' '}
-                        {`${detailPrescription.doctor?.userId?.firstName ?? ''} ${detailPrescription.doctor?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.doctorId?.userId?.firstName ?? ''} ${detailPrescription.doctorId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                     </div>
                   </div>

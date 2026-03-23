@@ -23,8 +23,8 @@ export interface PrescriptionLineItem {
 export interface Prescription {
   _id: string;
   prescriptionId: string;
-  patient: { _id: string; userId?: { firstName: string; lastName: string; email: string } };
-  doctor: { _id: string; userId?: { firstName: string; lastName: string } };
+  patientId: { _id: string; userId?: { firstName: string; lastName: string; email: string } };
+  doctorId: { _id: string; userId?: { firstName: string; lastName: string } };
   appointmentId?: string;
   lineItems: PrescriptionLineItem[];
   status: PrescriptionStatus;

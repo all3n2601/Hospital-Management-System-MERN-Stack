@@ -55,6 +55,10 @@ export function NurseDispensingQueue() {
     },
   });
 
+  const handleDispense = (id: string) => {
+    dispenseMutation.mutate(id);
+  };
+
   const columns: ColumnDef<Prescription>[] = [
     {
       header: 'Prescription ID',
@@ -62,15 +66,15 @@ export function NurseDispensingQueue() {
     },
     {
       header: 'Patient',
-      accessorKey: 'patient',
+      accessorKey: 'patientId',
       cell: (row) =>
-        `${row.patient?.userId?.firstName ?? ''} ${row.patient?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.patientId?.userId?.firstName ?? ''} ${row.patientId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Doctor',
-      accessorKey: 'doctor',
+      accessorKey: 'doctorId',
       cell: (row) =>
-        `${row.doctor?.userId?.firstName ?? ''} ${row.doctor?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.doctorId?.userId?.firstName ?? ''} ${row.doctorId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Date',
@@ -97,8 +101,8 @@ export function NurseDispensingQueue() {
           </Button>
           <Button
             size="sm"
-            onClick={() => dispenseMutation.mutate(row._id)}
-            disabled={dispenseMutation.isPending}
+            onClick={() => handleDispense(row._id)}
+            disabled={row.status !== 'active' || dispenseMutation.isPending}
           >
             Dispense
           </Button>
@@ -157,11 +161,11 @@ export function NurseDispensingQueue() {
                       <span>Date: {new Date(detailPrescription.createdAt).toLocaleDateString()}</span>
                       <span>
                         Patient:{' '}
-                        {`${detailPrescription.patient?.userId?.firstName ?? ''} ${detailPrescription.patient?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.patientId?.userId?.firstName ?? ''} ${detailPrescription.patientId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                       <span>
                         Doctor:{' '}
-                        {`${detailPrescription.doctor?.userId?.firstName ?? ''} ${detailPrescription.doctor?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.doctorId?.userId?.firstName ?? ''} ${detailPrescription.doctorId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                     </div>
                   </div>

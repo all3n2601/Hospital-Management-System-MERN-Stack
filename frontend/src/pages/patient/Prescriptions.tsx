@@ -42,9 +42,9 @@ export function PatientPrescriptions() {
     },
     {
       header: 'Doctor',
-      accessorKey: 'doctor',
+      accessorKey: 'doctorId',
       cell: (row) =>
-        `${row.doctor?.userId?.firstName ?? ''} ${row.doctor?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.doctorId?.userId?.firstName ?? ''} ${row.doctorId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Date',
@@ -122,7 +122,7 @@ export function PatientPrescriptions() {
                       <span>Date: {new Date(detailPrescription.createdAt).toLocaleDateString()}</span>
                       <span>
                         Doctor:{' '}
-                        {`${detailPrescription.doctor?.userId?.firstName ?? ''} ${detailPrescription.doctor?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.doctorId?.userId?.firstName ?? ''} ${detailPrescription.doctorId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                     </div>
                   </div>

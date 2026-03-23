@@ -28,6 +28,7 @@ const STATUS_TABS: { value: StatusFilter; label: string }[] = [
 ];
 
 interface LineItemInput {
+  drugId: string;
   drugName: string;
   dosage: string;
   frequency: string;
@@ -36,6 +37,7 @@ interface LineItemInput {
 }
 
 const emptyLineItem = (): LineItemInput => ({
+  drugId: '',
   drugName: '',
   dosage: '',
   frequency: '',
@@ -52,6 +54,8 @@ export function DoctorPrescriptions() {
 
   // Create form state
   const [patientId, setPatientId] = useState('');
+  // doctorProfileId: Doctor profile _id (not User _id). Temporary input until auto-detection is implemented.
+  const [doctorProfileId, setDoctorProfileId] = useState('');
   const [lineItems, setLineItems] = useState<LineItemInput[]>([emptyLineItem()]);
   const [notes, setNotes] = useState('');
 
@@ -86,6 +90,7 @@ export function DoctorPrescriptions() {
 
   const resetCreateForm = () => {
     setPatientId('');
+    setDoctorProfileId('');
     setLineItems([emptyLineItem()]);
     setNotes('');
   };
@@ -94,7 +99,9 @@ export function DoctorPrescriptions() {
     mutationFn: async () => {
       const body = {
         patientId: patientId.trim(),
+        doctorId: doctorProfileId.trim(),
         lineItems: lineItems.map((item) => ({
+          drugId: item.drugId.trim(),
           drugName: item.drugName.trim(),
           dosage: item.dosage.trim(),
           frequency: item.frequency.trim(),
@@ -161,15 +168,19 @@ export function DoctorPrescriptions() {
       toast.error('Patient ID is required');
       return;
     }
+    if (!doctorProfileId.trim()) {
+      toast.error('Doctor Profile ID is required');
+      return;
+    }
     if (lineItems.length === 0) {
       toast.error('At least one line item is required');
       return;
     }
     const invalid = lineItems.some(
-      (item) => !item.drugName.trim() || !item.dosage.trim() || !item.frequency.trim() || !item.duration.trim()
+      (item) => !item.drugId.trim() || !item.drugName.trim() || !item.dosage.trim() || !item.frequency.trim() || !item.duration.trim()
     );
     if (invalid) {
-      toast.error('All line items must have drug name, dosage, frequency, and duration');
+      toast.error('All line items must have drug ID, drug name, dosage, frequency, and duration');
       return;
     }
     createMutation.mutate();
@@ -182,9 +193,9 @@ export function DoctorPrescriptions() {
     },
     {
       header: 'Patient',
-      accessorKey: 'patient',
+      accessorKey: 'patientId',
       cell: (row) =>
-        `${row.patient?.userId?.firstName ?? ''} ${row.patient?.userId?.lastName ?? ''}`.trim() || '—',
+        `${row.patientId?.userId?.firstName ?? ''} ${row.patientId?.userId?.lastName ?? ''}`.trim() || '—',
     },
     {
       header: 'Date',
@@ -277,6 +288,18 @@ export function DoctorPrescriptions() {
               />
             </div>
 
+            <div>
+              <Label htmlFor="doctorProfileId">Doctor Profile ID</Label>
+              <Input
+                id="doctorProfileId"
+                placeholder="Doctor Profile _id"
+                value={doctorProfileId}
+                onChange={(e) => setDoctorProfileId(e.target.value)}
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">(temporary until auto-detection)</p>
+            </div>
+
             {/* Line Items */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -302,6 +325,15 @@ export function DoctorPrescriptions() {
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-xs">Drug ID</Label>
+                        <Input
+                          placeholder="Drug _id"
+                          value={item.drugId}
+                          onChange={(e) => updateLineItem(i, 'drugId', e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
                       <div>
                         <Label className="text-xs">Drug Name</Label>
                         <Input
@@ -405,7 +437,7 @@ export function DoctorPrescriptions() {
                       <span>Date: {new Date(detailPrescription.createdAt).toLocaleDateString()}</span>
                       <span>
                         Patient:{' '}
-                        {`${detailPrescription.patient?.userId?.firstName ?? ''} ${detailPrescription.patient?.userId?.lastName ?? ''}`.trim() || '—'}
+                        {`${detailPrescription.patientId?.userId?.firstName ?? ''} ${detailPrescription.patientId?.userId?.lastName ?? ''}`.trim() || '—'}
                       </span>
                     </div>
                   </div>
