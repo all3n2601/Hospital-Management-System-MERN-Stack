@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils';
 
 // Minimal types for dashboard queries
 interface Patient { _id: string; }
-interface StaffMember { _id: string; onDuty?: boolean; }
 interface LabOrder {
   _id: string; orderId?: string; testName?: string;
   status?: string; priority?: string; createdAt?: string;
@@ -66,12 +65,7 @@ export function AdminDashboard() {
 
   const patientsQ = useQuery<{ success: boolean; data: Patient[] }>({
     queryKey: ['admin-dash', 'patients'],
-    queryFn: () => api.get('/patients').then(r => r.data),
-  });
-
-  const staffQ = useQuery<{ success: boolean; data: StaffMember[] }>({
-    queryKey: ['admin-dash', 'staff'],
-    queryFn: () => api.get('/staff').then(r => r.data),
+    queryFn: () => api.get('/patients?limit=1000').then(r => r.data),
   });
 
   const apptQ = useQuery<{ success: boolean; data: Appointment[] }>({
@@ -141,7 +135,7 @@ export function AdminDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="Total Patients"     value={patientsQ.isLoading ? '…' : totalPatients.toLocaleString()}
+          title="Total Patients"     value={patientsQ.isLoading ? '…' : patientsQ.isError ? '—' : totalPatients.toLocaleString()}
           trend="12% this month"     trendDir="up"
           color="blue"              icon="🏥"
           sparklineData={PATIENT_SPARK}
@@ -162,11 +156,10 @@ export function AdminDashboard() {
           isLoading={revenueQ.isLoading}
         />
         <KpiCard
-          title="Staff on Duty"      value={staffQ.isLoading ? '…' : '32'}
+          title="Staff on Duty"      value="32"
           trend="4 on leave"         trendDir="neutral"
           color="purple"            icon="👥"
           sparklineData={STAFF_SPARK}
-          isLoading={staffQ.isLoading}
         />
       </div>
 
@@ -247,7 +240,7 @@ export function AdminDashboard() {
             <div className="grid grid-cols-2 gap-2">
               {[
                 { icon: '👤', label: 'New Patient',   sub: 'Register',      to: '/admin/patients' },
-                { icon: '📅', label: 'Appointments',  sub: 'View schedule', to: '/admin/patients' },
+                { icon: '📅', label: 'Book Appointment', sub: 'Schedule visit', to: '/admin/appointments' },
                 { icon: '💰', label: 'Billing',       sub: 'Manage bills',  to: '/admin/billing' },
                 { icon: '👥', label: 'Staff',         sub: 'Manage team',   to: '/admin/staff' },
               ].map(({ icon, label, sub, to }) => (
@@ -271,7 +264,7 @@ export function AdminDashboard() {
               <h2 className="text-[13px] font-bold text-slate-900">🔔 Live Alerts</h2>
             </div>
             <div className="px-4 py-1">
-              {alerts.map((a, i) => <AlertItem key={i} dotColor={a.dotColor} time={a.time}>{a.text}</AlertItem>)}
+              {alerts.map((a) => <AlertItem key={a.text} dotColor={a.dotColor} time={a.time}>{a.text}</AlertItem>)}
             </div>
           </div>
         </div>
@@ -300,6 +293,7 @@ export function AdminDashboard() {
                 {[1,2,3].map(i => <div key={i} className="h-7 bg-slate-100 rounded animate-pulse" />)}
               </div>
             )}
+            {labQ.isError && <p className="text-sm text-red-500 px-4 py-2">Failed to load lab orders</p>}
             {!labQ.isLoading && pendingLabs.length === 0 && (
               <p className="text-[12px] text-slate-400 py-6 text-center">No pending lab orders</p>
             )}
