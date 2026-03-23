@@ -32,6 +32,8 @@ import { DoctorPrescriptions } from '@/pages/doctor/Prescriptions';
 import { NurseDispensingQueue } from '@/pages/nurse/DispensingQueue';
 import { PatientPrescriptions } from '@/pages/patient/Prescriptions';
 import { AdminPharmacyManagement } from '@/pages/admin/PharmacyManagement';
+import { AdminInventoryManagement } from '@/pages/admin/InventoryManagement';
+import { NurseInventoryView } from '@/pages/nurse/InventoryView';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -96,6 +98,7 @@ export default function App() {
                       <Route path="lab/:id" element={<AdminLabManagement />} />
                       <Route path="pharmacy" element={<AdminPharmacyManagement />} />
                       <Route path="pharmacy/:id" element={<AdminPharmacyManagement />} />
+                      <Route path="inventory" element={<AdminInventoryManagement />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -122,6 +125,7 @@ export default function App() {
                     <Routes>
                       <Route path="dashboard" element={<NurseDashboard />} />
                       <Route path="dispensing" element={<NurseDispensingQueue />} />
+                      <Route path="inventory" element={<NurseInventoryView />} />
                     </Routes>
                   </ProtectedRoute>
                 }

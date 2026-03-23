@@ -19,6 +19,11 @@ const STATUS_STYLES: Record<string, string> = {
   amended: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
   // Pharmacy prescription statuses (draft + cancelled already covered above)
   dispensed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  // Inventory movement types
+  in: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  out: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  adjustment: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  waste: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
   // Lab priority statuses
   routine: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
   urgent: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
