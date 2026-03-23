@@ -63,7 +63,7 @@ export function AppointmentCard({
     ? `${appointment.patient.userId.firstName} ${appointment.patient.userId.lastName}`
     : 'Unknown Patient';
 
-  const isUpcoming = appointment.status === 'scheduled' || appointment.status === 'confirmed';
+  const isUpcoming = (appointment.status === 'scheduled' || appointment.status === 'confirmed') && new Date(appointment.date) >= new Date();
 
   return (
     <Card className="w-full">

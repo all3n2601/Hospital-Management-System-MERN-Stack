@@ -27,12 +27,16 @@ function generateTimeSlots(startTime: string, endTime: string): string[] {
 
 const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
 
-export async function bookAppointment(input: CreateAppointmentInput, createdByUserId: string) {
+export async function bookAppointment(
+  input: CreateAppointmentInput,
+  createdByUserId: string,
+  requestingRole?: string
+) {
   // Validate date is not in the past
   const appointmentDate = new Date(input.date);
-  appointmentDate.setHours(0, 0, 0, 0);
+  appointmentDate.setUTCHours(0, 0, 0, 0);
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setUTCHours(0, 0, 0, 0);
   if (appointmentDate < today) {
     throw new ValidationError('Appointment date cannot be in the past');
   }
@@ -45,6 +49,11 @@ export async function bookAppointment(input: CreateAppointmentInput, createdByUs
   // Find the Patient document
   const patient = await Patient.findById(input.patientId);
   if (!patient) throw new NotFoundError('Patient');
+
+  // Patients can only book appointments for themselves
+  if (requestingRole === 'patient' && patient.userId.toString() !== createdByUserId) {
+    throw new ForbiddenError('You can only book appointments for yourself');
+  }
 
   // Check doctor availability for that day of week
   const dayOfWeek = DAY_NAMES[appointmentDate.getDay()];
@@ -253,7 +262,8 @@ export async function listAppointments(filters: {
     query.patient = new Types.ObjectId(filters.patientId);
   }
   if (filters.status) {
-    query.status = filters.status;
+    const statuses = filters.status.split(',').map(s => s.trim()).filter(Boolean);
+    query.status = statuses.length === 1 ? statuses[0] : { $in: statuses };
   }
   if (filters.departmentId) {
     query.department = new Types.ObjectId(filters.departmentId);

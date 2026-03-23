@@ -20,7 +20,7 @@ export async function bookAppointment(req: Request, res: Response, next: NextFun
     const parsed = CreateAppointmentSchema.safeParse(req.body);
     if (!parsed.success) return next(parseZodError(parsed.error));
 
-    const appointment = await AppointmentService.bookAppointment(parsed.data, req.user._id);
+    const appointment = await AppointmentService.bookAppointment(parsed.data, req.user._id, req.user.role);
     res.status(201).json(successResponse(appointment));
   } catch (err) {
     next(err);
@@ -31,7 +31,20 @@ export async function listAppointments(req: Request, res: Response, next: NextFu
   try {
     if (!req.user) return next(new AuthError());
 
-    const { date, doctorId, patientId, status, departmentId, page, limit } = req.query as Record<string, string>;
+    const { date, doctorId, status, departmentId, page, limit } = req.query as Record<string, string>;
+    let { patientId } = req.query as Record<string, string>;
+
+    // If ownOnly is set (e.g. patient role), enforce that patient can only see their own appointments
+    if (req.ownOnly && req.user.role === 'patient') {
+      const { Patient } = await import('../../models/Patient');
+      const patientProfile = await Patient.findOne({ userId: req.user._id }).lean();
+      if (!patientProfile) {
+        res.json({ success: true, data: [], page: 1, limit: 20, total: 0, totalPages: 0 });
+        return;
+      }
+      patientId = (patientProfile._id as import('mongoose').Types.ObjectId).toString();
+    }
+
     const result = await AppointmentService.listAppointments({
       date,
       doctorId,

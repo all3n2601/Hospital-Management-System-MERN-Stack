@@ -44,18 +44,7 @@ export function PatientAppointments() {
     queryKey: ['appointments', 'patient', 'upcoming', patientId],
     queryFn: async () => {
       const params = new URLSearchParams({ patientId: patientId! });
-      params.set('status', 'scheduled');
-      const res = await api.get(`/appointments?${params}`);
-      return res.data;
-    },
-    enabled: !!patientId,
-  });
-
-  const { data: confirmedData } = useQuery<AppointmentsResponse>({
-    queryKey: ['appointments', 'patient', 'confirmed', patientId],
-    queryFn: async () => {
-      const params = new URLSearchParams({ patientId: patientId! });
-      params.set('status', 'confirmed');
+      params.set('status', 'scheduled,confirmed');
       const res = await api.get(`/appointments?${params}`);
       return res.data;
     },
@@ -66,7 +55,7 @@ export function PatientAppointments() {
     queryKey: ['appointments', 'patient', 'past', patientId],
     queryFn: async () => {
       const params = new URLSearchParams({ patientId: patientId! });
-      params.set('status', 'completed');
+      params.set('status', 'completed,cancelled,noShow');
       const res = await api.get(`/appointments?${params}`);
       return res.data;
     },
@@ -89,10 +78,9 @@ export function PatientAppointments() {
     },
   });
 
-  const upcomingAppointments = [
-    ...(upcomingData?.data ?? []),
-    ...(confirmedData?.data ?? []),
-  ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const upcomingAppointments = (upcomingData?.data ?? [])
+    .slice()
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const pastAppointments = pastData?.data ?? [];
   const isLoading = upcomingLoading || (activeTab === 'past' && pastLoading);
