@@ -18,7 +18,7 @@ export function StatBar({ label, value, max = 100, color = '#6366f1', unit = '%'
         />
       </div>
       <span className="text-[10px] font-bold text-slate-800 w-10 text-right flex-shrink-0">
-        {unit === '%' ? `${value}%` : `${value} ${unit}`}
+        {unit === '%' ? `${Math.round(pct)}%` : `${value} ${unit}`}
       </span>
     </div>
   );
