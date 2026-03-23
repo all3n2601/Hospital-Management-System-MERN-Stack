@@ -72,7 +72,6 @@ declare global {
 //   Action[] → only these specific actions are permitted
 //   'own-read' → read access, but ownOnly flag is set
 //   'own-rw'   → read + write access, but ownOnly flag is set
-//   'own-R'    → alias for own-read (used in spec comments)
 // ---------------------------------------------------------------------------
 
 type Permission =

@@ -39,6 +39,18 @@ interface MigrationOptions {
 // ---------------------------------------------------------------------------
 // Minimal inline schemas (avoids importing the full app)
 // ---------------------------------------------------------------------------
+//
+// NOTE: These schemas are intentionally minimal — they only declare the fields
+// this migration reads or writes.  They are NOT the production schemas.
+//
+// UserSchema omits optional fields that exist on the production User model,
+// such as `emergencyContact` and `medicalHistory`.  Those fields are not
+// needed here and omitting them keeps the migration self-contained.
+//
+// NurseSchema omits the `department` field that exists on actual nurse
+// documents.  This is intentional: the migration does not move department
+// data.  The raw field remains accessible via `.lean()` if needed in future.
+// ---------------------------------------------------------------------------
 
 interface IUser extends Document {
   userName: string;
@@ -91,7 +103,7 @@ interface IDoctor extends Document {
   phoneno?: string;
   dob?: Date;
   gender?: string;
-  address?: { city?: string; state?: string; street?: string };
+  address?: { city?: string; state?: string; street?: string; zipCode?: string };
   password: string;
   specialization: string;
   role: string;
@@ -132,7 +144,7 @@ interface INurse extends Document {
   phoneno?: string;
   dob?: Date;
   gender?: string;
-  address?: { city?: string; state?: string; street?: string };
+  address?: { city?: string; state?: string; street?: string; zipCode?: string };
   password: string;
   ward?: string;
   role: string;
@@ -221,6 +233,7 @@ async function migrateDoctors(
               street: doc.address?.street ?? "",
               city: doc.address?.city ?? "",
               state: doc.address?.state ?? "",
+              zipCode: doc.address?.zipCode || "",
             },
           },
         ],
@@ -245,8 +258,9 @@ async function migrateDoctors(
       { session }
     );
   } else {
+    const doctorCount = await Doctor.countDocuments({}, { session });
     console.log(
-      `[DRY-RUN] Would remove password/role fields from ${result.doctorsMigrated} doctor documents`
+      `[DRY-RUN] Would remove password/role fields from ${doctorCount} doctor documents`
     );
   }
 }
@@ -305,6 +319,7 @@ async function migrateNurses(
               street: doc.address?.street ?? "",
               city: doc.address?.city ?? "",
               state: doc.address?.state ?? "",
+              zipCode: doc.address?.zipCode || "",
             },
           },
         ],
@@ -329,8 +344,9 @@ async function migrateNurses(
       { session }
     );
   } else {
+    const nurseCount = await Nurse.countDocuments({}, { session });
     console.log(
-      `[DRY-RUN] Would remove password/role fields from ${result.nursesMigrated} nurse documents`
+      `[DRY-RUN] Would remove password/role fields from ${nurseCount} nurse documents`
     );
   }
 }

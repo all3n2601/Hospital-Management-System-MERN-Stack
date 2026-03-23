@@ -135,6 +135,30 @@ describe("authorize middleware", () => {
       expect(next).not.toHaveBeenCalled();
     });
 
+    test("doctor gets ownOnly flag on appointments read", () => {
+      const req = makeReq(doctor);
+      const { res, status } = makeRes();
+      const next = makeNext();
+
+      authorize("appointments", "read")(req as Request, res as Response, next);
+
+      expect(status).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledTimes(1);
+      expect((req as Request).ownOnly).toBe(true);
+    });
+
+    test("doctor gets ownOnly flag on appointments write", () => {
+      const req = makeReq(doctor);
+      const { res, status } = makeRes();
+      const next = makeNext();
+
+      authorize("appointments", "write")(req as Request, res as Response, next);
+
+      expect(status).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledTimes(1);
+      expect((req as Request).ownOnly).toBe(true);
+    });
+
     test("doctor cannot access users", () => {
       const req = makeReq(doctor);
       const { res, status } = makeRes();
