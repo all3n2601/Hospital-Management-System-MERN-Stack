@@ -56,7 +56,7 @@ const LineItemSchema = new Schema<ILineItem>(
     description: { type: String, required: true },
     quantity: { type: Number, required: true, min: [0.001, 'Quantity must be positive'] },
     unitPrice: { type: Number, required: true, min: [0, 'Unit price cannot be negative'] },
-    total: { type: Number, required: true },
+    total: { type: Number, default: 0 },
   },
   { _id: false }
 );
