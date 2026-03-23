@@ -16,6 +16,7 @@ export interface IInsurance {
 }
 
 export interface IPayment {
+  _id?: Types.ObjectId;
   amount: number;
   method: 'cash' | 'card' | 'insurance' | 'transfer';
   paidAt: Date;
@@ -93,7 +94,7 @@ const InvoiceSchema = new Schema<IInvoice>(
       },
     },
     subtotal: { type: Number, default: 0 },
-    taxRate: { type: Number, default: 0, max: [100, 'Tax rate cannot exceed 100%'] },
+    taxRate: { type: Number, default: 0, min: [0, 'Tax rate cannot be negative'], max: [100, 'Tax rate cannot exceed 100%'] },
     tax: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
@@ -141,8 +142,8 @@ InvoiceSchema.pre('save', async function (next) {
   doc.tax = Math.round((doc.subtotal * this.taxRate / 100) * 100) / 100;
 
   // 4. Compute total
-  doc.total = doc.subtotal + doc.tax - this.discount;
   if (this.discount < 0) throw new Error('Discount cannot be negative');
+  doc.total = doc.subtotal + doc.tax - this.discount;
   if (doc.total < 0) throw new Error('Discount cannot exceed subtotal + tax');
 
   // 5. Compute amountPaid
