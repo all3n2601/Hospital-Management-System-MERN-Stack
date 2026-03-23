@@ -39,6 +39,12 @@ function getPatientName(appt: Appointment): string {
   return u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() : 'Unknown Patient';
 }
 
+function labDotColor(lab: LabOrder): string {
+  if (lab.priority === 'urgent' || lab.status === 'critical') return '#ef4444';
+  if (lab.status === 'pending' || lab.status === 'processing') return '#f59e0b';
+  return '#22c55e';
+}
+
 export function DoctorDashboard() {
   const user = useAppSelector(s => s.auth.user);
   const today = new Date().toISOString().split('T')[0];
@@ -90,8 +96,9 @@ export function DoctorDashboard() {
         />
         <KpiCard
           title="Pending Lab Orders"  value={labQ.isLoading ? '…' : labOrders.length}
+          subtitle={`${labQ.data?.data?.filter((l: LabOrder) => l.priority === 'urgent').length ?? 0} critical`}
           trend={criticalLabs.length > 0 ? `${criticalLabs.length} critical` : 'All normal'} trendDir={criticalLabs.length > 0 ? 'down' : 'neutral'}
-          color="purple" icon="🔬" sparklineData={LAB_SPARK} isLoading={labQ.isLoading}
+          color="purple" icon="🧪" sparklineData={LAB_SPARK} isLoading={labQ.isLoading}
         />
         <KpiCard
           title="Active Prescriptions" value={rxQ.isLoading ? '…' : activePrescriptions.length}
@@ -106,9 +113,6 @@ export function DoctorDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
             <h2 className="text-[13px] font-bold text-slate-900">Today's Schedule</h2>
-            <Link to="/doctor/schedule" className="text-[11px] font-semibold text-indigo-600 hover:underline">
-              Full schedule →
-            </Link>
           </div>
           <div className="px-4 divide-y divide-slate-50">
             {apptQ.isLoading && (
@@ -130,6 +134,12 @@ export function DoctorDashboard() {
               />
             ))}
           </div>
+          {/* Footer */}
+          <div className="px-6 py-3 border-t border-slate-100 text-right">
+            <Link to="/doctor/schedule" className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
+              Full schedule →
+            </Link>
+          </div>
         </div>
 
         {/* Right column */}
@@ -139,10 +149,10 @@ export function DoctorDashboard() {
             <h2 className="text-[13px] font-bold text-slate-900 mb-3">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { icon: '💊', label: 'Prescribe',    sub: 'Write script',    to: '/doctor/prescriptions' },
-                { icon: '🔬', label: 'Order Lab',    sub: 'Request test',    to: '/doctor/lab' },
-                { icon: '📄', label: 'Documents',    sub: 'Patient files',   to: '/doctor/documents' },
-                { icon: '📅', label: 'Schedule',     sub: 'Manage calendar', to: '/doctor/schedule' },
+                { icon: '💊', label: 'Prescribe',         sub: 'New prescription',    to: '/doctor/prescriptions/new' },
+                { icon: '🧪', label: 'Order Lab',         sub: 'Request test',        to: '/doctor/lab/new' },
+                { icon: '📄', label: 'Issue Certificate', sub: 'Medical certificate', to: '/doctor/documents' },
+                { icon: '📝', label: 'Patient Notes',     sub: 'Clinical notes',      to: '/doctor/patients' },
               ].map(({ icon, label, sub, to }) => (
                 <Link
                   key={label} to={to}
@@ -161,17 +171,16 @@ export function DoctorDashboard() {
           {/* Lab results feed */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
-              <h2 className="text-[13px] font-bold text-slate-900">🔬 Lab Orders</h2>
+              <h2 className="text-[13px] font-bold text-slate-900">🧪 Lab Results In</h2>
               <Link to="/doctor/lab" className="text-[11px] font-semibold text-indigo-600 hover:underline">View all →</Link>
             </div>
             <div className="px-4 py-1">
               {labQ.isLoading && <div className="h-16 animate-pulse bg-slate-50 rounded-lg m-2" />}
               {!labQ.isLoading && labOrders.length === 0 && (
-                <p className="text-[11px] text-slate-400 py-4 text-center">No recent lab orders</p>
+                <p className="text-[11px] text-slate-400 py-4 text-center">No recent lab results</p>
               )}
               {labOrders.slice(0, 4).map(lab => {
-                const isUrgent = lab.priority === 'urgent';
-                const dotColor = isUrgent ? '#ef4444' : lab.status === 'resulted' ? '#10b981' : '#f59e0b';
+                const dotColor = labDotColor(lab);
                 const patName = lab.patient?.userId
                   ? `${lab.patient.userId.firstName ?? ''} ${lab.patient.userId.lastName ?? ''}`.trim()
                   : '—';
@@ -179,8 +188,8 @@ export function DoctorDashboard() {
                   <AlertItem key={lab._id} dotColor={dotColor}
                     time={lab.createdAt ? new Date(lab.createdAt).toLocaleDateString() : undefined}
                   >
-                    {isUrgent && <strong>URGENT — </strong>}
-                    {lab.testName ?? 'Lab order'}{patName !== '—' && ` · ${patName}`}
+                    {(lab.priority === 'urgent' || lab.status === 'critical') && <strong>URGENT — </strong>}
+                    {lab.testName ?? 'Lab result'}{patName !== '—' && ` · ${patName}`}
                   </AlertItem>
                 );
               })}
