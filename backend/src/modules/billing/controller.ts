@@ -91,8 +91,7 @@ export async function recordPayment(req: Request, res: Response, next: NextFunct
     const invoice = await BillingService.recordPayment(
       req.params.id,
       parsed.data,
-      req.user._id,
-      req.user.role
+      req.user._id
     );
     res.json(successResponse(invoice));
   } catch (err) {

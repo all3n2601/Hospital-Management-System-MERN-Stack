@@ -48,15 +48,10 @@ export async function issueInvoice(invoiceId: string) {
 export async function recordPayment(
   invoiceId: string,
   input: RecordPaymentInput,
-  recordedByUserId: string,
-  requestingRole: string
+  recordedByUserId: string
 ) {
   const invoice = await Invoice.findById(invoiceId);
   if (!invoice) throw new NotFoundError('Invoice');
-
-  if (requestingRole !== 'admin' && requestingRole !== 'receptionist') {
-    throw new ForbiddenError('Only admins and receptionists can record payments');
-  }
 
   if (invoice.status === 'draft' || invoice.status === 'void') {
     throw new ValidationError(`Cannot record payment on a ${invoice.status} invoice`);
