@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useAppSelector } from '@/store/hooks';
 import { fmt } from '@/lib/format';
 import type { Invoice } from '@/types/billing';
@@ -99,7 +100,8 @@ export function AdminBilling() {
     },
   });
 
-  // Detail query (fetched when detailInvoiceId is set)
+  // NOTE: detail key omits 'admin' namespace intentionally — must be invalidated separately
+  // from the list query. All mutations call invalidateQueries for both keys.
   const { data: detailData, isLoading: detailLoading, isError: detailError } = useQuery<InvoiceDetailResponse>({
     queryKey: ['billing', detailInvoiceId],
     queryFn: async () => {
@@ -175,10 +177,11 @@ export function AdminBilling() {
       const res = await api.patch(`/billing/${id}/issue`);
       return res.data;
     },
-    onSuccess: () => {
-      toast.success('Invoice issued');
+    onSuccess: (_data, id) => {
+      void queryClient.invalidateQueries({ queryKey: ['billing', id] });
       void queryClient.invalidateQueries({ queryKey: ['billing', 'admin'] });
-      void queryClient.invalidateQueries({ queryKey: ['billing', detailInvoiceId] });
+      toast.success('Invoice issued');
+      closeDetail();
     },
     onError: (err: unknown) => {
       const msg =
@@ -190,21 +193,17 @@ export function AdminBilling() {
 
   // Record payment mutation
   const payMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const body = {
-        amount: parseFloat(payAmount),
-        method: payMethod,
-        reference: payReference.trim() || undefined,
-      };
+    mutationFn: async ({ id, amount, method, reference }: { id: string; amount: number; method: typeof payMethod; reference?: string }) => {
+      const body = { amount, method, reference };
       const res = await api.post(`/billing/${id}/payments`, body);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['billing', variables.id] });
+      void queryClient.invalidateQueries({ queryKey: ['billing', 'admin'] });
       toast.success('Payment recorded');
       setPayInvoiceId(null);
       resetPayForm();
-      void queryClient.invalidateQueries({ queryKey: ['billing', 'admin'] });
-      void queryClient.invalidateQueries({ queryKey: ['billing', detailInvoiceId] });
     },
     onError: (err: unknown) => {
       const msg =
@@ -216,16 +215,16 @@ export function AdminBilling() {
 
   // Void invoice mutation
   const voidMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await api.patch(`/billing/${id}/void`, { voidReason: voidReason.trim() });
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const res = await api.patch(`/billing/${id}/void`, { voidReason: reason });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ['billing', variables.id] });
+      void queryClient.invalidateQueries({ queryKey: ['billing', 'admin'] });
       toast.success('Invoice voided');
       setVoidInvoiceId(null);
       setVoidReason('');
-      void queryClient.invalidateQueries({ queryKey: ['billing', 'admin'] });
-      void queryClient.invalidateQueries({ queryKey: ['billing', detailInvoiceId] });
     },
     onError: (err: unknown) => {
       const msg =
@@ -295,6 +294,7 @@ export function AdminBilling() {
               Issue
             </Button>
           )}
+          {/* Pay: intentionally available to both admin and receptionist */}
           {row.status !== 'paid' && row.status !== 'void' && row.status !== 'draft' && (
             <Button
               variant="outline"
@@ -515,13 +515,13 @@ export function AdminBilling() {
 
             <div>
               <Label htmlFor="notes">Notes</Label>
-              <textarea
+              <Textarea
                 id="notes"
-                placeholder="Optional notes..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                placeholder="Optional notes for this invoice"
+                className="mt-1"
               />
             </div>
           </div>
@@ -589,8 +589,22 @@ export function AdminBilling() {
               Cancel
             </Button>
             <Button
-              onClick={() => payInvoiceId && payMutation.mutate(payInvoiceId)}
-              disabled={payMutation.isPending || !payAmount}
+              onClick={() => {
+                const parsedAmount = parseFloat(payAmount);
+                if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+                  toast.error('Amount must be a positive number');
+                  return;
+                }
+                if (payInvoiceId) {
+                  payMutation.mutate({
+                    id: payInvoiceId,
+                    amount: parsedAmount,
+                    method: payMethod,
+                    reference: payReference.trim() || undefined,
+                  });
+                }
+              }}
+              disabled={payMutation.isPending || !payAmount || parseFloat(payAmount) <= 0}
             >
               {payMutation.isPending ? 'Recording...' : 'Record Payment'}
             </Button>
@@ -632,7 +646,7 @@ export function AdminBilling() {
                   toast.error('Please provide a reason for voiding this invoice');
                   return;
                 }
-                if (voidInvoiceId) voidMutation.mutate(voidInvoiceId);
+                if (voidInvoiceId) voidMutation.mutate({ id: voidInvoiceId, reason: voidReason.trim() });
               }}
               disabled={voidMutation.isPending}
             >
