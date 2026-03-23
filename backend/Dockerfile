@@ -10,7 +10,8 @@ RUN npm run build
 # Stage 2: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
-RUN addgroup -g 1001 -S nodejs && adduser -S nodeuser -u 1001
+RUN addgroup -g 1001 -S nodejs \
+ && adduser -S -u 1001 -G nodejs nodeuser
 COPY package*.json ./
 RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist

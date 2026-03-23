@@ -24,7 +24,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t hms-backend ./backend
       - name: Security scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: hms-backend
           format: table

@@ -14,3 +14,17 @@ services:
       resources:
         limits: { cpus: '0.5', memory: 256M }
     restart: always
+
+  mongodb:
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 2G }
+        reservations: { cpus: '0.5', memory: 512M }
+    restart: always
+
+  redis:
+    deploy:
+      resources:
+        limits: { cpus: '0.5', memory: 512M }
+        reservations: { cpus: '0.25', memory: 128M }
+    restart: always

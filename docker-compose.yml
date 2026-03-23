@@ -9,8 +9,10 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017/hms
       - REDIS_URL=redis://redis:6379
       - CORS_ORIGINS=http://localhost:5173
+    command: npm run dev
     volumes:
       - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
     depends_on: [mongodb, redis]
     restart: unless-stopped
 

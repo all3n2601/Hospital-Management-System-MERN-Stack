@@ -1,3 +1,12 @@
+/**
+ * Standard API response envelope used by all route handlers.
+ *
+ * All success responses: { success: true, data: T, meta?: PaginationMeta }
+ * All error responses:   { success: false, error: { code, message, details? } }
+ *
+ * Use successResponse() and errorResponse() helpers to construct these.
+ * ApiResponse<T> is a discriminated union — narrow on `response.success` to access data.
+ */
 export interface ApiSuccess<T> {
   success: true;
   data: T;
