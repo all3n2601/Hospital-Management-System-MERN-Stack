@@ -188,8 +188,8 @@ export function AdminLabManagement() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const body = {
-        patient: patientId.trim(),
-        doctor: doctorId.trim() || undefined,
+        patientId: patientId.trim(),
+        doctorId: doctorId.trim(),
         tests: tests.map((t) => ({ name: t.name.trim(), code: t.code.trim() })),
         priority,
         notes: notes.trim() || undefined,
@@ -236,7 +236,7 @@ export function AdminLabManagement() {
   const enterResultsMutation = useMutation({
     mutationFn: async () => {
       const body = {
-        labOrder: targetOrderId,
+        labOrderId: targetOrderId,
         technician: technicianId.trim() || undefined,
         results: resultItems.map((r) => ({
           testCode: r.testCode,
@@ -269,6 +269,10 @@ export function AdminLabManagement() {
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
       toast.error('Patient ID is required');
+      return;
+    }
+    if (!doctorId.trim()) {
+      toast.error('Doctor ID is required');
       return;
     }
     if (tests.length === 0) {
@@ -444,7 +448,7 @@ export function AdminLabManagement() {
             </div>
 
             <div>
-              <Label htmlFor="doctorId">Doctor ID (optional)</Label>
+              <Label htmlFor="doctorId">Doctor ID</Label>
               <Input
                 id="doctorId"
                 placeholder="MongoDB _id of the doctor record"

@@ -35,8 +35,8 @@ export interface LabResult {
   labOrder: string | LabOrder;
   patient: string;
   results: ILabResultItem[];
-  technician: { _id: string; firstName?: string; lastName?: string };
-  verifiedBy?: { _id: string };
+  technician: { _id: string; firstName?: string; lastName?: string; name?: string };
+  verifiedBy?: { _id: string; userId?: { firstName: string; lastName: string } };
   reportUrl?: string;
   notes?: string;
   status: LabResultStatus;

@@ -46,6 +46,8 @@ export function DoctorLabOrders() {
 
   // Create form state
   const [patientId, setPatientId] = useState('');
+  // doctorId: Doctor profile _id (not User _id). Temporary input until auto-detection is implemented.
+  const [doctorProfileId, setDoctorProfileId] = useState('');
   const [tests, setTests] = useState<TestInput[]>([{ name: '', code: '' }]);
   const [priority, setPriority] = useState<LabOrderPriority>('routine');
   const [notes, setNotes] = useState('');
@@ -103,6 +105,7 @@ export function DoctorLabOrders() {
 
   const resetCreateForm = () => {
     setPatientId('');
+    setDoctorProfileId('');
     setTests([{ name: '', code: '' }]);
     setPriority('routine');
     setNotes('');
@@ -112,7 +115,8 @@ export function DoctorLabOrders() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const body = {
-        patient: patientId.trim(),
+        patientId: patientId.trim(),
+        doctorId: doctorProfileId.trim(),
         tests: tests.map((t) => ({ name: t.name.trim(), code: t.code.trim() })),
         priority,
         notes: notes.trim() || undefined,
@@ -156,6 +160,10 @@ export function DoctorLabOrders() {
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
       toast.error('Patient ID is required');
+      return;
+    }
+    if (!doctorProfileId.trim()) {
+      toast.error('Your Doctor Profile ID is required');
       return;
     }
     if (tests.length === 0) {
@@ -273,6 +281,18 @@ export function DoctorLabOrders() {
                 placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              {/* Temporary: will be replaced by auto-detection from session once doctor profile lookup is wired up */}
+              <Label htmlFor="doctorProfileId">Your Doctor Profile ID</Label>
+              <Input
+                id="doctorProfileId"
+                placeholder="MongoDB _id of your Doctor profile (not User _id)"
+                value={doctorProfileId}
+                onChange={(e) => setDoctorProfileId(e.target.value)}
                 className="mt-1"
               />
             </div>

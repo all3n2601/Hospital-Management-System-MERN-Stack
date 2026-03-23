@@ -18,6 +18,7 @@ const TABS: { key: FilterTab; label: string }[] = [
   { key: 'pending', label: 'Pending' },
   { key: 'in_progress', label: 'In Progress' },
   { key: 'completed', label: 'Completed' },
+  { key: 'cancelled', label: 'Cancelled' },
 ];
 
 function LoadingSkeleton() {

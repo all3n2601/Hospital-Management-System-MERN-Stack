@@ -108,6 +108,18 @@ export async function updateLabOrderStatus(orderId: string, input: UpdateOrderSt
   const order = await LabOrder.findById(orderId);
   if (!order) throw new NotFoundError('Lab order');
 
+  const VALID_TRANSITIONS: Record<string, string[]> = {
+    pending: ['in_progress', 'cancelled'],
+    in_progress: ['completed', 'cancelled'],
+    completed: [],   // terminal
+    cancelled: [],   // terminal
+  };
+
+  const allowed = VALID_TRANSITIONS[order.status] ?? [];
+  if (!allowed.includes(input.status)) {
+    throw new ValidationError(`Cannot transition from '${order.status}' to '${input.status}'`);
+  }
+
   order.status = input.status;
 
   if (input.status === 'completed') {

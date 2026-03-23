@@ -26,7 +26,7 @@ export const CreateLabResultSchema = z.object({
   collectedAt: z.string().datetime({ offset: true }).optional(),
   resultedAt: z.string().datetime({ offset: true }).optional(),
   notes: z.string().optional(),
-  reportUrl: z.string().optional(),
+  reportUrl: z.string().url().optional(),
 });
 
 export const VerifyResultSchema = z.object({
