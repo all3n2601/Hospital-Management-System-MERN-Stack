@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
@@ -47,7 +48,7 @@ function labDotColor(lab: LabOrder): string {
 
 export function DoctorDashboard() {
   const user = useAppSelector(s => s.auth.user);
-  const today = new Date().toISOString().split('T')[0];
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const apptQ = useQuery<{ success: boolean; data: Appointment[] }>({
     queryKey: ['doctor-dashboard', 'appointments', today],
@@ -90,18 +91,18 @@ export function DoctorDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard
-          title="Today's Patients"    value={apptQ.isLoading ? '…' : todayAppts.length}
+          title="Today's Patients"    value={apptQ.isLoading ? '…' : apptQ.isError ? '—' : todayAppts.length}
           trend={`${todayAppts.filter(a => a.status === 'confirmed').length} confirmed`} trendDir="up"
           color="green" icon="📅" sparklineData={APPT_SPARK} isLoading={apptQ.isLoading}
         />
         <KpiCard
-          title="Pending Lab Orders"  value={labQ.isLoading ? '…' : labOrders.length}
-          subtitle={`${labQ.data?.data?.filter((l: LabOrder) => l.priority === 'urgent').length ?? 0} critical`}
+          title="Pending Lab Orders"  value={labQ.isLoading ? '…' : labQ.isError ? '—' : labOrders.length}
+          subtitle={`${criticalLabs.length} critical`}
           trend={criticalLabs.length > 0 ? `${criticalLabs.length} critical` : 'All normal'} trendDir={criticalLabs.length > 0 ? 'down' : 'neutral'}
           color="purple" icon="🧪" sparklineData={LAB_SPARK} isLoading={labQ.isLoading}
         />
         <KpiCard
-          title="Active Prescriptions" value={rxQ.isLoading ? '…' : activePrescriptions.length}
+          title="Active Prescriptions" value={rxQ.isLoading ? '…' : rxQ.isError ? '—' : activePrescriptions.length}
           trend="Active" trendDir="neutral"
           color="amber" icon="💊" sparklineData={RX_SPARK} isLoading={rxQ.isLoading}
         />
@@ -120,7 +121,8 @@ export function DoctorDashboard() {
                 {[1,2,3,4].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
               </div>
             )}
-            {!apptQ.isLoading && todayAppts.length === 0 && (
+            {apptQ.isError && <p className="text-sm text-red-500 px-4 py-2">Failed to load schedule</p>}
+            {!apptQ.isLoading && !apptQ.isError && todayAppts.length === 0 && (
               <p className="text-[12px] text-slate-400 py-8 text-center">No patients scheduled for today</p>
             )}
             {todayAppts.slice(0, 6).map(appt => (
@@ -176,7 +178,8 @@ export function DoctorDashboard() {
             </div>
             <div className="px-4 py-1">
               {labQ.isLoading && <div className="h-16 animate-pulse bg-slate-50 rounded-lg m-2" />}
-              {!labQ.isLoading && labOrders.length === 0 && (
+              {labQ.isError && <p className="text-sm text-red-500 px-4 py-2">Failed to load lab results</p>}
+              {!labQ.isLoading && !labQ.isError && labOrders.length === 0 && (
                 <p className="text-[11px] text-slate-400 py-4 text-center">No recent lab results</p>
               )}
               {labOrders.slice(0, 4).map(lab => {
