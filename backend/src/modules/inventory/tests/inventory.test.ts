@@ -471,12 +471,13 @@ describe('Inventory Routes', () => {
     });
   });
 
-  it('22. GET /api/v1/inventory/movements — nurse gets 403 (write-only route)', async () => {
+  it('22. GET /api/v1/inventory/movements — nurse can read movements', async () => {
     const res = await request(app)
       .get('/api/v1/inventory/movements')
       .set('Authorization', `Bearer ${nurseToken}`);
 
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('23. GET /api/v1/inventory/items?lowStock=true — returns only low stock items', async () => {

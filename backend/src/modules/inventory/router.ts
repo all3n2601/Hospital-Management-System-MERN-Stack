@@ -15,7 +15,7 @@ router.patch('/items/:id', authenticate, authorize('inventory', 'write'), Invent
 router.post('/items/:id/stock', authenticate, authorize('inventory', 'write'), InventoryController.adjustStock);
 
 // Movement routes
-router.get('/items/:id/movements', authenticate, authorize('inventory', 'write'), InventoryController.listItemMovements);
-router.get('/movements', authenticate, authorize('inventory', 'write'), InventoryController.listAllMovements);
+router.get('/items/:id/movements', authenticate, authorize('inventory', 'read'), InventoryController.listItemMovements);
+router.get('/movements', authenticate, authorize('inventory', 'read'), InventoryController.listAllMovements);
 
 export { router as inventoryRouter };
