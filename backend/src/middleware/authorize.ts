@@ -25,6 +25,7 @@ export type Resource =
   | "appointments"
   | "billing"
   | "lab"
+  | "drugs"
   | "prescriptions"
   | "inventory"
   | "documents"
@@ -119,6 +120,13 @@ const MATRIX: PermissionMatrix = {
     nurse:         ["read"],
     receptionist:  false,
     patient:       "own-read",
+  },
+  drugs: {
+    admin:         "all",
+    doctor:        ["read"],
+    nurse:         ["read"],
+    receptionist:  false,
+    patient:       false,
   },
   prescriptions: {
     admin:         "all",

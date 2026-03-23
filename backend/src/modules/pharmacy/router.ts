@@ -6,10 +6,10 @@ import * as PharmacyController from './controller';
 const router = Router();
 
 // Drug routes
-router.post('/drugs', authenticate, authorize('inventory', 'write'), PharmacyController.createDrug);
-router.get('/drugs', authenticate, authorize('lab', 'read'), PharmacyController.listDrugs);
-router.get('/drugs/:id', authenticate, authorize('lab', 'read'), PharmacyController.getDrugById);
-router.patch('/drugs/:id', authenticate, authorize('inventory', 'write'), PharmacyController.updateDrug);
+router.post('/drugs', authenticate, authorize('drugs', 'write'), PharmacyController.createDrug);
+router.get('/drugs', authenticate, authorize('drugs', 'read'), PharmacyController.listDrugs);
+router.get('/drugs/:id', authenticate, authorize('drugs', 'read'), PharmacyController.getDrugById);
+router.patch('/drugs/:id', authenticate, authorize('drugs', 'write'), PharmacyController.updateDrug);
 
 // Prescription routes
 router.post(
