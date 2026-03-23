@@ -1,17 +1,25 @@
 import http from 'http';
 import { app } from './app';
-import { connectDB } from './db/mongoose';
-import { connectRedis } from './db/redis';
+import { connectDB, disconnectDB } from './db/mongoose';
+import { connectRedis, disconnectRedis } from './db/redis';
 import { initSocket } from './socket';
 import { env } from './config/env';
 import { logger } from './middleware/requestLogger';
+import { fetchSecrets } from './config/secrets';
 
 async function bootstrap() {
+  const secrets = await fetchSecrets();
+
+  // Set secrets on process.env for connectDB/connectRedis to use
+  process.env.MONGODB_URI = secrets.MONGODB_URI;
+  process.env.REDIS_URL = secrets.REDIS_URL;
+  process.env.JWT_SECRET = secrets.JWT_SECRET;
+
   await connectDB();
   await connectRedis();
 
   const server = http.createServer(app);
-  initSocket(server);
+  initSocket(server, secrets.JWT_SECRET);
 
   server.listen(env.PORT, () => {
     logger.info(`HMS API running on port ${env.PORT} [${env.NODE_ENV}]`);
@@ -19,7 +27,11 @@ async function bootstrap() {
 
   const shutdown = async (signal: string) => {
     logger.info(`${signal} received — shutting down gracefully`);
-    server.close(() => process.exit(0));
+    server.close(async () => {
+      await disconnectDB();
+      await disconnectRedis();
+      process.exit(0);
+    });
   };
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));

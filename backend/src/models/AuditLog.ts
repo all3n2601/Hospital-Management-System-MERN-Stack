@@ -36,12 +36,27 @@ const AuditLogSchema = new Schema<IAuditLog>(
 AuditLogSchema.index({ resourceType: 1, timestamp: -1 });
 AuditLogSchema.index({ actorId: 1, timestamp: -1 });
 
-// Prevent updates and deletes at model level
+// Prevent updates and deletes at model level (query middleware)
 AuditLogSchema.pre(
-  ['updateOne', 'updateMany', 'findOneAndUpdate', 'deleteOne', 'deleteMany', 'findOneAndDelete'],
+  ['updateOne', 'updateMany', 'findOneAndUpdate', 'deleteOne', 'deleteMany', 'findOneAndDelete', 'replaceOne'],
   function() {
     throw new Error('AuditLog is append-only — updates and deletes are not permitted');
   }
 );
 
 export const AuditLog = model<IAuditLog>('AuditLog', AuditLogSchema);
+
+// Guard bulkWrite at the model level — mongoose does not support bulkWrite as a schema middleware
+const originalBulkWrite = AuditLog.bulkWrite.bind(AuditLog);
+AuditLog.bulkWrite = function(...args: Parameters<typeof originalBulkWrite>) {
+  // Allow insertOne operations only; reject any write that mutates or deletes
+  const ops = args[0] as Array<Record<string, unknown>>;
+  const hasMutation = ops.some(op =>
+    'updateOne' in op || 'updateMany' in op || 'replaceOne' in op ||
+    'deleteOne' in op || 'deleteMany' in op
+  );
+  if (hasMutation) {
+    return Promise.reject(new Error('AuditLog is append-only — updates and deletes are not permitted')) as ReturnType<typeof originalBulkWrite>;
+  }
+  return originalBulkWrite(...args);
+} as typeof originalBulkWrite;

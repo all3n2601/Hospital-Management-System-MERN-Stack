@@ -21,3 +21,7 @@ export async function connectDB(uri?: string): Promise<void> {
     }
   }
 }
+
+export async function disconnectDB(): Promise<void> {
+  await mongoose.disconnect();
+}

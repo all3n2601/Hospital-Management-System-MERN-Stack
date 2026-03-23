@@ -27,3 +27,7 @@ export async function connectRedis(url?: string): Promise<Redis> {
 
   return redisClient;
 }
+
+export async function disconnectRedis(): Promise<void> {
+  await redisClient?.quit();
+}

@@ -79,4 +79,18 @@ describe('AuditLog append-only enforcement', () => {
       AuditLog.deleteMany({})
     ).rejects.toThrow('AuditLog is append-only');
   });
+
+  it('throws when calling replaceOne on AuditLog', async () => {
+    await AuditLog.create(validEntry);
+    await expect(
+      AuditLog.replaceOne({ action: 'CREATE' }, validEntry)
+    ).rejects.toThrow('AuditLog is append-only');
+  });
+
+  it('throws when calling bulkWrite on AuditLog', async () => {
+    await AuditLog.create(validEntry);
+    await expect(
+      AuditLog.bulkWrite([{ deleteOne: { filter: { action: 'CREATE' } } }])
+    ).rejects.toThrow('AuditLog is append-only');
+  });
 });

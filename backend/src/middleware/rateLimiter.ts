@@ -6,16 +6,23 @@ import { errorResponse } from '../types/api';
 const WINDOW_SECONDS = 60;
 const MAX_REQUESTS = 100;
 
+// Atomic Lua script: INCR and EXPIRE in a single round-trip, eliminating the race condition
+// where a key could be incremented but never expire if the server crashes between INCR and EXPIRE.
+const RATE_LIMIT_LUA = `
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+return current
+`;
+
 export async function rateLimiter(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const redis = getRedisClient();
     const identifier = req.ip ?? 'unknown';
     const key = `ratelimit:${identifier}`;
 
-    const current = await redis.incr(key);
-    if (current === 1) {
-      await redis.expire(key, WINDOW_SECONDS);
-    }
+    const current = await redis.eval(RATE_LIMIT_LUA, 1, key, String(WINDOW_SECONDS)) as number;
 
     res.setHeader('X-RateLimit-Limit', MAX_REQUESTS);
     res.setHeader('X-RateLimit-Remaining', Math.max(0, MAX_REQUESTS - current));

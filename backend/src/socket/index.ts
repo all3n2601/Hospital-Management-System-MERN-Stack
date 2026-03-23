@@ -3,6 +3,7 @@ import { Server as SocketServer } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { getRedisClient } from '../db/redis';
 import { logger } from '../middleware/requestLogger';
+import { env } from '../config/env';
 import jwt from 'jsonwebtoken';
 
 export let io: SocketServer;
@@ -12,10 +13,10 @@ interface SocketAuthUser {
   role: string;
 }
 
-export function initSocket(httpServer: HttpServer): SocketServer {
+export function initSocket(httpServer: HttpServer, jwtSecret: string): SocketServer {
   io = new SocketServer(httpServer, {
     cors: {
-      origin: (process.env.CORS_ORIGINS ?? 'http://localhost:5173').split(',').map(o => o.trim()),
+      origin: env.CORS_ORIGINS.split(',').map(o => o.trim()),
       credentials: true,
     },
     transports: ['websocket', 'polling'],
@@ -31,11 +32,6 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     const token = socket.handshake.auth.token as string | undefined;
     if (!token) {
       return next(new Error('Authentication required'));
-    }
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      return next(new Error('Server configuration error'));
     }
 
     try {
