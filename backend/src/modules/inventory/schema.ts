@@ -26,8 +26,12 @@ export const UpdateInventoryItemSchema = z.object({
 
 export const AdjustStockSchema = z.object({
   type: z.enum(['in', 'out', 'adjustment', 'waste']),
-  quantity: z.number().int().min(1),
+  // For 'in'/'out'/'waste': delta quantity (min 1). For 'adjustment': absolute target (min 0 allows zeroing stock).
+  quantity: z.number().int().min(0),
   reason: z.string().optional(),
+}).refine((data) => data.type === 'adjustment' || data.quantity >= 1, {
+  message: 'quantity must be at least 1 for in/out/waste movements',
+  path: ['quantity'],
 });
 
 export const ListInventoryQuerySchema = z.object({

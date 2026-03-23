@@ -35,7 +35,6 @@ let mongoServer: MongoMemoryServer;
 let adminToken = '';
 let nurseToken = '';
 let patientToken = '';
-let adminUserId = '';
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
@@ -47,15 +46,13 @@ beforeAll(async () => {
   process.env.NODE_ENV = 'test';
 
   // Create admin user
-  const adminUser = await User.create({
+  await User.create({
     firstName: 'Admin',
     lastName: 'User',
     email: 'admin@inventory.test',
     password: 'AdminPass1!',
     role: 'admin',
   });
-  adminUserId = adminUser._id.toString();
-
   // Create nurse user
   await User.create({
     firstName: 'Nurse',
