@@ -5,8 +5,8 @@ export const RegisterSchema = z.object({
   lastName: z.string().min(1).max(50),
   email: z.string().email(),
   password: z.string().min(8).max(100).regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/,
+    'Password must contain uppercase, lowercase, number, and special character'
   ),
   phone: z.string().optional(),
   dob: z.string().datetime().optional(),
@@ -25,8 +25,8 @@ export const ForgotPasswordSchema = z.object({
 export const ResetPasswordSchema = z.object({
   token: z.string().min(1),
   password: z.string().min(8).max(100).regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/,
+    'Password must contain uppercase, lowercase, number, and special character'
   ),
 });
 

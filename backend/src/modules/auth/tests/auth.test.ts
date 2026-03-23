@@ -50,7 +50,7 @@ const validUser = {
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@example.com',
-  password: 'SecurePass1',
+  password: 'SecurePass1!',
 };
 
 // Helper: register + get tokens
@@ -133,7 +133,7 @@ describe('POST /api/v1/auth/login', () => {
   it('returns 401 for wrong password', async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
-      .send({ email: validUser.email, password: 'WrongPass1' });
+      .send({ email: validUser.email, password: 'WrongPass1!' });
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -145,7 +145,7 @@ describe('POST /api/v1/auth/login', () => {
     for (let i = 0; i < 5; i++) {
       await request(app)
         .post('/api/v1/auth/login')
-        .send({ email: validUser.email, password: 'WrongPass1' });
+        .send({ email: validUser.email, password: 'WrongPass1!' });
     }
 
     // 6th attempt — should be locked
@@ -274,5 +274,58 @@ describe('GET /api/v1/auth/me', () => {
 
     expect(meRes.status).toBe(401);
     expect(meRes.body.success).toBe(false);
+  });
+});
+
+describe('POST /api/v1/auth/forgot-password', () => {
+  it('returns same 200 message for registered and non-existent emails (anti-enumeration)', async () => {
+    // Register a user first
+    await registerAndGetTokens();
+
+    // Attempt with registered email
+    const resRegistered = await request(app)
+      .post('/api/v1/auth/forgot-password')
+      .send({ email: validUser.email });
+
+    // Attempt with non-existent email
+    const resUnknown = await request(app)
+      .post('/api/v1/auth/forgot-password')
+      .send({ email: 'nonexistent@example.com' });
+
+    // Both should return 200 with identical message
+    expect(resRegistered.status).toBe(200);
+    expect(resUnknown.status).toBe(200);
+    expect(resRegistered.body.success).toBe(true);
+    expect(resUnknown.body.success).toBe(true);
+    expect(resRegistered.body.data.message).toBe(resUnknown.body.data.message);
+    expect(resRegistered.body.data.message).toMatch(/reset link/i);
+  });
+});
+
+describe('POST /api/v1/auth/logout-all', () => {
+  it('returns 200 and subsequent refresh with a pre-logout cookie fails', async () => {
+    // Register to get tokens
+    const registerRes = await registerAndGetTokens();
+    const { accessToken } = registerRes.body.data;
+    const cookies: string[] = Array.isArray(registerRes.headers['set-cookie'])
+      ? registerRes.headers['set-cookie']
+      : [registerRes.headers['set-cookie']];
+    const refreshCookie = cookies.find((c: string) => c.startsWith('refreshToken='))!;
+
+    // Logout from all devices using the access token
+    const logoutAllRes = await request(app)
+      .post('/api/v1/auth/logout-all')
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(logoutAllRes.status).toBe(200);
+    expect(logoutAllRes.body.success).toBe(true);
+    expect(logoutAllRes.body.data.message).toMatch(/all devices/i);
+
+    // The pre-logout refresh token cookie should no longer work
+    const refreshRes = await request(app)
+      .post('/api/v1/auth/refresh')
+      .set('Cookie', refreshCookie);
+
+    expect(refreshRes.status).toBe(401);
   });
 });

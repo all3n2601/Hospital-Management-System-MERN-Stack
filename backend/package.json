@@ -11,7 +11,8 @@
     "test:coverage": "jest --coverage --forceExit",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
-    "postinstall": "node -e \"const fs=require('fs'),p='node_modules/buffer-equal-constant-time/index.js',c=fs.readFileSync(p,'utf8');if(!c.includes('SlowBuffer || Buffer'))fs.writeFileSync(p,c.replace('require(\\'buffer\\').SlowBuffer;','require(\\'buffer\\').SlowBuffer || Buffer;'));\""
+    "postinstall": "node -e \"const fs=require('fs'),p='node_modules/buffer-equal-constant-time/index.js',c=fs.readFileSync(p,'utf8');if(!c.includes('SlowBuffer || Buffer'))fs.writeFileSync(p,c.replace('require(\\'buffer\\').SlowBuffer;','require(\\'buffer\\').SlowBuffer || Buffer;'));\"",
+    "_postinstall_reason": "Patches buffer-equal-constant-time@1.0.1 to remove removed SlowBuffer API in Node 25+ (jsonwebtoken@9 transitive dep). Remove when upgrading to jose or jsonwebtoken@10."
   },
   "overrides": {
     "buffer-equal-constant-time": "1.0.1"

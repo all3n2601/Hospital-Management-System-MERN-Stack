@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RegisterSchema, LoginSchema, ForgotPasswordSchema, ResetPasswordSchema } from './schema';
 import * as AuthService from './service';
 import { successResponse } from '../../types/api';
-import { ValidationError } from '../../middleware/errorHandler';
+import { ValidationError, AuthError } from '../../middleware/errorHandler';
 
 // Cookie config for refresh token
 const REFRESH_COOKIE_OPTIONS = {
@@ -16,8 +16,7 @@ const REFRESH_COOKIE_OPTIONS = {
 function getSecrets(_req: Request) {
   // Secrets injected at bootstrap via process.env after fetchSecrets()
   const jwtSecret = process.env.JWT_SECRET!;
-  const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET!;
-  return { jwtSecret, jwtRefreshSecret };
+  return { jwtSecret };
 }
 
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -25,8 +24,8 @@ export async function register(req: Request, res: Response, next: NextFunction):
     const input = RegisterSchema.safeParse(req.body);
     if (!input.success) throw new ValidationError('Invalid input', input.error.flatten().fieldErrors as Record<string, unknown>);
 
-    const { jwtSecret, jwtRefreshSecret } = getSecrets(req);
-    const { user, tokens } = await AuthService.registerUser(input.data, jwtSecret, jwtRefreshSecret);
+    const { jwtSecret } = getSecrets(req);
+    const { user, tokens } = await AuthService.registerUser(input.data, jwtSecret);
 
     res.cookie('refreshToken', tokens.refreshToken, REFRESH_COOKIE_OPTIONS);
     res.status(201).json(successResponse({
@@ -43,12 +42,11 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     const input = LoginSchema.safeParse(req.body);
     if (!input.success) throw new ValidationError('Invalid input', input.error.flatten().fieldErrors as Record<string, unknown>);
 
-    const { jwtSecret, jwtRefreshSecret } = getSecrets(req);
+    const { jwtSecret } = getSecrets(req);
     const { user, tokens } = await AuthService.loginUser(
       input.data.email,
       input.data.password,
       jwtSecret,
-      jwtRefreshSecret,
       { userAgent: req.headers['user-agent'], ip: req.ip }
     );
 
@@ -66,13 +64,13 @@ export async function refresh(req: Request, res: Response, next: NextFunction): 
   try {
     const rawToken = req.cookies?.refreshToken as string | undefined;
     if (!rawToken) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'No refresh token' } });
+      next(new AuthError('No refresh token'));
       return;
     }
 
-    const { jwtSecret, jwtRefreshSecret } = getSecrets(req);
+    const { jwtSecret } = getSecrets(req);
     const tokens = await AuthService.refreshTokens(
-      rawToken, jwtSecret, jwtRefreshSecret,
+      rawToken, jwtSecret,
       { userAgent: req.headers['user-agent'], ip: req.ip }
     );
 
@@ -96,7 +94,7 @@ export async function logout(req: Request, res: Response, next: NextFunction): P
 
 export async function logoutAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    if (!req.user) { res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Not authenticated' } }); return; }
+    if (!req.user) { next(new AuthError('Not authenticated')); return; }
     await AuthService.logoutAllDevices(req.user._id);
     res.clearCookie('refreshToken', { path: '/api/v1/auth' });
     res.json(successResponse({ message: 'Logged out from all devices' }));
@@ -131,7 +129,10 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
 export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) { res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Not authenticated' } }); return; }
-    res.json(successResponse({ user: req.user }));
+    const { User } = await import('../../models/User');
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) { next(new AuthError('User not found')); return; }
+    res.json(successResponse({ user }));
   } catch (err) {
     next(err);
   }

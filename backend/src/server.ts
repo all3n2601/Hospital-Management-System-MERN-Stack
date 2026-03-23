@@ -14,6 +14,7 @@ async function bootstrap() {
   process.env.MONGODB_URI = secrets.MONGODB_URI;
   process.env.REDIS_URL = secrets.REDIS_URL;
   process.env.JWT_SECRET = secrets.JWT_SECRET;
+  process.env.JWT_REFRESH_SECRET = secrets.JWT_REFRESH_SECRET;
 
   await connectDB();
   await connectRedis();

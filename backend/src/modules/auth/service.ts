@@ -30,8 +30,7 @@ function generateRefreshToken(): string {
 
 export async function registerUser(
   input: { firstName: string; lastName: string; email: string; password: string; phone?: string; dob?: string; gender?: string },
-  jwtSecret: string,
-  jwtRefreshSecret: string
+  jwtSecret: string
 ): Promise<{ user: IUser; tokens: TokenPair }> {
   const existing = await User.findOne({ email: input.email });
   if (existing) throw new ConflictError('Email already registered');
@@ -51,7 +50,7 @@ export async function registerUser(
     // Patient model not yet available (Phase 2) — skip silently
   }
 
-  const tokens = await createTokenPair(user, jwtSecret, jwtRefreshSecret);
+  const tokens = await createTokenPair(user, jwtSecret);
   return { user, tokens };
 }
 
@@ -59,13 +58,12 @@ export async function loginUser(
   email: string,
   password: string,
   jwtSecret: string,
-  jwtRefreshSecret: string,
   meta: { userAgent?: string; ip?: string }
 ): Promise<{ user: IUser; tokens: TokenPair }> {
   const user = await User.findOne({ email }).select('+password');
   if (!user) throw new AuthError('Invalid credentials');
 
-  if (!user.isActive) throw new AuthError('Account is deactivated');
+  if (!user.isActive) throw new AuthError('Invalid credentials');
 
   if (user.isLocked()) {
     throw new AuthError('Account is temporarily locked due to too many failed login attempts');
@@ -88,14 +86,13 @@ export async function loginUser(
   user.lastLogin = new Date();
   await user.save();
 
-  const tokens = await createTokenPair(user, jwtSecret, jwtRefreshSecret, meta);
+  const tokens = await createTokenPair(user, jwtSecret, meta);
   return { user, tokens };
 }
 
 async function createTokenPair(
   user: IUser,
   jwtSecret: string,
-  jwtRefreshSecret: string,
   meta?: { userAgent?: string; ip?: string }
 ): Promise<TokenPair> {
   const rawRefreshToken = generateRefreshToken();
@@ -117,7 +114,6 @@ async function createTokenPair(
 export async function refreshTokens(
   rawToken: string,
   jwtSecret: string,
-  jwtRefreshSecret: string,
   meta?: { userAgent?: string; ip?: string }
 ): Promise<TokenPair> {
   const tokenHash = hashToken(rawToken);
