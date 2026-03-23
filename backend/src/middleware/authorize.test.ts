@@ -234,23 +234,34 @@ describe("authorize middleware", () => {
   describe("receptionist role", () => {
     const receptionist: AuthUser = { _id: "rec-id", role: "receptionist" };
 
-    test("receptionist can create_draft billing", () => {
+    test("receptionist can read billing", () => {
       const req = makeReq(receptionist);
       const { res, status } = makeRes();
       const next = makeNext();
 
-      authorize("billing", "create_draft")(req as Request, res as Response, next);
+      authorize("billing", "read")(req as Request, res as Response, next);
 
       expect(status).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalledTimes(1);
     });
 
-    test("receptionist cannot write billing", () => {
+    test("receptionist can write billing", () => {
+      const req = makeReq(receptionist);
+      const { res, status } = makeRes();
+      const next = makeNext();
+
+      authorize("billing", "write")(req as Request, res as Response, next);
+
+      expect(status).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test("receptionist cannot issue billing", () => {
       const req = makeReq(receptionist);
       const { res, status, json } = makeRes();
       const next = makeNext();
 
-      authorize("billing", "write")(req as Request, res as Response, next);
+      authorize("billing", "issue")(req as Request, res as Response, next);
 
       expect(status).toHaveBeenCalledWith(403);
       expect(json).toHaveBeenCalledWith(
