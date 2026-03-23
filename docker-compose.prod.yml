@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  api:
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 1G }
+        reservations: { cpus: '0.5', memory: 512M }
+    restart: always
+    environment:
+      - NODE_ENV=production
+
+  frontend:
+    deploy:
+      resources:
+        limits: { cpus: '0.5', memory: 256M }
+    restart: always
