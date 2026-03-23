@@ -16,8 +16,11 @@ import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminPatients } from '@/pages/admin/Patients';
 import { AdminStaff } from '@/pages/admin/Staff';
 import { DoctorDashboard } from '@/pages/doctor/Dashboard';
+import { DoctorSchedule } from '@/pages/doctor/Schedule';
 import { NurseDashboard } from '@/pages/nurse/Dashboard';
 import { PatientDashboard } from '@/pages/patient/Dashboard';
+import { BookAppointment } from '@/pages/patient/BookAppointment';
+import { PatientAppointments } from '@/pages/patient/Appointments';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -81,6 +84,7 @@ export default function App() {
                   <ProtectedRoute allowedRoles={['doctor']}>
                     <Routes>
                       <Route path="dashboard" element={<DoctorDashboard />} />
+                      <Route path="schedule" element={<DoctorSchedule />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -103,6 +107,8 @@ export default function App() {
                   <ProtectedRoute allowedRoles={['patient']}>
                     <Routes>
                       <Route path="dashboard" element={<PatientDashboard />} />
+                      <Route path="book-appointment" element={<BookAppointment />} />
+                      <Route path="appointments" element={<PatientAppointments />} />
                     </Routes>
                   </ProtectedRoute>
                 }
