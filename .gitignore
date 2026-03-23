@@ -1,1 +1,8 @@
 
+.worktrees/
+.superpowers/
+node_modules/
+.env
+.env.local
+dist/
+build/
