@@ -160,9 +160,14 @@ export async function getLabResultByOrderId(
 
   if (ownOnly) {
     const labOrderDoc = result.labOrder as unknown as {
-      patient: { userId: Types.ObjectId | { toString(): string } };
+      patient: { userId: Types.ObjectId | { _id?: Types.ObjectId; toString(): string } };
     };
-    const patientUserId = labOrderDoc?.patient?.userId?.toString();
+    const rawUserId = labOrderDoc?.patient?.userId;
+    // userId may be a populated User document (has _id) or a raw ObjectId
+    const patientUserId =
+      rawUserId && typeof rawUserId === 'object' && '_id' in rawUserId
+        ? (rawUserId._id as Types.ObjectId).toString()
+        : rawUserId?.toString();
     if (!patientUserId || patientUserId !== requestingUserId) {
       throw new ForbiddenError('You can only view your own lab results');
     }
