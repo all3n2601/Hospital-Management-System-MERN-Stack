@@ -18,12 +18,12 @@ TypeScript MERN Stack rebuild of the Hospital Management System.
 | 3 | Appointments | ✅ | ✅ | ✅ | Done |
 | 4 | Billing | ✅ | ✅ | ✅ | Done |
 | 5 | Lab & Diagnostics | ✅ | ✅ | ✅ | Done |
-| 6 | Pharmacy | ⬜ | ⬜ | ⬜ | To Do |
-| 7 | Inventory | ⬜ | ⬜ | ⬜ | To Do |
-| 8 | Documents | ⬜ | ⬜ | ⬜ | To Do |
-| 9 | Analytics & Settings | ⬜ | ⬜ | ⬜ | To Do |
+| 6 | Pharmacy | ✅ | ✅ | ✅ | Done |
+| 7 | Inventory | ✅ | ✅ | ✅ | Done |
+| 8 | Documents | ✅ | ✅ | ✅ | Done |
+| 9 | Analytics & Settings | ✅ | ✅ | ✅ | Done |
 
-**Tests:** 105 passing across 9 suites (as of Phase 5)
+**Tests:** 198 passing across 13 suites (as of Phase 9)
 
 ---
 
