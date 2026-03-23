@@ -7,7 +7,7 @@ import { StatBar } from '@/components/Shared/StatBar';
 
 interface Prescription {
   _id: string; status?: string; medicationName?: string; dosage?: string;
-  quantity?: number; instructions?: string;
+  quantity?: number; instructions?: string; patientId?: string;
   patient?: { patientId?: string; userId?: { firstName?: string; lastName?: string } };
   doctor?: { userId?: { firstName?: string; lastName?: string } };
 }
@@ -42,9 +42,9 @@ function greetingByHour(): string {
 export function NurseDashboard() {
   const user = useAppSelector(s => s.auth.user);
 
-  const rxQ = useQuery<{ success: boolean; data: Prescription[] }>({
-    queryKey: ['nurse-dashboard', 'prescriptions'],
-    queryFn: () => api.get('/pharmacy/prescriptions?status=active&limit=6').then(r => r.data),
+  const dispensingQ = useQuery({
+    queryKey: ['pharmacy-dispensing'],
+    queryFn: () => api.get('/pharmacy/dispensing?status=pending,ready&limit=5').then(r => r.data),
   });
 
   const inventoryQ = useQuery<{ success: boolean; data: InventoryItem[] }>({
@@ -57,7 +57,7 @@ export function NurseDashboard() {
     queryFn: () => api.get('/lab/orders?status=pending,collected&limit=5').then(r => r.data),
   });
 
-  const pendingRx  = rxQ.data?.data ?? [];
+  const pendingRx: Prescription[]  = dispensingQ.data?.data ?? [];
   const lowStock   = inventoryQ.data?.data ?? [];
   const labOrders  = labQ.data?.data ?? [];
 
@@ -79,9 +79,9 @@ export function NurseDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard
-          title="Pending Dispense"     value={rxQ.isLoading ? '…' : pendingRx.length}
+          title="Pending Dispense"     value={dispensingQ.isLoading ? '…' : pendingRx.length}
           trend={pendingRx.length > 0 ? `${pendingRx.length} waiting` : 'Queue clear'} trendDir={pendingRx.length > 0 ? 'down' : 'neutral'}
-          color="amber" icon="💊" sparklineData={DISPENSE_SPARK} isLoading={rxQ.isLoading}
+          color="amber" icon="💊" sparklineData={DISPENSE_SPARK} isLoading={dispensingQ.isLoading}
         />
         <KpiCard
           title="Low Stock Items"      value={inventoryQ.isLoading ? '…' : lowStock.length}
@@ -89,7 +89,7 @@ export function NurseDashboard() {
           color="purple" icon="📦" sparklineData={STOCK_SPARK} isLoading={inventoryQ.isLoading}
         />
         <KpiCard
-          title="Lab Samples Pending"  value={labQ.isLoading ? '…' : labOrders.length}
+          title="Lab Samples Collected Today"  value={labQ.isLoading ? '…' : labOrders.length}
           trend="Awaiting results"     trendDir="neutral"
           color="green" icon="🔬" sparklineData={LAB_SPARK} isLoading={labQ.isLoading}
         />
@@ -106,12 +106,12 @@ export function NurseDashboard() {
             </Link>
           </div>
           <div className="px-4 divide-y divide-slate-50">
-            {rxQ.isLoading && (
+            {dispensingQ.isLoading && (
               <div className="space-y-3 py-3">
                 {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
               </div>
             )}
-            {!rxQ.isLoading && pendingRx.length === 0 && (
+            {!dispensingQ.isLoading && pendingRx.length === 0 && (
               <p className="text-[12px] text-slate-400 py-8 text-center">No pending prescriptions</p>
             )}
             {pendingRx.map(rx => {
@@ -137,6 +137,7 @@ export function NurseDashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-semibold text-slate-900 truncate">{patName}</p>
+                    <div className="text-xs text-slate-400">{rx.patient?.patientId || rx.patientId || ''}</div>
                     <p className="text-[10px] text-slate-400 truncate">{drug} · {docName}</p>
                   </div>
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${statusStyle}`}>
@@ -175,6 +176,7 @@ export function NurseDashboard() {
                     max={reorder}
                     color={color}
                     unit="qty"
+                    valueLabel={`${item.quantity ?? 0} / ${reorder}`}
                   />
                 );
               })}
@@ -184,13 +186,13 @@ export function NurseDashboard() {
           {/* Quick actions */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
             <h2 className="text-[13px] font-bold text-slate-900 mb-3">Quick Actions</h2>
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: '💊', label: 'Dispensing Queue', sub: `${pendingRx.length} pending`, to: '/nurse/dispensing' },
-                { icon: '📦', label: 'Inventory',        sub: 'Check stock levels',          to: '/nurse/inventory' },
-              ].map(({ icon, label, sub, to }) => (
+                { icon: '💊', label: 'Dispense',    sub: 'Process script',  href: '/nurse/dispensing' },
+                { icon: '📦', label: 'Stock Check', sub: 'Inventory view',  href: '/nurse/inventory' },
+              ].map(({ icon, label, sub, href }) => (
                 <Link
-                  key={label} to={to}
+                  key={label} to={href}
                   className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors group"
                 >
                   <span className="text-lg">{icon}</span>

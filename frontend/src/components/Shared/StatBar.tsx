@@ -4,9 +4,10 @@ interface StatBarProps {
   max?: number;
   color?: string;
   unit?: string;
+  valueLabel?: string;
 }
 
-export function StatBar({ label, value, max = 100, color = '#6366f1', unit = '%' }: StatBarProps) {
+export function StatBar({ label, value, max = 100, color = '#6366f1', unit = '%', valueLabel }: StatBarProps) {
   const pct = max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0;
   return (
     <div className="flex items-center gap-3 py-1.5">
@@ -18,7 +19,7 @@ export function StatBar({ label, value, max = 100, color = '#6366f1', unit = '%'
         />
       </div>
       <span className="text-[10px] font-bold text-slate-800 w-10 text-right flex-shrink-0">
-        {unit === '%' ? `${Math.round(pct)}%` : `${value} ${unit}`}
+        {valueLabel !== undefined ? valueLabel : unit === '%' ? `${Math.round(pct)}%` : `${value} ${unit}`}
       </span>
     </div>
   );
