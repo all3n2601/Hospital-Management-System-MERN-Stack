@@ -1,108 +1,313 @@
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { useAppSelector } from '@/store/hooks';
+import { KpiCard } from '@/components/Shared/KpiCard';
+import { AppointmentRow } from '@/components/Shared/AppointmentRow';
+import { AlertItem } from '@/components/Shared/AlertItem';
+import { StatBar } from '@/components/Shared/StatBar';
 
-const ADMIN_KPI_CARDS = [
-  { title: 'Total Patients', value: '1,284', change: '+12% this month' },
-  { title: 'Appointments Today', value: '48', change: '6 pending' },
-  { title: 'Revenue (MTD)', value: '$84,320', change: '+8.2% vs last month' },
-  { title: 'Staff on Duty', value: '32', change: '4 on leave' },
+// Minimal types for dashboard queries
+interface Patient { _id: string; }
+interface StaffMember { _id: string; onDuty?: boolean; }
+interface LabOrder {
+  _id: string; orderId?: string; testName?: string;
+  status?: string; priority?: string; createdAt?: string;
+  patient?: { patientId?: string; userId?: { firstName?: string; lastName?: string } };
+  doctor?: { userId?: { firstName?: string; lastName?: string } };
+}
+interface Appointment {
+  _id: string; timeSlot?: string; status?: string; type?: string; reason?: string;
+  patient?: { patientId?: string; userId?: { firstName?: string; lastName?: string } };
+  doctor?: { specialization?: string; userId?: { firstName?: string; lastName?: string } };
+}
+interface Invoice { _id: string; totalAmount?: number; status?: string; }
+
+const DEPT_STATS = [
+  { label: 'Cardiology',   value: 82, color: '#6366f1' },
+  { label: 'General Med',  value: 67, color: '#10b981' },
+  { label: 'Orthopedics',  value: 45, color: '#f59e0b' },
+  { label: 'Neurology',    value: 58, color: '#0ea5e9' },
 ];
 
-const RECEPTIONIST_QUICK_LINKS = [
-  { label: 'Patients', to: '/admin/patients' },
-  { label: 'Billing', to: '/admin/billing' },
-  { label: 'Lab', to: '/admin/lab' },
-  { label: 'Pharmacy', to: '/admin/pharmacy' },
-];
+const PATIENT_SPARK  = [40, 45, 38, 52, 48, 60, 55, 70, 65, 80];
+const APPT_SPARK     = [20, 28, 22, 35, 30, 42, 38, 48, 44, 50];
+const REVENUE_SPARK  = [30, 40, 35, 50, 45, 58, 52, 65, 60, 75];
+const STAFF_SPARK    = [28, 30, 29, 32, 31, 33, 30, 32, 31, 32];
+
+function greetingByHour(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function getInitials(a?: Appointment | null): string {
+  const u = a?.patient?.userId;
+  return u ? `${u.firstName?.[0] ?? ''}${u.lastName?.[0] ?? ''}`.toUpperCase() : 'PT';
+}
+
+function getPatientName(a: Appointment): string {
+  const u = a.patient?.userId;
+  return u ? `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() : 'Unknown Patient';
+}
+
+function getDoctorMeta(a: Appointment): string {
+  const u = a.doctor?.userId;
+  const spec = a.doctor?.specialization ?? '';
+  return u ? `${spec} · Dr. ${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() : spec;
+}
 
 export function AdminDashboard() {
   const user = useAppSelector(s => s.auth.user);
   const isReceptionist = user?.role === 'receptionist';
+  const today = new Date().toISOString().split('T')[0];
+
+  const patientsQ = useQuery<{ success: boolean; data: Patient[] }>({
+    queryKey: ['admin-dash', 'patients'],
+    queryFn: () => api.get('/patients').then(r => r.data),
+  });
+
+  const staffQ = useQuery<{ success: boolean; data: StaffMember[] }>({
+    queryKey: ['admin-dash', 'staff'],
+    queryFn: () => api.get('/staff').then(r => r.data),
+  });
+
+  const apptQ = useQuery<{ success: boolean; data: Appointment[] }>({
+    queryKey: ['admin-dash', 'appts', today],
+    queryFn: () => api.get(`/appointments?date=${today}&limit=6`).then(r => r.data),
+  });
+
+  const billingQ = useQuery<{ success: boolean; data: Invoice[] }>({
+    queryKey: ['admin-dash', 'billing'],
+    queryFn: () => api.get('/billing?limit=50').then(r => r.data),
+  });
+
+  const labQ = useQuery<{ success: boolean; data: LabOrder[] }>({
+    queryKey: ['admin-dash', 'lab'],
+    queryFn: () => api.get('/lab/orders?status=pending,processing&limit=5').then(r => r.data),
+  });
+
+  const totalPatients = patientsQ.data?.data?.length ?? 0;
+  const totalStaff    = staffQ.data?.data?.length ?? 0;
+  const todayAppts    = apptQ.data?.data ?? [];
+
+  const revenueMTD = (billingQ.data?.data ?? [])
+    .filter(inv => inv.status === 'paid')
+    .reduce((sum, inv) => sum + (inv.totalAmount ?? 0), 0);
+
+  const pendingLabs = labQ.data?.data ?? [];
+
+  const dateLabel = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {isReceptionist ? 'Receptionist Dashboard' : 'Admin Dashboard'}
-        </h1>
-        <p className="text-muted-foreground">
-          {isReceptionist
-            ? `Welcome, ${user?.firstName} ${user?.lastName}`
-            : 'Hospital overview and key metrics'}
-        </p>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
+            {greetingByHour()}, {user?.firstName} 👋
+          </h1>
+          <p className="text-[12px] text-slate-500 mt-0.5">
+            {dateLabel} · {isReceptionist ? 'Receptionist Dashboard' : 'Hospital Overview'}
+          </p>
+        </div>
+        {!isReceptionist && (
+          <Link
+            to="/admin/analytics"
+            className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-colors"
+          >
+            📊 Analytics →
+          </Link>
+        )}
       </div>
 
-      {isReceptionist ? (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Appointments Today</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">—</p>
-                <p className="text-xs text-muted-foreground mt-1">Check scheduling system</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Pending Bills</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">—</p>
-                <p className="text-xs text-muted-foreground mt-1">Open invoices</p>
-              </CardContent>
-            </Card>
+      {/* KPI Cards */}
+      {!isReceptionist && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <KpiCard
+            title="Total Patients"     value={patientsQ.isLoading ? '…' : totalPatients.toLocaleString()}
+            trend="12% this month"     trendDir="up"
+            color="blue"              icon="🏥"
+            sparklineData={PATIENT_SPARK}
+            isLoading={patientsQ.isLoading}
+          />
+          <KpiCard
+            title="Appointments Today" value={apptQ.isLoading ? '…' : todayAppts.length}
+            trend={`${todayAppts.filter(a => a.status === 'scheduled').length} pending`} trendDir="neutral"
+            color="green"             icon="📅"
+            sparklineData={APPT_SPARK}
+            isLoading={apptQ.isLoading}
+          />
+          <KpiCard
+            title="Revenue (MTD)"      value={billingQ.isLoading ? '…' : `$${(revenueMTD / 1000).toFixed(1)}K`}
+            trend="8.2% vs last month" trendDir="up"
+            color="amber"             icon="💰"
+            sparklineData={REVENUE_SPARK}
+            isLoading={billingQ.isLoading}
+          />
+          <KpiCard
+            title="Staff on Duty"      value={staffQ.isLoading ? '…' : totalStaff}
+            trend="4 on leave"         trendDir="neutral"
+            color="purple"            icon="👥"
+            sparklineData={STAFF_SPARK}
+            isLoading={staffQ.isLoading}
+          />
+        </div>
+      )}
+
+      {isReceptionist && (
+        <div className="grid grid-cols-2 gap-4">
+          <KpiCard
+            title="Appointments Today" value={apptQ.isLoading ? '…' : todayAppts.length}
+            color="green" icon="📅" isLoading={apptQ.isLoading}
+          />
+          <KpiCard
+            title="Pending Lab Orders" value={labQ.isLoading ? '…' : pendingLabs.length}
+            color="purple" icon="🔬" isLoading={labQ.isLoading}
+          />
+        </div>
+      )}
+
+      {/* Main grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Appointments card - takes 2 cols */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
+            <h2 className="text-[13px] font-bold text-slate-900">Today's Appointments</h2>
+            <Link to="/admin/patients" className="text-[11px] font-semibold text-indigo-600 hover:underline">
+              View all →
+            </Link>
+          </div>
+          <div className="px-4 divide-y divide-slate-50">
+            {apptQ.isLoading && (
+              <div className="space-y-3 py-3">
+                {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
+              </div>
+            )}
+            {!apptQ.isLoading && todayAppts.length === 0 && (
+              <p className="text-[12px] text-slate-400 py-6 text-center">No appointments scheduled today</p>
+            )}
+            {todayAppts.slice(0, 5).map(appt => (
+              <AppointmentRow
+                key={appt._id}
+                initials={getInitials(appt)}
+                name={getPatientName(appt)}
+                meta={getDoctorMeta(appt)}
+                time={appt.timeSlot ?? '—'}
+                status={appt.status ?? 'scheduled'}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className="space-y-4">
+          {/* Quick Actions */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <h2 className="text-[13px] font-bold text-slate-900 mb-3">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { icon: '👤', label: 'New Patient',   sub: 'Register',      to: '/admin/patients' },
+                { icon: '📅', label: 'Appointments',  sub: 'View schedule', to: '/admin/patients' },
+                { icon: '💰', label: 'Billing',       sub: 'Manage bills',  to: '/admin/billing' },
+                { icon: '👥', label: 'Staff',         sub: 'Manage team',   to: '/admin/staff' },
+              ].map(({ icon, label, sub, to }) => (
+                <Link
+                  key={label} to={to}
+                  className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors group"
+                >
+                  <span className="text-base">{icon}</span>
+                  <div>
+                    <p className="text-[11px] font-bold text-slate-700 group-hover:text-indigo-700">{label}</p>
+                    <p className="text-[10px] text-slate-400">{sub}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                {RECEPTIONIST_QUICK_LINKS.map(link => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ADMIN_KPI_CARDS.map((card) => (
-              <Card key={card.title}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{card.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{card.change}</p>
-                </CardContent>
-              </Card>
+          {/* Live Alerts */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
+              <h2 className="text-[13px] font-bold text-slate-900">🔔 Recent Activity</h2>
+            </div>
+            <div className="px-4 py-1">
+              {pendingLabs.length > 0 ? (
+                pendingLabs.slice(0, 3).map(lab => (
+                  <AlertItem key={lab._id} dotColor={lab.priority === 'urgent' ? '#ef4444' : '#f59e0b'} time="Pending">
+                    <strong>{lab.testName ?? 'Lab order'}</strong>
+                    {lab.patient?.userId && ` — ${lab.patient.userId.firstName} ${lab.patient.userId.lastName}`}
+                  </AlertItem>
+                ))
+              ) : (
+                <>
+                  <AlertItem dotColor="#10b981" time="System">Hospital system running normally</AlertItem>
+                  <AlertItem dotColor="#6366f1" time="Tip">
+                    Check <Link to="/admin/analytics" className="text-indigo-600 hover:underline">Analytics</Link> for detailed reports
+                  </AlertItem>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom grid — department load + pending labs */}
+      {!isReceptionist && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[13px] font-bold text-slate-900">Department Load</h2>
+              <Link to="/admin/analytics" className="text-[11px] text-indigo-600 hover:underline font-semibold">View report →</Link>
+            </div>
+            {DEPT_STATS.map(d => (
+              <StatBar key={d.label} label={d.label} value={d.value} max={100} color={d.color} />
             ))}
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">
-                View detailed analytics in the{' '}
-                <Link to="/admin/analytics" className="text-primary hover:underline">Analytics</Link> section.
-              </p>
-            </CardContent>
-          </Card>
-        </>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
+              <h2 className="text-[13px] font-bold text-slate-900">Pending Lab Orders</h2>
+              <Link to="/admin/lab" className="text-[11px] text-indigo-600 hover:underline font-semibold">View all →</Link>
+            </div>
+            <div className="px-4 divide-y divide-slate-50">
+              {labQ.isLoading && (
+                <div className="space-y-2 py-3">
+                  {[1,2,3].map(i => <div key={i} className="h-7 bg-slate-100 rounded animate-pulse" />)}
+                </div>
+              )}
+              {!labQ.isLoading && pendingLabs.length === 0 && (
+                <p className="text-[12px] text-slate-400 py-6 text-center">No pending lab orders</p>
+              )}
+              {pendingLabs.map(lab => {
+                const patName = lab.patient?.userId
+                  ? `${lab.patient.userId.firstName ?? ''} ${lab.patient.userId.lastName ?? ''}`.trim()
+                  : lab.patient?.patientId ?? '—';
+                const docName = lab.doctor?.userId
+                  ? `Dr. ${lab.doctor.userId.firstName ?? ''} ${lab.doctor.userId.lastName ?? ''}`.trim()
+                  : 'Unknown';
+                const createdLabel = lab.createdAt
+                  ? new Date(lab.createdAt).toLocaleDateString() : '—';
+                return (
+                  <div key={lab._id} className="flex items-center gap-3 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-semibold text-slate-800 truncate">{lab.testName ?? lab.orderId ?? '—'}</p>
+                      <p className="text-[10px] text-slate-400 truncate">{patName} · {docName} · {createdLabel}</p>
+                    </div>
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
+                      lab.priority === 'urgent' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
+                    }`}>
+                      {lab.status ?? 'Pending'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
