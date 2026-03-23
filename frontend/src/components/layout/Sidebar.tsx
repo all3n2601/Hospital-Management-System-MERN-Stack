@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
+import type { AuthUser } from '@/store/authSlice';
 import {
   LayoutDashboard, Users, Calendar, FileText, FlaskConical,
   Pill, Package, Award, BarChart3, Settings, LogOut, Menu, ChevronRight
@@ -12,7 +13,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  roles: Array<string>;
+  roles: Array<AuthUser['role']>;
 }
 
 const NAV_ITEMS: NavItem[] = [

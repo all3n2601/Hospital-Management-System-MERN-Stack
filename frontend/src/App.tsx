@@ -7,6 +7,7 @@ import { queryClient } from '@/lib/queryClient';
 import { useAppSelector } from '@/store/hooks';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AuthInitializer } from '@/components/Auth/AuthInitializer';
 import { SignIn } from '@/pages/public/SignIn';
 import { SignUp } from '@/pages/public/SignUp';
 import { Unauthorized } from '@/pages/public/Unauthorized';
@@ -19,7 +20,7 @@ import { PatientDashboard } from '@/pages/patient/Dashboard';
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
 
-  if (!user) return null;
+  if (!user) return <Navigate to="/sign-in" replace />;
 
   switch (user.role) {
     case 'admin':
@@ -42,6 +43,7 @@ export default function App() {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <AuthInitializer>
           <Routes>
             {/* Public routes */}
             <Route path="/sign-in" element={<SignIn />} />
@@ -106,6 +108,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </AuthInitializer>
         </BrowserRouter>
         <Toaster position="top-right" />
       </QueryClientProvider>

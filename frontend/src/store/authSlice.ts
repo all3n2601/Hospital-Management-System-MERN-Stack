@@ -13,12 +13,14 @@ interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   accessToken: null,
   isAuthenticated: false,
+  isLoading: true,
 };
 
 const authSlice = createSlice({
@@ -38,8 +40,11 @@ const authSlice = createSlice({
     updateAccessToken(state, action: PayloadAction<string>) {
       state.accessToken = action.payload;
     },
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload;
+    },
   },
 });
 
-export const { setCredentials, clearCredentials, updateAccessToken } = authSlice.actions;
+export const { setCredentials, clearCredentials, updateAccessToken, setLoading } = authSlice.actions;
 export const authReducer = authSlice.reducer;

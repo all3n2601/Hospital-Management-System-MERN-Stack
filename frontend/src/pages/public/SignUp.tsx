@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useAppDispatch } from '@/store/hooks';
@@ -82,7 +82,7 @@ export function SignUp() {
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{' '}
-              <a href="/sign-in" className="text-primary hover:underline">Sign in</a>
+              <Link to="/sign-in" className="text-primary hover:underline">Sign in</Link>
             </p>
           </form>
         </CardContent>
