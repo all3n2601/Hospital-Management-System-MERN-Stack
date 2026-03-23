@@ -355,6 +355,13 @@ describe('Analytics - Appointments', () => {
     const res = await request(app).get('/api/v1/analytics/appointments');
     expect(res.status).toBe(401);
   });
+
+  it('GET /analytics/appointments — invalid doctorId returns 400', async () => {
+    const res = await request(app)
+      .get('/api/v1/analytics/appointments?doctorId=not-a-valid-id')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(400);
+  });
 });
 
 // ---------------------------------------------------------------------------

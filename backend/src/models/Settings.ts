@@ -1,4 +1,4 @@
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Model, HydratedDocument } from 'mongoose';
 
 export interface ISettings {
   hospitalName: string;
@@ -15,7 +15,7 @@ export interface ISettings {
 }
 
 interface ISettingsModel extends Model<ISettings> {
-  getSingleton(): Promise<ISettings & { _id: unknown }>;
+  getSingleton(): Promise<HydratedDocument<ISettings>>;
 }
 
 const SettingsSchema = new Schema<ISettings>(
@@ -44,11 +44,12 @@ const SettingsSchema = new Schema<ISettings>(
 );
 
 SettingsSchema.statics.getSingleton = async function () {
-  let settings = await this.findOne();
-  if (!settings) {
-    settings = await this.create({});
-  }
-  return settings;
+  const settings = await this.findOneAndUpdate(
+    {},
+    { $setOnInsert: {} },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+  return settings!;
 };
 
 export const Settings = model<ISettings, ISettingsModel>('Settings', SettingsSchema);

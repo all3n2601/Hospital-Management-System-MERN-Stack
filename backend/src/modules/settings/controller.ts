@@ -22,11 +22,13 @@ export async function updateSettings(req: Request, res: Response, next: NextFunc
       return;
     }
 
-    const settings = await Settings.getSingleton();
-    Object.assign(settings, parsed.data);
-    await (settings as unknown as { save: () => Promise<void> }).save();
+    const updated = await Settings.findOneAndUpdate(
+      {},
+      { $set: parsed.data },
+      { new: true, runValidators: true }
+    );
 
-    res.json({ success: true, data: settings });
+    res.json({ success: true, data: updated });
   } catch (err) {
     next(err);
   }
