@@ -30,13 +30,9 @@ export async function createInvoice(input: CreateInvoiceInput, issuedByUserId: s
   return invoice;
 }
 
-export async function issueInvoice(invoiceId: string, requestingUserId: string, requestingRole: string) {
+export async function issueInvoice(invoiceId: string) {
   const invoice = await Invoice.findById(invoiceId);
   if (!invoice) throw new NotFoundError('Invoice');
-
-  if (requestingRole !== 'admin') {
-    throw new ForbiddenError('Only admins can issue invoices');
-  }
 
   if (invoice.status !== 'draft') {
     throw new ValidationError('Invoice must be in draft status to be issued');
@@ -81,15 +77,10 @@ export async function recordPayment(
 export async function voidInvoice(
   invoiceId: string,
   input: VoidInvoiceInput,
-  requestingUserId: string,
-  requestingRole: string
+  requestingUserId: string
 ) {
   const invoice = await Invoice.findById(invoiceId);
   if (!invoice) throw new NotFoundError('Invoice');
-
-  if (requestingRole !== 'admin') {
-    throw new ForbiddenError('Only admins can void invoices');
-  }
 
   if (invoice.status === 'paid') {
     throw new ValidationError('Cannot void a paid invoice');
@@ -104,7 +95,7 @@ export async function voidInvoice(
 }
 
 export async function listInvoices(
-  filters: ListInvoicesQuery & { patientId?: string },
+  filters: ListInvoicesQuery,
   requestingUserId: string,
   requestingRole: string,
   ownOnly?: boolean
@@ -154,12 +145,9 @@ export async function getInvoiceById(
   if (!invoice) throw new NotFoundError('Invoice');
 
   if (ownOnly) {
-    const patientDoc = invoice.patient as unknown as { userId: { _id: Types.ObjectId; toString(): string } | Types.ObjectId };
-    const patientUserId = patientDoc.userId instanceof Types.ObjectId
-      ? patientDoc.userId.toString()
-      : (patientDoc.userId as { _id: Types.ObjectId; toString(): string }).toString();
-
-    if (patientUserId !== requestingUserId) {
+    const patientDoc = invoice.patient as unknown as { userId: Types.ObjectId | { _id: Types.ObjectId; toString(): string } };
+    const patientUserId = patientDoc.userId?.toString();
+    if (!patientUserId || patientUserId !== requestingUserId) {
       throw new ForbiddenError('You can only view your own invoices');
     }
   }

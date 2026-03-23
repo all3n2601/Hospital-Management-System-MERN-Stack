@@ -15,12 +15,12 @@ router.get('/', authenticate, authorize('billing', 'read'), BillingController.li
 router.get('/:id', authenticate, authorize('billing', 'read'), BillingController.getInvoice);
 
 // Issue invoice
-router.patch('/:id/issue', authenticate, authorize('billing', 'write'), BillingController.issueInvoice);
+router.patch('/:id/issue', authenticate, authorize('billing', 'issue'), BillingController.issueInvoice);
 
 // Record payment
 router.post('/:id/payments', authenticate, authorize('billing', 'write'), BillingController.recordPayment);
 
 // Void invoice
-router.patch('/:id/void', authenticate, authorize('billing', 'write'), BillingController.voidInvoice);
+router.patch('/:id/void', authenticate, authorize('billing', 'void'), BillingController.voidInvoice);
 
 export { router as billingRouter };

@@ -36,7 +36,10 @@ export const VoidInvoiceSchema = z.object({
 
 export const ListInvoicesQuerySchema = z.object({
   patientId: z.string().optional(),
-  status: z.string().optional(),
+  status: z.string().refine(
+    (val) => !val || val.split(',').every(s => ['draft','issued','paid','partial','overdue','void'].includes(s.trim())),
+    { message: 'Invalid status value(s)' }
+  ).optional(),
   page: z.coerce.number().default(1),
   limit: z.coerce.number().max(100).default(20),
 });

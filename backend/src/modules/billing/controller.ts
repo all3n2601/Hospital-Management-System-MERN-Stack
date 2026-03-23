@@ -74,7 +74,7 @@ export async function issueInvoice(req: Request, res: Response, next: NextFuncti
   try {
     if (!req.user) return next(new AuthError());
 
-    const invoice = await BillingService.issueInvoice(req.params.id, req.user._id, req.user.role);
+    const invoice = await BillingService.issueInvoice(req.params.id);
     res.json(successResponse(invoice));
   } catch (err) {
     next(err);
@@ -94,7 +94,7 @@ export async function recordPayment(req: Request, res: Response, next: NextFunct
       req.user._id,
       req.user.role
     );
-    res.status(201).json(successResponse(invoice));
+    res.json(successResponse(invoice));
   } catch (err) {
     next(err);
   }
@@ -110,8 +110,7 @@ export async function voidInvoice(req: Request, res: Response, next: NextFunctio
     const invoice = await BillingService.voidInvoice(
       req.params.id,
       parsed.data,
-      req.user._id,
-      req.user.role
+      req.user._id
     );
     res.json(successResponse(invoice));
   } catch (err) {
