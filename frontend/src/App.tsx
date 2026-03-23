@@ -72,6 +72,12 @@ export default function App() {
             >
               <Route path="/dashboard" element={<DashboardRouter />} />
 
+              {/* Nurse-accessible lab routes (must come before /admin/* wildcard) */}
+              <Route path="/admin/lab" element={<ProtectedRoute allowedRoles={['admin', 'nurse']} />}>
+                <Route index element={<AdminLabManagement />} />
+                <Route path=":id" element={<AdminLabManagement />} />
+              </Route>
+
               <Route
                 path="/admin/*"
                 element={

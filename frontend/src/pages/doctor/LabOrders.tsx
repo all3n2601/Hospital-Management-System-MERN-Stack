@@ -353,136 +353,142 @@ export function DoctorLabOrders() {
         </DialogContent>
       </Dialog>
 
-      {/* ── Detail Panel Dialog ── */}
-      <Dialog open={!!detailOrderId} onOpenChange={(open) => { if (!open) setDetailOrderId(null); }}>
-        <DialogContent className="max-w-2xl" onClose={() => setDetailOrderId(null)}>
-          <DialogHeader>
-            <DialogTitle>Lab Order Detail</DialogTitle>
-          </DialogHeader>
-
-          {detailOrderLoading || detailResultLoading ? (
-            <div className="space-y-3 animate-pulse py-4">
-              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-              <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
-            </div>
-          ) : detailOrder ? (
-            <div className="space-y-5">
-              {/* Order header */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-lg font-semibold">{detailOrder.orderId}</p>
-                  <div className="flex flex-wrap gap-3 mt-1 text-xs text-muted-foreground">
-                    <span>Date: {new Date(detailOrder.orderedAt ?? detailOrder.createdAt).toLocaleDateString()}</span>
-                    <span className="capitalize">Priority: {detailOrder.priority}</span>
-                  </div>
-                </div>
-                <StatusBadge status={detailOrder.status} />
-              </div>
-
-              {/* Tests */}
-              <div>
-                <p className="text-sm font-medium mb-2">Tests</p>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b text-left text-muted-foreground">
-                        <th className="pb-2 pr-4 font-medium">Name</th>
-                        <th className="pb-2 pr-4 font-medium">Code</th>
-                        <th className="pb-2 font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {detailOrder.tests.map((test, idx) => (
-                        <tr key={idx}>
-                          <td className="py-2 pr-4">{test.name}</td>
-                          <td className="py-2 pr-4 font-mono text-muted-foreground">{test.code}</td>
-                          <td className="py-2">
-                            <StatusBadge status={test.status} />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Result */}
-              {detailResult ? (
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium">Results</p>
-                    <StatusBadge status={detailResult.status} />
-                  </div>
-                  {detailResult.results.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b text-left text-muted-foreground">
-                            <th className="pb-2 pr-4 font-medium">Test</th>
-                            <th className="pb-2 pr-4 font-medium">Value</th>
-                            <th className="pb-2 pr-4 font-medium">Reference</th>
-                            <th className="pb-2 font-medium">Normal</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {detailResult.results.map((r, idx) => (
-                            <tr key={idx}>
-                              <td className="py-2 pr-4">{r.testName}</td>
-                              <td className="py-2 pr-4">
-                                {r.value}
-                                {r.unit && <span className="ml-1 text-muted-foreground">{r.unit}</span>}
-                              </td>
-                              <td className="py-2 pr-4 text-muted-foreground">{r.referenceRange ?? '—'}</td>
-                              <td className="py-2">
-                                {r.isNormal === undefined ? (
-                                  <span className="text-muted-foreground">—</span>
-                                ) : r.isNormal ? (
-                                  <span className="text-green-600 font-medium">Normal</span>
-                                ) : (
-                                  <span className="text-red-600 font-medium">Abnormal</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No result values recorded yet.</p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground italic">Results not available yet.</p>
-              )}
-
-              {detailOrder.notes && (
-                <div>
-                  <p className="text-sm font-medium mb-1">Notes</p>
-                  <p className="text-sm text-muted-foreground">{detailOrder.notes}</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4">Order not found.</p>
-          )}
-
-          <DialogFooter>
-            {detailResult && detailResult.status === 'preliminary' && (
-              <Button
-                variant="outline"
-                onClick={() => verifyMutation.mutate(detailResult._id)}
-                disabled={verifyMutation.isPending}
-              >
-                {verifyMutation.isPending ? 'Verifying...' : 'Verify Result'}
+      {/* ── Detail Panel (inline) ── */}
+      {detailOrderId && (
+        <Card className="mt-6">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Lab Order Detail</h2>
+              <Button variant="outline" size="sm" onClick={() => setDetailOrderId(null)}>
+                ✕ Close
               </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {detailOrderLoading || detailResultLoading ? (
+              <div className="space-y-3 animate-pulse py-4">
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            ) : detailOrder ? (
+              <div className="space-y-5">
+                {/* Order header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-semibold">{detailOrder.orderId}</p>
+                    <div className="flex flex-wrap gap-3 mt-1 text-xs text-muted-foreground">
+                      <span>Date: {new Date(detailOrder.orderedAt ?? detailOrder.createdAt).toLocaleDateString()}</span>
+                      <span className="capitalize">Priority: {detailOrder.priority}</span>
+                    </div>
+                  </div>
+                  <StatusBadge status={detailOrder.status} />
+                </div>
+
+                {/* Tests */}
+                <div>
+                  <p className="text-sm font-medium mb-2">Tests</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b text-left text-muted-foreground">
+                          <th className="pb-2 pr-4 font-medium">Name</th>
+                          <th className="pb-2 pr-4 font-medium">Code</th>
+                          <th className="pb-2 font-medium">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {detailOrder.tests.map((test, idx) => (
+                          <tr key={idx}>
+                            <td className="py-2 pr-4">{test.name}</td>
+                            <td className="py-2 pr-4 font-mono text-muted-foreground">{test.code}</td>
+                            <td className="py-2">
+                              <StatusBadge status={test.status} />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Result */}
+                {detailResult ? (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium">Results</p>
+                      <StatusBadge status={detailResult.status} />
+                    </div>
+                    {detailResult.results.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b text-left text-muted-foreground">
+                              <th className="pb-2 pr-4 font-medium">Test</th>
+                              <th className="pb-2 pr-4 font-medium">Value</th>
+                              <th className="pb-2 pr-4 font-medium">Reference</th>
+                              <th className="pb-2 font-medium">Normal</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {detailResult.results.map((r, idx) => (
+                              <tr key={idx}>
+                                <td className="py-2 pr-4">{r.testName}</td>
+                                <td className="py-2 pr-4">
+                                  {r.value}
+                                  {r.unit && <span className="ml-1 text-muted-foreground">{r.unit}</span>}
+                                </td>
+                                <td className="py-2 pr-4 text-muted-foreground">{r.referenceRange ?? '—'}</td>
+                                <td className="py-2">
+                                  {r.isNormal === undefined ? (
+                                    <span className="text-muted-foreground">—</span>
+                                  ) : r.isNormal ? (
+                                    <span className="text-green-600 font-medium">Normal</span>
+                                  ) : (
+                                    <span className="text-red-600 font-medium">Abnormal</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No result values recorded yet.</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Results not available yet.</p>
+                )}
+
+                {detailOrder.notes && (
+                  <div>
+                    <p className="text-sm font-medium mb-1">Notes</p>
+                    <p className="text-sm text-muted-foreground">{detailOrder.notes}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  {detailResult && detailResult.status === 'preliminary' && (
+                    <Button
+                      variant="outline"
+                      onClick={() => verifyMutation.mutate(detailResult._id)}
+                      disabled={verifyMutation.isPending}
+                    >
+                      {verifyMutation.isPending ? 'Verifying...' : 'Verify Result'}
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={() => setDetailOrderId(null)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground py-4">Order not found.</p>
             )}
-            <Button variant="outline" onClick={() => setDetailOrderId(null)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
