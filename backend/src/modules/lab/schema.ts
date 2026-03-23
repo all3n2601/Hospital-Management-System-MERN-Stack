@@ -23,14 +23,13 @@ export const CreateLabResultSchema = z.object({
     referenceRange: z.string().optional(),
     isNormal: z.boolean().optional(),
   })).min(1),
-  collectedAt: z.string().optional(),
-  resultedAt: z.string().optional(),
+  collectedAt: z.string().datetime({ offset: true }).optional(),
+  resultedAt: z.string().datetime({ offset: true }).optional(),
   notes: z.string().optional(),
   reportUrl: z.string().optional(),
 });
 
 export const VerifyResultSchema = z.object({
-  verifiedBy: z.string().min(1), // doctorId
   notes: z.string().optional(),
 });
 

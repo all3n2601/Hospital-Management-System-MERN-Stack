@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthError } from '../../middleware/errorHandler';
+import { ZodError } from 'zod';
+import { AuthError, ValidationError } from '../../middleware/errorHandler';
 import { successResponse } from '../../types/api';
 import {
   CreateLabOrderSchema,
@@ -10,11 +11,20 @@ import {
 } from './schema';
 import * as LabService from './service';
 
+function parseZodError(err: ZodError): ValidationError {
+  const details: Record<string, unknown> = {};
+  for (const issue of err.errors) {
+    details[issue.path.join('.')] = issue.message;
+  }
+  return new ValidationError('Validation failed', details);
+}
+
 export async function createLabOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const input = CreateLabOrderSchema.parse(req.body);
-    const order = await LabService.createLabOrder(input, req.user._id);
+    const parsed = CreateLabOrderSchema.safeParse(req.body);
+    if (!parsed.success) return next(parseZodError(parsed.error));
+    const order = await LabService.createLabOrder(parsed.data, req.user._id);
     res.status(201).json(successResponse(order));
   } catch (err) {
     next(err);
@@ -24,8 +34,9 @@ export async function createLabOrder(req: Request, res: Response, next: NextFunc
 export async function listLabOrders(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const query = ListLabOrdersQuerySchema.parse(req.query);
-    const result = await LabService.listLabOrders(query, req.user._id, req.ownOnly);
+    const parsed = ListLabOrdersQuerySchema.safeParse(req.query);
+    if (!parsed.success) return next(parseZodError(parsed.error));
+    const result = await LabService.listLabOrders(parsed.data, req.user._id, req.ownOnly);
     res.json(
       successResponse(result.data, {
         page: result.page,
@@ -52,8 +63,9 @@ export async function getLabOrderById(req: Request, res: Response, next: NextFun
 export async function updateLabOrderStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const input = UpdateOrderStatusSchema.parse(req.body);
-    const order = await LabService.updateLabOrderStatus(req.params.id, input);
+    const parsed = UpdateOrderStatusSchema.safeParse(req.body);
+    if (!parsed.success) return next(parseZodError(parsed.error));
+    const order = await LabService.updateLabOrderStatus(req.params.id, parsed.data);
     res.json(successResponse(order));
   } catch (err) {
     next(err);
@@ -63,8 +75,9 @@ export async function updateLabOrderStatus(req: Request, res: Response, next: Ne
 export async function createLabResult(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const input = CreateLabResultSchema.parse(req.body);
-    const result = await LabService.createLabResult(input, req.user._id);
+    const parsed = CreateLabResultSchema.safeParse(req.body);
+    if (!parsed.success) return next(parseZodError(parsed.error));
+    const result = await LabService.createLabResult(parsed.data, req.user._id);
     res.status(201).json(successResponse(result));
   } catch (err) {
     next(err);
@@ -84,8 +97,9 @@ export async function getLabResultByOrderId(req: Request, res: Response, next: N
 export async function verifyLabResult(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user) return next(new AuthError());
-    const input = VerifyResultSchema.parse(req.body);
-    const result = await LabService.verifyLabResult(req.params.id, input, req.user._id);
+    const parsed = VerifyResultSchema.safeParse(req.body);
+    if (!parsed.success) return next(parseZodError(parsed.error));
+    const result = await LabService.verifyLabResult(req.params.id, parsed.data, req.user._id);
     res.json(successResponse(result));
   } catch (err) {
     next(err);

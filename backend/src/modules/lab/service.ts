@@ -183,7 +183,7 @@ export async function verifyLabResult(
     throw new ValidationError('Lab result has already been verified');
   }
 
-  result.verifiedBy = new Types.ObjectId(input.verifiedBy);
+  result.verifiedBy = new Types.ObjectId(verifyingUserId);
   result.verifiedAt = new Date();
   result.status = 'final';
 
