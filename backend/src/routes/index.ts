@@ -7,6 +7,7 @@ import { billingRouter } from '../modules/billing/router';
 import { labRouter } from '../modules/lab/router';
 import { pharmacyRouter } from '../modules/pharmacy/router';
 import { inventoryRouter } from '../modules/inventory/router';
+import { documentsRouter } from '../modules/documents/router';
 
 const router = Router();
 router.use('/auth', authRouter);
@@ -17,5 +18,6 @@ router.use('/billing', billingRouter);
 router.use('/lab', labRouter);
 router.use('/pharmacy', pharmacyRouter);
 router.use('/inventory', inventoryRouter);
+router.use('/documents', documentsRouter);
 
 export { router };
