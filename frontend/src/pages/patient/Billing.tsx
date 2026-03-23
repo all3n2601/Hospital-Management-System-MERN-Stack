@@ -2,52 +2,10 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '@/lib/api';
+import { fmt } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/Shared/StatusBadge';
-
-interface ILineItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
-
-interface IPayment {
-  _id?: string;
-  amount: number;
-  method: 'cash' | 'card' | 'insurance' | 'transfer';
-  paidAt: string;
-  reference?: string;
-}
-
-interface IInsurance {
-  provider: string;
-  policyNumber: string;
-  coverageAmount: number;
-}
-
-interface Invoice {
-  _id: string;
-  invoiceId: string;
-  patient: { _id: string; userId: { firstName: string; lastName: string } };
-  appointment?: string;
-  lineItems: ILineItem[];
-  subtotal: number;
-  taxRate: number;
-  tax: number;
-  discount: number;
-  total: number;
-  amountPaid: number;
-  balance: number;
-  status: 'draft' | 'issued' | 'paid' | 'partial' | 'overdue' | 'void';
-  insurance?: IInsurance;
-  payments: IPayment[];
-  issuedDate?: string;
-  dueDate?: string;
-  paidDate?: string;
-  notes?: string;
-  createdAt: string;
-}
+import type { Invoice } from '@/types/billing';
 
 interface BillingResponse {
   success: boolean;
@@ -57,8 +15,6 @@ interface BillingResponse {
 type FilterTab = 'all' | 'pending' | 'paid' | 'void';
 
 const PENDING_STATUSES = new Set(['draft', 'issued', 'partial', 'overdue']);
-
-const fmt = (n: number) => `$${n.toFixed(2)}`;
 
 function LoadingSkeleton() {
   return (
@@ -82,7 +38,7 @@ function LoadingSkeleton() {
 export function PatientBilling() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
-  const { data, isLoading } = useQuery<BillingResponse>({
+  const { data, isLoading, isError } = useQuery<BillingResponse>({
     queryKey: ['billing', 'patient'],
     queryFn: async () => {
       const res = await api.get('/billing');
@@ -118,84 +74,94 @@ export function PatientBilling() {
         <p className="text-muted-foreground">View and track your invoices and payments</p>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 border-b">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {tab.label}
-            {tab.count !== undefined && (
-              <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
-            )}
-          </button>
-        ))}
-      </div>
+      {isError && (
+        <p className="text-center py-10 text-sm text-red-600 dark:text-red-400">
+          Failed to load invoices. Please try again.
+        </p>
+      )}
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Invoices</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading && <LoadingSkeleton />}
+      {!isError && (
+        <>
+          {/* Filter tabs */}
+          <div className="flex gap-2 border-b">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.key
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
+                )}
+              </button>
+            ))}
+          </div>
 
-          {!isLoading && filtered.length === 0 && (
-            <div className="text-center py-10">
-              <p className="text-muted-foreground">No invoices found.</p>
-            </div>
-          )}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Invoices</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading && <LoadingSkeleton />}
 
-          {!isLoading && filtered.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th className="pb-2 pr-4 font-medium">Invoice #</th>
-                    <th className="pb-2 pr-4 font-medium">Date</th>
-                    <th className="pb-2 pr-4 font-medium">Total</th>
-                    <th className="pb-2 pr-4 font-medium">Balance Due</th>
-                    <th className="pb-2 pr-4 font-medium">Status</th>
-                    <th className="pb-2 font-medium" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {filtered.map((inv) => {
-                    const dateStr = inv.issuedDate ?? inv.createdAt;
-                    const date = new Date(dateStr).toLocaleDateString();
-                    return (
-                      <tr key={inv._id} className="hover:bg-muted/50 transition-colors">
-                        <td className="py-3 pr-4 font-medium text-gray-900 dark:text-white">
-                          {inv.invoiceId}
-                        </td>
-                        <td className="py-3 pr-4 text-muted-foreground">{date}</td>
-                        <td className="py-3 pr-4">{fmt(inv.total)}</td>
-                        <td className="py-3 pr-4">{fmt(inv.balance)}</td>
-                        <td className="py-3 pr-4">
-                          <StatusBadge status={inv.status} />
-                        </td>
-                        <td className="py-3">
-                          <Link
-                            to={`/patient/billing/${inv._id}`}
-                            className="inline-flex items-center justify-center rounded-md text-xs font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 transition-colors"
-                          >
-                            View
-                          </Link>
-                        </td>
+              {!isLoading && filtered.length === 0 && (
+                <div className="text-center py-10">
+                  <p className="text-muted-foreground">No invoices found.</p>
+                </div>
+              )}
+
+              {!isLoading && filtered.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-muted-foreground">
+                        <th className="pb-2 pr-4 font-medium">Invoice #</th>
+                        <th className="pb-2 pr-4 font-medium">Date</th>
+                        <th className="pb-2 pr-4 font-medium">Total</th>
+                        <th className="pb-2 pr-4 font-medium">Balance Due</th>
+                        <th className="pb-2 pr-4 font-medium">Status</th>
+                        <th className="pb-2 font-medium" />
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filtered.map((inv) => {
+                        const dateStr = inv.issuedDate ?? inv.createdAt;
+                        const date = new Date(dateStr).toLocaleDateString();
+                        return (
+                          <tr key={inv._id} className="hover:bg-muted/50 transition-colors">
+                            <td className="py-3 pr-4 font-medium text-gray-900 dark:text-white">
+                              {inv.invoiceId}
+                            </td>
+                            <td className="py-3 pr-4 text-muted-foreground">{date}</td>
+                            <td className="py-3 pr-4">{fmt(inv.total)}</td>
+                            <td className="py-3 pr-4">{fmt(inv.balance)}</td>
+                            <td className="py-3 pr-4">
+                              <StatusBadge status={inv.status} />
+                            </td>
+                            <td className="py-3">
+                              <Link
+                                to={`/patient/billing/${inv._id}`}
+                                className="inline-flex items-center justify-center rounded-md text-xs font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 transition-colors"
+                              >
+                                View
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

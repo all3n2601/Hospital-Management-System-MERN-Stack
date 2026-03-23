@@ -2,59 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import api from '@/lib/api';
+import { fmt } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/Shared/StatusBadge';
-
-interface ILineItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
-
-interface IPayment {
-  _id?: string;
-  amount: number;
-  method: 'cash' | 'card' | 'insurance' | 'transfer';
-  paidAt: string;
-  reference?: string;
-}
-
-interface IInsurance {
-  provider: string;
-  policyNumber: string;
-  coverageAmount: number;
-}
-
-interface Invoice {
-  _id: string;
-  invoiceId: string;
-  patient: { _id: string; userId: { firstName: string; lastName: string } };
-  appointment?: string;
-  lineItems: ILineItem[];
-  subtotal: number;
-  taxRate: number;
-  tax: number;
-  discount: number;
-  total: number;
-  amountPaid: number;
-  balance: number;
-  status: 'draft' | 'issued' | 'paid' | 'partial' | 'overdue' | 'void';
-  insurance?: IInsurance;
-  payments: IPayment[];
-  issuedDate?: string;
-  dueDate?: string;
-  paidDate?: string;
-  notes?: string;
-  createdAt: string;
-}
+import type { Invoice } from '@/types/billing';
 
 interface InvoiceDetailResponse {
   success: boolean;
   data: Invoice;
 }
-
-const fmt = (n: number) => `$${n.toFixed(2)}`;
 
 function LoadingSkeleton() {
   return (
@@ -177,7 +133,7 @@ export function PatientInvoiceDetail() {
             </div>
             {inv.tax > 0 && (
               <div className="flex justify-between">
-                <dt className="text-muted-foreground">Tax ({(inv.taxRate * 100).toFixed(1)}%)</dt>
+                <dt className="text-muted-foreground">Tax ({inv.taxRate.toFixed(1)}%)</dt>
                 <dd>{fmt(inv.tax)}</dd>
               </div>
             )}
