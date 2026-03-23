@@ -24,6 +24,10 @@ import { BookAppointment } from '@/pages/patient/BookAppointment';
 import { PatientAppointments } from '@/pages/patient/Appointments';
 import { PatientBilling } from '@/pages/patient/Billing';
 import { PatientInvoiceDetail } from '@/pages/patient/InvoiceDetail';
+import { PatientLabResults } from '@/pages/patient/LabResults';
+import { PatientLabResultDetail } from '@/pages/patient/LabResultDetail';
+import { DoctorLabOrders } from '@/pages/doctor/LabOrders';
+import { AdminLabManagement } from '@/pages/admin/LabManagement';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -78,6 +82,8 @@ export default function App() {
                       <Route path="staff" element={<AdminStaff />} />
                       <Route path="billing" element={<AdminBilling />} />
                       <Route path="billing/:id" element={<AdminBilling />} />
+                      <Route path="lab" element={<AdminLabManagement />} />
+                      <Route path="lab/:id" element={<AdminLabManagement />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -90,6 +96,7 @@ export default function App() {
                     <Routes>
                       <Route path="dashboard" element={<DoctorDashboard />} />
                       <Route path="schedule" element={<DoctorSchedule />} />
+                      <Route path="lab" element={<DoctorLabOrders />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -116,6 +123,8 @@ export default function App() {
                       <Route path="appointments" element={<PatientAppointments />} />
                       <Route path="billing" element={<PatientBilling />} />
                       <Route path="billing/:id" element={<PatientInvoiceDetail />} />
+                      <Route path="lab" element={<PatientLabResults />} />
+                      <Route path="lab/:id" element={<PatientLabResultDetail />} />
                     </Routes>
                   </ProtectedRoute>
                 }
