@@ -1,9 +1,11 @@
 import { Schema, model, Types } from 'mongoose';
 
+export type LabTestStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+
 export interface ILabTest {
   name: string;
   code: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  status: LabTestStatus;
 }
 
 export type LabOrderStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';

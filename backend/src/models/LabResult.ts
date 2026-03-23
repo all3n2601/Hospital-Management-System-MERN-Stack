@@ -9,11 +9,14 @@ export interface ILabResultItem {
   isNormal?: boolean;
 }
 
+export type LabResultStatus = 'preliminary' | 'final' | 'amended';
+
 export interface ILabResult {
   _id: Types.ObjectId;
   labOrder: Types.ObjectId;     // ref LabOrder, required, unique (1 result per order)
   patient: Types.ObjectId;      // ref Patient, required, indexed
   results: ILabResultItem[];    // array of individual test results
+  status: LabResultStatus;
   technician: Types.ObjectId;   // ref User, required (who ran the tests)
   verifiedBy?: Types.ObjectId;  // ref Doctor (who verified)
   reportUrl?: string;           // S3 URL placeholder
@@ -41,7 +44,20 @@ const LabResultSchema = new Schema<ILabResult>(
   {
     labOrder: { type: Schema.Types.ObjectId, ref: 'LabOrder', required: true, unique: true },
     patient: { type: Schema.Types.ObjectId, ref: 'Patient', required: true, index: true },
-    results: { type: [LabResultItemSchema], default: [] },
+    results: {
+      type: [LabResultItemSchema],
+      default: [],
+      validate: {
+        validator: (v: ILabResultItem[]) => v && v.length >= 1,
+        message: 'Lab result must have at least one test result',
+      },
+    },
+    status: {
+      type: String,
+      enum: ['preliminary', 'final', 'amended'],
+      default: 'preliminary',
+      index: true,
+    },
     technician: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     verifiedBy: { type: Schema.Types.ObjectId, ref: 'Doctor' },
     reportUrl: { type: String },
