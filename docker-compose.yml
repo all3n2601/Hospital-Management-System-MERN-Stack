@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  api:
+    build: { context: ./backend, dockerfile: Dockerfile }
+    ports: ['4451:4451']
+    environment:
+      - NODE_ENV=development
+      - PORT=4451
+      - MONGODB_URI=mongodb://mongodb:27017/hms
+      - REDIS_URL=redis://redis:6379
+      - CORS_ORIGINS=http://localhost:5173
+    command: npm run dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+    depends_on: [mongodb, redis]
+    restart: unless-stopped
+
+  frontend:
+    build: { context: ./frontend, dockerfile: Dockerfile }
+    ports: ['5173:80']
+    depends_on: [api]
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    ports: ['27017:27017']
+    volumes: [mongodb_data:/data/db]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+    volumes: [redis_data:/data]
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  redis_data:
