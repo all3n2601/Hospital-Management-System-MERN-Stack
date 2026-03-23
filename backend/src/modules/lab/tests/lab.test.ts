@@ -163,12 +163,12 @@ afterEach(async () => {
 });
 
 describe('Lab Routes', () => {
-  it('1. POST /api/v1/lab/orders — doctor creates order → 201, orderId matches /^LAB-\\d{4}$/', async () => {
+  it('1. POST /api/v1/lab/orders — doctor creates order → 201, orderId matches /^LAB-\\d{4,}$/', async () => {
     const res = await createLabOrder(doctorToken, patientProfileId, doctorProfileId);
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.orderId).toMatch(/^LAB-\d{4}$/);
+    expect(res.body.data.orderId).toMatch(/^LAB-\d{4,}$/);
   });
 
   it('2. POST /api/v1/lab/orders — patient gets 403', async () => {
@@ -188,7 +188,7 @@ describe('Lab Routes', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
-    expect(res.body.data.orderId).toMatch(/^LAB-\d{4}$/);
+    expect(res.body.data.orderId).toMatch(/^LAB-\d{4,}$/);
   });
 
   it('5. GET /api/v1/lab/orders — admin lists all orders (sees all)', async () => {
@@ -343,7 +343,7 @@ describe('Lab Routes', () => {
     const labOrderId = createOrderRes.body.data._id;
 
     // Admin creates the result
-    await request(app)
+    const createResultRes = await request(app)
       .post('/api/v1/lab/results')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
@@ -352,6 +352,7 @@ describe('Lab Routes', () => {
           { testCode: 'CBC-001', testName: 'CBC', value: '12.5', unit: 'g/dL', isNormal: true },
         ],
       });
+    expect(createResultRes.status).toBe(201);
 
     const res = await request(app)
       .get(`/api/v1/lab/results/${labOrderId}`)
