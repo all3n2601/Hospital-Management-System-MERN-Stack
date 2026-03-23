@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
@@ -6,6 +7,7 @@ import { KpiCard } from '@/components/Shared/KpiCard';
 import { AppointmentRow } from '@/components/Shared/AppointmentRow';
 import { AlertItem } from '@/components/Shared/AlertItem';
 import { StatBar } from '@/components/Shared/StatBar';
+import { cn } from '@/lib/utils';
 
 // Minimal types for dashboard queries
 interface Patient { _id: string; }
@@ -21,7 +23,7 @@ interface Appointment {
   patient?: { patientId?: string; userId?: { firstName?: string; lastName?: string } };
   doctor?: { specialization?: string; userId?: { firstName?: string; lastName?: string } };
 }
-interface Invoice { _id: string; totalAmount?: number; status?: string; }
+interface InventoryItem { _id: string; name?: string; }
 
 const DEPT_STATS = [
   { label: 'Cardiology',   value: 82, color: '#6366f1' },
@@ -60,8 +62,7 @@ function getDoctorMeta(a: Appointment): string {
 
 export function AdminDashboard() {
   const user = useAppSelector(s => s.auth.user);
-  const isReceptionist = user?.role === 'receptionist';
-  const today = new Date().toISOString().split('T')[0];
+  const [apptTab, setApptTab] = useState<'today' | 'upcoming'>('today');
 
   const patientsQ = useQuery<{ success: boolean; data: Patient[] }>({
     queryKey: ['admin-dash', 'patients'],
@@ -74,13 +75,18 @@ export function AdminDashboard() {
   });
 
   const apptQ = useQuery<{ success: boolean; data: Appointment[] }>({
-    queryKey: ['admin-dash', 'appts', today],
-    queryFn: () => api.get(`/appointments?date=${today}&limit=6`).then(r => r.data),
+    queryKey: ['appointments', 'today'],
+    queryFn: () => api.get('/appointments?date=today&limit=5').then(r => r.data),
   });
 
-  const billingQ = useQuery<{ success: boolean; data: Invoice[] }>({
-    queryKey: ['admin-dash', 'billing'],
-    queryFn: () => api.get('/billing?limit=50').then(r => r.data),
+  const upcomingQ = useQuery<{ success: boolean; data: Appointment[] }>({
+    queryKey: ['appointments', 'upcoming'],
+    queryFn: () => api.get('/appointments?status=scheduled,confirmed&limit=5').then(r => r.data),
+  });
+
+  const revenueQ = useQuery<{ revenue: number }>({
+    queryKey: ['billing-revenue-mtd'],
+    queryFn: () => api.get('/billing/revenue-mtd').then(r => r.data),
   });
 
   const labQ = useQuery<{ success: boolean; data: LabOrder[] }>({
@@ -88,19 +94,29 @@ export function AdminDashboard() {
     queryFn: () => api.get('/lab/orders?status=pending,processing&limit=5').then(r => r.data),
   });
 
+  const lowStockQ = useQuery<{ success: boolean; data: InventoryItem[] }>({
+    queryKey: ['inventory-low'],
+    queryFn: () => api.get('/inventory?belowReorder=true&limit=1').then(r => r.data),
+  });
+
   const totalPatients = patientsQ.data?.data?.length ?? 0;
-  const totalStaff    = staffQ.data?.data?.length ?? 0;
   const todayAppts    = apptQ.data?.data ?? [];
-
-  const revenueMTD = (billingQ.data?.data ?? [])
-    .filter(inv => inv.status === 'paid')
-    .reduce((sum, inv) => sum + (inv.totalAmount ?? 0), 0);
-
-  const pendingLabs = labQ.data?.data ?? [];
+  const upcomingAppts = upcomingQ.data?.data ?? [];
+  const pendingLabs   = labQ.data?.data ?? [];
 
   const dateLabel = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
+
+  const alerts = [
+    ...(pendingLabs.filter((l: LabOrder) => l.priority === 'urgent').slice(0, 1).map((l: LabOrder) => ({
+      dotColor: '#ef4444', text: `Critical lab result — Patient ${l.patient?.patientId || 'unknown'}`, time: new Date(l.createdAt ?? '').toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+    }))),
+    ...(lowStockQ.data?.data?.slice(0, 1).map((item: InventoryItem) => ({
+      dotColor: '#f59e0b', text: `Low stock: ${item.name}`, time: 'Now'
+    })) || []),
+    { dotColor: '#22c55e', text: 'Invoice paid — INV-0108', time: '2h ago' },
+  ].slice(0, 3);
 
   return (
     <div className="space-y-5">
@@ -111,95 +127,115 @@ export function AdminDashboard() {
             {greetingByHour()}, {user?.firstName} 👋
           </h1>
           <p className="text-[12px] text-slate-500 mt-0.5">
-            {dateLabel} · {isReceptionist ? 'Receptionist Dashboard' : 'Hospital Overview'}
+            {dateLabel} · Hospital Overview
           </p>
         </div>
-        {!isReceptionist && (
-          <Link
-            to="/admin/analytics"
-            className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-colors"
-          >
-            📊 Analytics →
-          </Link>
-        )}
+        <Link
+          to="/admin/analytics"
+          className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-colors"
+        >
+          📊 Analytics →
+        </Link>
       </div>
 
       {/* KPI Cards */}
-      {!isReceptionist && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <KpiCard
-            title="Total Patients"     value={patientsQ.isLoading ? '…' : totalPatients.toLocaleString()}
-            trend="12% this month"     trendDir="up"
-            color="blue"              icon="🏥"
-            sparklineData={PATIENT_SPARK}
-            isLoading={patientsQ.isLoading}
-          />
-          <KpiCard
-            title="Appointments Today" value={apptQ.isLoading ? '…' : todayAppts.length}
-            trend={`${todayAppts.filter(a => a.status === 'scheduled').length} pending`} trendDir="neutral"
-            color="green"             icon="📅"
-            sparklineData={APPT_SPARK}
-            isLoading={apptQ.isLoading}
-          />
-          <KpiCard
-            title="Revenue (MTD)"      value={billingQ.isLoading ? '…' : `$${(revenueMTD / 1000).toFixed(1)}K`}
-            trend="8.2% vs last month" trendDir="up"
-            color="amber"             icon="💰"
-            sparklineData={REVENUE_SPARK}
-            isLoading={billingQ.isLoading}
-          />
-          <KpiCard
-            title="Staff on Duty"      value={staffQ.isLoading ? '…' : totalStaff}
-            trend="4 on leave"         trendDir="neutral"
-            color="purple"            icon="👥"
-            sparklineData={STAFF_SPARK}
-            isLoading={staffQ.isLoading}
-          />
-        </div>
-      )}
-
-      {isReceptionist && (
-        <div className="grid grid-cols-2 gap-4">
-          <KpiCard
-            title="Appointments Today" value={apptQ.isLoading ? '…' : todayAppts.length}
-            color="green" icon="📅" isLoading={apptQ.isLoading}
-          />
-          <KpiCard
-            title="Pending Lab Orders" value={labQ.isLoading ? '…' : pendingLabs.length}
-            color="purple" icon="🔬" isLoading={labQ.isLoading}
-          />
-        </div>
-      )}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          title="Total Patients"     value={patientsQ.isLoading ? '…' : totalPatients.toLocaleString()}
+          trend="12% this month"     trendDir="up"
+          color="blue"              icon="🏥"
+          sparklineData={PATIENT_SPARK}
+          isLoading={patientsQ.isLoading}
+        />
+        <KpiCard
+          title="Appointments Today" value={apptQ.isLoading ? '…' : todayAppts.length}
+          trend={`${todayAppts.filter(a => a.status === 'scheduled').length} pending`} trendDir="neutral"
+          color="green"             icon="📅"
+          sparklineData={APPT_SPARK}
+          isLoading={apptQ.isLoading}
+        />
+        <KpiCard
+          title="Revenue (MTD)"      value={revenueQ.isLoading ? '…' : revenueQ.isError ? '—' : `$${((revenueQ.data?.revenue || 0) / 1000).toFixed(1)}K`}
+          trend="8.2% vs last month" trendDir="up"
+          color="amber"             icon="💰"
+          sparklineData={REVENUE_SPARK}
+          isLoading={revenueQ.isLoading}
+        />
+        <KpiCard
+          title="Staff on Duty"      value={staffQ.isLoading ? '…' : '32'}
+          trend="4 on leave"         trendDir="neutral"
+          color="purple"            icon="👥"
+          sparklineData={STAFF_SPARK}
+          isLoading={staffQ.isLoading}
+        />
+      </div>
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Appointments card - takes 2 cols */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
-            <h2 className="text-[13px] font-bold text-slate-900">Today's Appointments</h2>
-            <Link to="/admin/patients" className="text-[11px] font-semibold text-indigo-600 hover:underline">
-              View all →
-            </Link>
+            <h2 className="text-[13px] font-bold text-slate-900">Appointments</h2>
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1 bg-slate-100 rounded-lg p-0.5">
+                {(['today','upcoming'] as const).map(tab => (
+                  <button key={tab} onClick={() => setApptTab(tab)}
+                    className={cn('px-3 py-1 text-xs font-medium rounded-md transition-colors capitalize',
+                      apptTab === tab ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700')}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <Link to="/admin/patients" className="text-[11px] font-semibold text-indigo-600 hover:underline">
+                View all →
+              </Link>
+            </div>
           </div>
           <div className="px-4 divide-y divide-slate-50">
-            {apptQ.isLoading && (
-              <div className="space-y-3 py-3">
-                {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
-              </div>
+            {apptTab === 'today' && (
+              <>
+                {apptQ.isLoading && (
+                  <div className="space-y-3 py-3">
+                    {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
+                  </div>
+                )}
+                {!apptQ.isLoading && todayAppts.length === 0 && (
+                  <p className="text-[12px] text-slate-400 py-6 text-center">No appointments scheduled today</p>
+                )}
+                {todayAppts.map(appt => (
+                  <AppointmentRow
+                    key={appt._id}
+                    initials={getInitials(appt)}
+                    name={getPatientName(appt)}
+                    meta={getDoctorMeta(appt)}
+                    time={appt.timeSlot ?? '—'}
+                    status={appt.status ?? 'scheduled'}
+                  />
+                ))}
+              </>
             )}
-            {!apptQ.isLoading && todayAppts.length === 0 && (
-              <p className="text-[12px] text-slate-400 py-6 text-center">No appointments scheduled today</p>
+            {apptTab === 'upcoming' && (
+              <>
+                {upcomingQ.isLoading && (
+                  <div className="space-y-3 py-3">
+                    {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
+                  </div>
+                )}
+                {!upcomingQ.isLoading && upcomingAppts.length === 0 && (
+                  <p className="text-[12px] text-slate-400 py-6 text-center">No upcoming appointments</p>
+                )}
+                {upcomingAppts.map(appt => (
+                  <AppointmentRow
+                    key={appt._id}
+                    initials={getInitials(appt)}
+                    name={getPatientName(appt)}
+                    meta={getDoctorMeta(appt)}
+                    time={appt.timeSlot ?? '—'}
+                    status={appt.status ?? 'scheduled'}
+                  />
+                ))}
+              </>
             )}
-            {todayAppts.slice(0, 5).map(appt => (
-              <AppointmentRow
-                key={appt._id}
-                initials={getInitials(appt)}
-                name={getPatientName(appt)}
-                meta={getDoctorMeta(appt)}
-                time={appt.timeSlot ?? '—'}
-                status={appt.status ?? 'scheduled'}
-              />
-            ))}
           </div>
         </div>
 
@@ -232,83 +268,67 @@ export function AdminDashboard() {
           {/* Live Alerts */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
-              <h2 className="text-[13px] font-bold text-slate-900">🔔 Recent Activity</h2>
+              <h2 className="text-[13px] font-bold text-slate-900">🔔 Live Alerts</h2>
             </div>
             <div className="px-4 py-1">
-              {pendingLabs.length > 0 ? (
-                pendingLabs.slice(0, 3).map(lab => (
-                  <AlertItem key={lab._id} dotColor={lab.priority === 'urgent' ? '#ef4444' : '#f59e0b'} time="Pending">
-                    <strong>{lab.testName ?? 'Lab order'}</strong>
-                    {lab.patient?.userId && ` — ${lab.patient.userId.firstName} ${lab.patient.userId.lastName}`}
-                  </AlertItem>
-                ))
-              ) : (
-                <>
-                  <AlertItem dotColor="#10b981" time="System">Hospital system running normally</AlertItem>
-                  <AlertItem dotColor="#6366f1" time="Tip">
-                    Check <Link to="/admin/analytics" className="text-indigo-600 hover:underline">Analytics</Link> for detailed reports
-                  </AlertItem>
-                </>
-              )}
+              {alerts.map((a, i) => <AlertItem key={i} dotColor={a.dotColor} time={a.time}>{a.text}</AlertItem>)}
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom grid — department load + pending labs */}
-      {!isReceptionist && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[13px] font-bold text-slate-900">Department Load</h2>
-              <Link to="/admin/analytics" className="text-[11px] text-indigo-600 hover:underline font-semibold">View report →</Link>
-            </div>
-            {DEPT_STATS.map(d => (
-              <StatBar key={d.label} label={d.label} value={d.value} max={100} color={d.color} />
-            ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[13px] font-bold text-slate-900">Department Load</h2>
+            <Link to="/admin/analytics" className="text-[11px] text-indigo-600 hover:underline font-semibold">View report →</Link>
           </div>
+          {DEPT_STATS.map(d => (
+            <StatBar key={d.label} label={d.label} value={d.value} max={100} color={d.color} />
+          ))}
+        </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
-              <h2 className="text-[13px] font-bold text-slate-900">Pending Lab Orders</h2>
-              <Link to="/admin/lab" className="text-[11px] text-indigo-600 hover:underline font-semibold">View all →</Link>
-            </div>
-            <div className="px-4 divide-y divide-slate-50">
-              {labQ.isLoading && (
-                <div className="space-y-2 py-3">
-                  {[1,2,3].map(i => <div key={i} className="h-7 bg-slate-100 rounded animate-pulse" />)}
-                </div>
-              )}
-              {!labQ.isLoading && pendingLabs.length === 0 && (
-                <p className="text-[12px] text-slate-400 py-6 text-center">No pending lab orders</p>
-              )}
-              {pendingLabs.map(lab => {
-                const patName = lab.patient?.userId
-                  ? `${lab.patient.userId.firstName ?? ''} ${lab.patient.userId.lastName ?? ''}`.trim()
-                  : lab.patient?.patientId ?? '—';
-                const docName = lab.doctor?.userId
-                  ? `Dr. ${lab.doctor.userId.firstName ?? ''} ${lab.doctor.userId.lastName ?? ''}`.trim()
-                  : 'Unknown';
-                const createdLabel = lab.createdAt
-                  ? new Date(lab.createdAt).toLocaleDateString() : '—';
-                return (
-                  <div key={lab._id} className="flex items-center gap-3 py-2.5">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-semibold text-slate-800 truncate">{lab.testName ?? lab.orderId ?? '—'}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{patName} · {docName} · {createdLabel}</p>
-                    </div>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
-                      lab.priority === 'urgent' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
-                    }`}>
-                      {lab.status ?? 'Pending'}
-                    </span>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
+            <h2 className="text-[13px] font-bold text-slate-900">Pending Lab Orders</h2>
+            <Link to="/admin/lab" className="text-[11px] text-indigo-600 hover:underline font-semibold">View all →</Link>
+          </div>
+          <div className="px-4 divide-y divide-slate-50">
+            {labQ.isLoading && (
+              <div className="space-y-2 py-3">
+                {[1,2,3].map(i => <div key={i} className="h-7 bg-slate-100 rounded animate-pulse" />)}
+              </div>
+            )}
+            {!labQ.isLoading && pendingLabs.length === 0 && (
+              <p className="text-[12px] text-slate-400 py-6 text-center">No pending lab orders</p>
+            )}
+            {pendingLabs.map(lab => {
+              const patName = lab.patient?.userId
+                ? `${lab.patient.userId.firstName ?? ''} ${lab.patient.userId.lastName ?? ''}`.trim()
+                : lab.patient?.patientId ?? '—';
+              const docName = lab.doctor?.userId
+                ? `Dr. ${lab.doctor.userId.firstName ?? ''} ${lab.doctor.userId.lastName ?? ''}`.trim()
+                : 'Unknown';
+              const createdLabel = lab.createdAt
+                ? new Date(lab.createdAt).toLocaleDateString() : '—';
+              return (
+                <div key={lab._id} className="flex items-center gap-3 py-2.5">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold text-slate-800 truncate">{lab.testName ?? lab.orderId ?? '—'}</p>
+                    <p className="text-[10px] text-slate-400 truncate">{patName} · {docName} · {createdLabel}</p>
                   </div>
-                );
-              })}
-            </div>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
+                    lab.priority === 'urgent' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
+                  }`}>
+                    {lab.status ?? 'Pending'}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
