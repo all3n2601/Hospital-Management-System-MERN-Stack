@@ -34,6 +34,9 @@ import { PatientPrescriptions } from '@/pages/patient/Prescriptions';
 import { AdminPharmacyManagement } from '@/pages/admin/PharmacyManagement';
 import { AdminInventoryManagement } from '@/pages/admin/InventoryManagement';
 import { NurseInventoryView } from '@/pages/nurse/InventoryView';
+import { AdminDocumentManagement } from '@/pages/admin/DocumentManagement';
+import { DoctorDocuments } from '@/pages/doctor/Documents';
+import { PatientDocuments } from '@/pages/patient/Documents';
 
 function DashboardRouter() {
   const user = useAppSelector(s => s.auth.user);
@@ -99,6 +102,8 @@ export default function App() {
                       <Route path="pharmacy" element={<AdminPharmacyManagement />} />
                       <Route path="pharmacy/:id" element={<AdminPharmacyManagement />} />
                       <Route path="inventory" element={<AdminInventoryManagement />} />
+                      <Route path="documents" element={<AdminDocumentManagement />} />
+                      <Route path="documents/:id" element={<AdminDocumentManagement />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -113,6 +118,7 @@ export default function App() {
                       <Route path="schedule" element={<DoctorSchedule />} />
                       <Route path="lab" element={<DoctorLabOrders />} />
                       <Route path="prescriptions" element={<DoctorPrescriptions />} />
+                      <Route path="documents" element={<DoctorDocuments />} />
                     </Routes>
                   </ProtectedRoute>
                 }
@@ -144,6 +150,7 @@ export default function App() {
                       <Route path="lab" element={<PatientLabResults />} />
                       <Route path="lab/:id" element={<PatientLabResultDetail />} />
                       <Route path="prescriptions" element={<PatientPrescriptions />} />
+                      <Route path="documents" element={<PatientDocuments />} />
                     </Routes>
                   </ProtectedRoute>
                 }

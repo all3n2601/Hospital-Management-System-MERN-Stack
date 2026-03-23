@@ -31,7 +31,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Pharmacy', href: '/admin/pharmacy', icon: Pill, roles: ['admin'] },
   { label: 'Inventory', href: '/admin/inventory', icon: Package, roles: ['admin'] },
   { label: 'Inventory', href: '/nurse/inventory', icon: Package, roles: ['nurse'] },
-  { label: 'Documents', href: '/documents', icon: Award, roles: ['admin', 'doctor', 'patient'] },
+  { label: 'Documents', href: '/doctor/documents', icon: Award, roles: ['doctor'] },
+  { label: 'My Documents', href: '/patient/documents', icon: Award, roles: ['patient'] },
+  { label: 'Documents', href: '/admin/documents', icon: Award, roles: ['admin'] },
   { label: 'Analytics', href: '/admin/analytics', icon: BarChart3, roles: ['admin'] },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['admin'] },
 ];
