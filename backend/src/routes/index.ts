@@ -6,6 +6,7 @@ import { appointmentRouter } from '../modules/appointments/router';
 import { billingRouter } from '../modules/billing/router';
 import { labRouter } from '../modules/lab/router';
 import { pharmacyRouter } from '../modules/pharmacy/router';
+import { inventoryRouter } from '../modules/inventory/router';
 
 const router = Router();
 router.use('/auth', authRouter);
@@ -15,5 +16,6 @@ router.use('/appointments', appointmentRouter);
 router.use('/billing', billingRouter);
 router.use('/lab', labRouter);
 router.use('/pharmacy', pharmacyRouter);
+router.use('/inventory', inventoryRouter);
 
 export { router };
