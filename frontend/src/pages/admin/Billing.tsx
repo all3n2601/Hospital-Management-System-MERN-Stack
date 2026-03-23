@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { DataTable, ColumnDef } from '@/components/Shared/DataTable';
@@ -42,7 +43,7 @@ const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: 'void', label: 'Void' },
 ];
 
-interface LineItem {
+interface LineItemInput {
   description: string;
   quantity: number;
   unitPrice: number;
@@ -52,6 +53,8 @@ export function AdminBilling() {
   const queryClient = useQueryClient();
   const user = useAppSelector((s) => s.auth.user);
   const isAdmin = user?.role === 'admin';
+  const { id: urlInvoiceId } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
 
   // Pagination & filter state
   const [page, setPage] = useState(1);
@@ -63,9 +66,15 @@ export function AdminBilling() {
   const [detailInvoiceId, setDetailInvoiceId] = useState<string | null>(null);
   const [payInvoiceId, setPayInvoiceId] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (urlInvoiceId) {
+      setDetailInvoiceId(urlInvoiceId);
+    }
+  }, [urlInvoiceId]);
+
   // Create form state
   const [patientId, setPatientId] = useState('');
-  const [lineItems, setLineItems] = useState<LineItem[]>([{ description: '', quantity: 1, unitPrice: 0 }]);
+  const [lineItems, setLineItems] = useState<LineItemInput[]>([{ description: '', quantity: 1, unitPrice: 0 }]);
   const [taxRate, setTaxRate] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState('');
@@ -91,7 +100,7 @@ export function AdminBilling() {
   });
 
   // Detail query (fetched when detailInvoiceId is set)
-  const { data: detailData, isLoading: detailLoading } = useQuery<InvoiceDetailResponse>({
+  const { data: detailData, isLoading: detailLoading, isError: detailError } = useQuery<InvoiceDetailResponse>({
     queryKey: ['billing', detailInvoiceId],
     queryFn: async () => {
       const res = await api.get(`/billing/${detailInvoiceId}`);
@@ -126,6 +135,11 @@ export function AdminBilling() {
     setPayAmount('');
     setPayMethod('cash');
     setPayReference('');
+  };
+
+  const closeDetail = () => {
+    setDetailInvoiceId(null);
+    if (urlInvoiceId) navigate('/admin/billing', { replace: true });
   };
 
   // Create invoice mutation
@@ -613,7 +627,13 @@ export function AdminBilling() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => voidInvoiceId && voidMutation.mutate(voidInvoiceId)}
+              onClick={() => {
+                if (!voidReason.trim()) {
+                  toast.error('Please provide a reason for voiding this invoice');
+                  return;
+                }
+                if (voidInvoiceId) voidMutation.mutate(voidInvoiceId);
+              }}
               disabled={voidMutation.isPending}
             >
               {voidMutation.isPending ? 'Voiding...' : 'Void Invoice'}
@@ -623,21 +643,21 @@ export function AdminBilling() {
       </Dialog>
 
       {/* ── Invoice Detail Dialog ── */}
-      <Dialog open={!!detailInvoiceId} onOpenChange={(open) => { if (!open) setDetailInvoiceId(null); }}>
-        <DialogContent className="max-w-2xl" onClose={() => setDetailInvoiceId(null)}>
+      <Dialog open={!!detailInvoiceId} onOpenChange={(open) => { if (!open) closeDetail(); }}>
+        <DialogContent className="max-w-2xl" onClose={closeDetail}>
           <DialogHeader>
             <DialogTitle>Invoice Detail</DialogTitle>
           </DialogHeader>
 
-          {detailLoading && (
+          {detailError ? (
+            <p className="text-sm text-red-600 py-4">Failed to load invoice details. Please try again.</p>
+          ) : detailLoading ? (
             <div className="space-y-3 animate-pulse py-4">
               <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
               <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
             </div>
-          )}
-
-          {!detailLoading && detailInv && (
+          ) : detailInv ? (
             <div className="space-y-5">
               {/* Header info */}
               <div className="flex items-start justify-between gap-4">
@@ -789,10 +809,8 @@ export function AdminBilling() {
                 </div>
               )}
             </div>
-          )}
-
-          {!detailLoading && !detailInv && (
-            <p className="text-center py-8 text-muted-foreground">Invoice not found.</p>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4">Invoice not found.</p>
           )}
 
           <DialogFooter>
@@ -811,13 +829,13 @@ export function AdminBilling() {
                 onClick={() => {
                   setVoidInvoiceId(detailInv._id);
                   setVoidReason('');
-                  setDetailInvoiceId(null);
+                  closeDetail();
                 }}
               >
                 Void
               </Button>
             )}
-            <Button variant="outline" onClick={() => setDetailInvoiceId(null)}>
+            <Button variant="outline" onClick={closeDetail}>
               Close
             </Button>
           </DialogFooter>
