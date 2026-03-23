@@ -42,7 +42,7 @@ function greetingByHour(): string {
 export function NurseDashboard() {
   const user = useAppSelector(s => s.auth.user);
 
-  const dispensingQ = useQuery({
+  const dispensingQ = useQuery<{ success: boolean; data: Prescription[] }>({
     queryKey: ['pharmacy-dispensing'],
     queryFn: () => api.get('/pharmacy/dispensing?status=pending,ready&limit=5').then(r => r.data),
   });
@@ -79,17 +79,17 @@ export function NurseDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard
-          title="Pending Dispense"     value={dispensingQ.isLoading ? '…' : pendingRx.length}
+          title="Pending Dispense"     value={dispensingQ.isLoading ? '…' : dispensingQ.isError ? '—' : pendingRx.length}
           trend={pendingRx.length > 0 ? `${pendingRx.length} waiting` : 'Queue clear'} trendDir={pendingRx.length > 0 ? 'down' : 'neutral'}
           color="amber" icon="💊" sparklineData={DISPENSE_SPARK} isLoading={dispensingQ.isLoading}
         />
         <KpiCard
-          title="Low Stock Items"      value={inventoryQ.isLoading ? '…' : lowStock.length}
+          title="Low Stock Items"      value={inventoryQ.isLoading ? '…' : inventoryQ.isError ? '—' : lowStock.length}
           trend={lowStock.length > 0 ? `${lowStock.length} items low` : 'Stock OK'} trendDir={lowStock.length > 0 ? 'down' : 'neutral'}
           color="purple" icon="📦" sparklineData={STOCK_SPARK} isLoading={inventoryQ.isLoading}
         />
         <KpiCard
-          title="Lab Samples Collected Today"  value={labQ.isLoading ? '…' : labOrders.length}
+          title="Lab Samples Collected Today"  value={labQ.isLoading ? '…' : labQ.isError ? '—' : labOrders.length}
           trend="Awaiting results"     trendDir="neutral"
           color="green" icon="🔬" sparklineData={LAB_SPARK} isLoading={labQ.isLoading}
         />
@@ -111,6 +111,7 @@ export function NurseDashboard() {
                 {[1,2,3].map(i => <div key={i} className="h-9 bg-slate-100 rounded-lg animate-pulse" />)}
               </div>
             )}
+            {dispensingQ.isError && <p className="text-sm text-red-500 px-4 py-2">Failed to load dispensing queue</p>}
             {!dispensingQ.isLoading && pendingRx.length === 0 && (
               <p className="text-[12px] text-slate-400 py-8 text-center">No pending prescriptions</p>
             )}
@@ -161,6 +162,7 @@ export function NurseDashboard() {
             </div>
             <div className="px-4 py-2">
               {inventoryQ.isLoading && <div className="h-16 animate-pulse bg-slate-50 rounded-lg" />}
+              {inventoryQ.isError && <p className="text-sm text-red-500 px-4 py-2">Failed to load inventory</p>}
               {!inventoryQ.isLoading && lowStock.length === 0 && (
                 <p className="text-[11px] text-slate-400 py-3 text-center">All stock levels OK</p>
               )}
