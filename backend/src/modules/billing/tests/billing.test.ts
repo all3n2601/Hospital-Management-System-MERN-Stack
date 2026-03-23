@@ -27,7 +27,6 @@ jest.mock('../../../socket', () => ({
 import { app } from '../../../app';
 import { User } from '../../../models/User';
 import { Patient } from '../../../models/Patient';
-import { Invoice } from '../../../models/Invoice';
 
 let mongoServer: MongoMemoryServer;
 
@@ -35,6 +34,8 @@ let patientProfileId = '';
 let patientToken = '';
 let receptionistToken = '';
 let adminToken = '';
+let secondPatientProfileId = '';
+let secondPatientToken = '';
 
 // Helper to create a draft invoice
 const createDraftInvoice = async (token: string, patientId: string) => {
@@ -87,6 +88,17 @@ beforeAll(async () => {
   const patientProfile = await Patient.create({ userId: patUser._id });
   patientProfileId = patientProfile._id.toString();
 
+  // Create second patient user and profile
+  const secondPatUser = await User.create({
+    firstName: 'Other',
+    lastName: 'Patient',
+    email: 'other.patient@test.com',
+    password: 'OtherPass1!',
+    role: 'patient',
+  });
+  const secondPatientProfile = await Patient.create({ userId: secondPatUser._id });
+  secondPatientProfileId = secondPatientProfile._id.toString();
+
   // Login all users
   const adminLoginRes = await request(app)
     .post('/api/v1/auth/login')
@@ -102,6 +114,11 @@ beforeAll(async () => {
     .post('/api/v1/auth/login')
     .send({ email: 'patient@test.com', password: 'PatPass1!' });
   patientToken = patLoginRes.body?.data?.accessToken ?? '';
+
+  const secondPatLoginRes = await request(app)
+    .post('/api/v1/auth/login')
+    .send({ email: 'other.patient@test.com', password: 'OtherPass1!' });
+  secondPatientToken = secondPatLoginRes.body?.data?.accessToken ?? '';
 });
 
 afterAll(async () => {
@@ -155,8 +172,11 @@ describe('Billing Routes', () => {
   });
 
   it('5. GET /api/v1/billing — patient sees only own invoices (ownOnly)', async () => {
-    // Create an invoice for the patient
+    // Create an invoice for the primary patient
     await createDraftInvoice(adminToken, patientProfileId);
+
+    // Create an invoice for the second patient (should NOT appear when first patient lists)
+    await createDraftInvoice(adminToken, secondPatientProfileId);
 
     const res = await request(app)
       .get('/api/v1/billing')
@@ -164,11 +184,14 @@ describe('Billing Routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
+    // Only the first patient's invoice should appear
+    expect(res.body.data.length).toBe(1);
     // All returned invoices should belong to patient's profile
     for (const invoice of res.body.data) {
       const invoicePatientId =
         typeof invoice.patient === 'object' ? invoice.patient._id : invoice.patient;
       expect(invoicePatientId.toString()).toBe(patientProfileId);
+      expect(invoicePatientId.toString()).not.toBe(secondPatientProfileId);
     }
   });
 
@@ -236,6 +259,8 @@ describe('Billing Routes', () => {
       .send({ amount: 75, method: 'cash' });
 
     expect(res.status).toBe(200);
+    expect(res.body.data.amountPaid).toBe(75);
+    expect(res.body.data.status).toBe('partial');
   });
 
   it('10. POST /api/v1/billing/:id/payments — full payment marks invoice paid', async () => {
@@ -271,6 +296,7 @@ describe('Billing Routes', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.status).toBe('void');
+    expect(res.body.data.voidReason).toBe('Billing error');
   });
 
   it('12. PATCH /api/v1/billing/:id/void — cannot void a paid invoice', async () => {
@@ -298,18 +324,8 @@ describe('Billing Routes', () => {
   });
 
   it('13. GET /api/v1/billing/:id — patient cannot access another patient invoice (403 or 404)', async () => {
-    // Create a second patient
-    const otherPatUser = await User.create({
-      firstName: 'Other',
-      lastName: 'Patient',
-      email: 'other.patient@test.com',
-      password: 'OtherPass1!',
-      role: 'patient',
-    });
-    const otherPatProfile = await Patient.create({ userId: otherPatUser._id });
-
-    // Create invoice for the other patient
-    const createRes = await createDraftInvoice(adminToken, otherPatProfile._id.toString());
+    // Create invoice for the second patient (set up in beforeAll)
+    const createRes = await createDraftInvoice(adminToken, secondPatientProfileId);
     expect(createRes.status).toBe(201);
     const invoiceMongoId = createRes.body.data._id;
 
