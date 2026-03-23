@@ -6,6 +6,7 @@ import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { rateLimiter } from './middleware/rateLimiter';
+import { router } from './routes';
 
 const app = express();
 
@@ -47,8 +48,8 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({ success: true, data: { status: 'ok', timestamp: new Date().toISOString() } });
 });
 
-// API routes placeholder (will be filled in Phase 1C+)
-// app.use('/api/v1', router);
+// API routes
+app.use('/api/v1', router);
 
 app.use(errorHandler);
 

@@ -10,7 +10,11 @@
     "test": "jest --forceExit",
     "test:coverage": "jest --coverage --forceExit",
     "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node -e \"const fs=require('fs'),p='node_modules/buffer-equal-constant-time/index.js',c=fs.readFileSync(p,'utf8');if(!c.includes('SlowBuffer || Buffer'))fs.writeFileSync(p,c.replace('require(\\'buffer\\').SlowBuffer;','require(\\'buffer\\').SlowBuffer || Buffer;'));\""
+  },
+  "overrides": {
+    "buffer-equal-constant-time": "1.0.1"
   },
   "keywords": [],
   "author": "",
