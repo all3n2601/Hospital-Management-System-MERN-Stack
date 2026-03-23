@@ -8,6 +8,8 @@ import { labRouter } from '../modules/lab/router';
 import { pharmacyRouter } from '../modules/pharmacy/router';
 import { inventoryRouter } from '../modules/inventory/router';
 import { documentsRouter } from '../modules/documents/router';
+import { analyticsRouter } from '../modules/analytics/router';
+import { settingsRouter } from '../modules/settings/router';
 
 const router = Router();
 router.use('/auth', authRouter);
@@ -19,5 +21,7 @@ router.use('/lab', labRouter);
 router.use('/pharmacy', pharmacyRouter);
 router.use('/inventory', inventoryRouter);
 router.use('/documents', documentsRouter);
+router.use('/analytics', analyticsRouter);
+router.use('/settings', settingsRouter);
 
 export { router };
