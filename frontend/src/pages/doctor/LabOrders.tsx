@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { useAppSelector } from '@/store/hooks';
+import { usePatientsSelectQuery, useMyDoctorProfileId, patientSelectLabel } from '@/hooks/useEntitySelectData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +41,11 @@ interface TestInput {
 
 export function DoctorLabOrders() {
   const queryClient = useQueryClient();
+  const authUser = useAppSelector((s) => s.auth.user);
+  const { data: myDoctorProfileId, isLoading: myDoctorProfileLoading } = useMyDoctorProfileId(
+    authUser?._id,
+    authUser?.role
+  );
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [createOpen, setCreateOpen] = useState(false);
@@ -46,11 +53,11 @@ export function DoctorLabOrders() {
 
   // Create form state
   const [patientId, setPatientId] = useState('');
-  // doctorId: Doctor profile _id (not User _id). Temporary input until auto-detection is implemented.
-  const [doctorProfileId, setDoctorProfileId] = useState('');
   const [tests, setTests] = useState<TestInput[]>([{ name: '', code: '' }]);
   const [priority, setPriority] = useState<LabOrderPriority>('routine');
   const [notes, setNotes] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
 
   // Main orders query
   const { data, isLoading, isError } = useQuery<LabOrdersResponse>({
@@ -105,7 +112,6 @@ export function DoctorLabOrders() {
 
   const resetCreateForm = () => {
     setPatientId('');
-    setDoctorProfileId('');
     setTests([{ name: '', code: '' }]);
     setPriority('routine');
     setNotes('');
@@ -116,7 +122,7 @@ export function DoctorLabOrders() {
     mutationFn: async () => {
       const body = {
         patientId: patientId.trim(),
-        doctorId: doctorProfileId.trim(),
+        doctorId: myDoctorProfileId ?? '',
         tests: tests.map((t) => ({ name: t.name.trim(), code: t.code.trim() })),
         priority,
         notes: notes.trim() || undefined,
@@ -159,11 +165,11 @@ export function DoctorLabOrders() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
-    if (!doctorProfileId.trim()) {
-      toast.error('Your Doctor Profile ID is required');
+    if (!myDoctorProfileId) {
+      toast.error('Could not load your doctor profile. Try signing in again.');
       return;
     }
     if (tests.length === 0) {
@@ -275,26 +281,32 @@ export function DoctorLabOrders() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>
-              {/* Temporary: will be replaced by auto-detection from session once doctor profile lookup is wired up */}
-              <Label htmlFor="doctorProfileId">Your Doctor Profile ID</Label>
-              <Input
-                id="doctorProfileId"
-                placeholder="MongoDB _id of your Doctor profile (not User _id)"
-                value={doctorProfileId}
-                onChange={(e) => setDoctorProfileId(e.target.value)}
-                className="mt-1"
-              />
+              <Label>Ordering doctor</Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {myDoctorProfileLoading
+                  ? 'Loading your profile…'
+                  : myDoctorProfileId
+                    ? `You (${authUser?.firstName ?? ''} ${authUser?.lastName ?? ''})`.trim() || 'Signed-in doctor'
+                    : 'Could not resolve your doctor profile'}
+              </p>
             </div>
 
             {/* Tests */}
@@ -366,7 +378,10 @@ export function DoctorLabOrders() {
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateSubmit} disabled={createMutation.isPending}>
+            <Button
+              onClick={handleCreateSubmit}
+              disabled={createMutation.isPending || myDoctorProfileLoading || !myDoctorProfileId}
+            >
               {createMutation.isPending ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { usePatientsSelectQuery, patientSelectLabel } from '@/hooks/useEntitySelectData';
 import { DataTable, ColumnDef } from '@/components/Shared/DataTable';
 import { StatusBadge } from '@/components/Shared/StatusBadge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -79,6 +80,8 @@ export function AdminBilling() {
   const [taxRate, setTaxRate] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
 
   // Payment form state
   const [payAmount, setPayAmount] = useState('');
@@ -326,7 +329,7 @@ export function AdminBilling() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
     if (lineItems.length === 0) {
@@ -427,14 +430,21 @@ export function AdminBilling() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             {/* Line Items */}

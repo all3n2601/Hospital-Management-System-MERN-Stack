@@ -168,7 +168,35 @@ describe('Patient Routes', () => {
     expect(res.body.success).toBe(false);
   });
 
-  it('5. PATCH /api/v1/patients/me — patient updates own profile', async () => {
+  it('5. GET /api/v1/patients — excludes profiles linked to non-patient users', async () => {
+    const admin = await createUser({
+      email: 'admin@test.com',
+      password: 'AdminPass1!',
+      role: 'admin',
+    });
+    await Patient.create({ userId: admin._id });
+
+    const patientUser = await createUser({
+      email: 'real.patient@test.com',
+      password: 'PatPass1!',
+      role: 'patient',
+    });
+    const realPatient = await Patient.create({ userId: patientUser._id });
+
+    const adminToken = await loginAs('admin@test.com', 'AdminPass1!');
+    const res = await request(app)
+      .get('/api/v1/patients?limit=50')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    const listedIds = (res.body.data as { _id: string }[]).map((p) => p._id);
+    expect(listedIds).toContain(realPatient._id.toString());
+    const strayProfile = await Patient.findOne({ userId: admin._id });
+    expect(strayProfile).toBeDefined();
+    expect(listedIds).not.toContain(strayProfile!._id.toString());
+  });
+
+  it('6. PATCH /api/v1/patients/me — patient updates own profile', async () => {
     const reg = await request(app)
       .post('/api/v1/auth/register')
       .send({

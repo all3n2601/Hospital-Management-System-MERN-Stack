@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { cn } from '@/lib/utils';
+import {
+  usePatientsSelectQuery,
+  useDoctorsSelectQuery,
+  useNurseUsersSelectQuery,
+  nurseUserSelectLabel,
+  nurseStaffUserId,
+  patientSelectLabel,
+  doctorSelectLabel,
+} from '@/hooks/useEntitySelectData';
 import { DataTable, ColumnDef } from '@/components/Shared/DataTable';
 import { StatusBadge } from '@/components/Shared/StatusBadge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -89,6 +99,10 @@ export function AdminLabManagement() {
   const [resultItems, setResultItems] = useState<ResultInput[]>([]);
   const [resultNotes, setResultNotes] = useState('');
   const [technicianId, setTechnicianId] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
+  const { data: doctorOptions = [], isLoading: doctorsLoading } = useDoctorsSelectQuery(createOpen);
+  const { data: nurseOptions = [], isLoading: nursesLoading } = useNurseUsersSelectQuery(enterResultsOpen);
 
   useEffect(() => {
     if (urlOrderId) {
@@ -268,11 +282,11 @@ export function AdminLabManagement() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
     if (!doctorId.trim()) {
-      toast.error('Doctor ID is required');
+      toast.error('Please select a doctor');
       return;
     }
     if (tests.length === 0) {
@@ -437,25 +451,39 @@ export function AdminLabManagement() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="doctorId">Doctor ID</Label>
-              <Input
+              <Label htmlFor="doctorId">Doctor</Label>
+              <Select
                 id="doctorId"
-                placeholder="MongoDB _id of the doctor record"
                 value={doctorId}
                 onChange={(e) => setDoctorId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={doctorsLoading}
+                placeholder={doctorsLoading ? 'Loading doctors…' : 'Select a doctor'}
+              >
+                {doctorOptions.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {doctorSelectLabel(d)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             {/* Tests */}
@@ -585,14 +613,32 @@ export function AdminLabManagement() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="technicianId">Technician ID (optional)</Label>
-              <Input
+              <Label htmlFor="technicianId">Technician (optional)</Label>
+              <select
                 id="technicianId"
-                placeholder="MongoDB _id of the technician user"
+                className={cn(
+                  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                  'disabled:cursor-not-allowed disabled:opacity-50 mt-1'
+                )}
                 value={technicianId}
                 onChange={(e) => setTechnicianId(e.target.value)}
-                className="mt-1"
-              />
+                disabled={nursesLoading}
+              >
+                <option value="">— None —</option>
+                {nurseOptions.map((n) => {
+                  const uid = nurseStaffUserId(n);
+                  if (!uid) return null;
+                  return (
+                    <option key={uid} value={uid}>
+                      {nurseUserSelectLabel(n)}
+                    </option>
+                  );
+                })}
+              </select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Usually a lab tech or nurse (linked user account).
+              </p>
             </div>
 
             {resultItems.map((item, i) => (

@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import {
+  usePatientsSelectQuery,
+  useDoctorsSelectQuery,
+  patientSelectLabel,
+  doctorSelectLabel,
+} from '@/hooks/useEntitySelectData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -50,6 +57,9 @@ export function AdminDocumentManagement() {
   const [notes, setNotes] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
   const [treatment, setTreatment] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
+  const { data: doctorOptions = [], isLoading: doctorsLoading } = useDoctorsSelectQuery(createOpen);
 
   const { data, isLoading, isError } = useQuery<DocumentsResponse>({
     queryKey: ['documents', 'admin', statusFilter],
@@ -153,11 +163,11 @@ export function AdminDocumentManagement() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
     if (!issuedBy.trim()) {
-      toast.error('Doctor Profile ID is required');
+      toast.error('Please select a doctor');
       return;
     }
     createMutation.mutate();
@@ -426,25 +436,39 @@ export function AdminDocumentManagement() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="issuedBy">Doctor Profile ID</Label>
-              <Input
+              <Label htmlFor="issuedBy">Issuing doctor</Label>
+              <Select
                 id="issuedBy"
-                placeholder="Doctor Profile _id"
                 value={issuedBy}
                 onChange={(e) => setIssuedBy(e.target.value)}
                 className="mt-1"
-              />
+                disabled={doctorsLoading}
+                placeholder={doctorsLoading ? 'Loading doctors…' : 'Select a doctor'}
+              >
+                {doctorOptions.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {doctorSelectLabel(d)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>

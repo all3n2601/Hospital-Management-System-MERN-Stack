@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { useAppSelector } from '@/store/hooks';
+import {
+  usePatientsSelectQuery,
+  useDrugsSelectQuery,
+  useMyDoctorProfileId,
+  patientSelectLabel,
+} from '@/hooks/useEntitySelectData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,6 +55,11 @@ const emptyLineItem = (): LineItemInput => ({
 
 export function DoctorPrescriptions() {
   const queryClient = useQueryClient();
+  const authUser = useAppSelector((s) => s.auth.user);
+  const { data: myDoctorProfileId, isLoading: myDoctorProfileLoading } = useMyDoctorProfileId(
+    authUser?._id,
+    authUser?.role
+  );
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [createOpen, setCreateOpen] = useState(false);
@@ -54,10 +67,11 @@ export function DoctorPrescriptions() {
 
   // Create form state
   const [patientId, setPatientId] = useState('');
-  // doctorProfileId: Doctor profile _id (not User _id). Temporary input until auto-detection is implemented.
-  const [doctorProfileId, setDoctorProfileId] = useState('');
   const [lineItems, setLineItems] = useState<LineItemInput[]>([emptyLineItem()]);
   const [notes, setNotes] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
+  const { data: drugOptions = [], isLoading: drugsLoading } = useDrugsSelectQuery(createOpen);
 
   // Main query
   const { data, isLoading, isError } = useQuery<PrescriptionsResponse>({
@@ -90,7 +104,6 @@ export function DoctorPrescriptions() {
 
   const resetCreateForm = () => {
     setPatientId('');
-    setDoctorProfileId('');
     setLineItems([emptyLineItem()]);
     setNotes('');
   };
@@ -99,7 +112,7 @@ export function DoctorPrescriptions() {
     mutationFn: async () => {
       const body = {
         patientId: patientId.trim(),
-        doctorId: doctorProfileId.trim(),
+        doctorId: myDoctorProfileId ?? '',
         lineItems: lineItems.map((item) => ({
           drugId: item.drugId.trim(),
           drugName: item.drugName.trim(),
@@ -165,11 +178,11 @@ export function DoctorPrescriptions() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
-    if (!doctorProfileId.trim()) {
-      toast.error('Doctor Profile ID is required');
+    if (!myDoctorProfileId) {
+      toast.error('Could not load your doctor profile. Try signing in again.');
       return;
     }
     if (lineItems.length === 0) {
@@ -180,7 +193,7 @@ export function DoctorPrescriptions() {
       (item) => !item.drugId.trim() || !item.drugName.trim() || !item.dosage.trim() || !item.frequency.trim() || !item.duration.trim()
     );
     if (invalid) {
-      toast.error('All line items must have drug ID, drug name, dosage, frequency, and duration');
+      toast.error('Each medication needs a drug, name, dosage, frequency, and duration');
       return;
     }
     createMutation.mutate();
@@ -278,26 +291,32 @@ export function DoctorPrescriptions() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="doctorProfileId">Doctor Profile ID</Label>
-              <Input
-                id="doctorProfileId"
-                placeholder="Doctor Profile _id"
-                value={doctorProfileId}
-                onChange={(e) => setDoctorProfileId(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">(temporary until auto-detection)</p>
+              <Label>Prescribing doctor</Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {myDoctorProfileLoading
+                  ? 'Loading your profile…'
+                  : myDoctorProfileId
+                    ? `You (${authUser?.firstName ?? ''} ${authUser?.lastName ?? ''})`.trim() || 'Signed-in doctor'
+                    : 'Could not resolve your doctor profile'}
+              </p>
             </div>
 
             {/* Line Items */}
@@ -325,17 +344,34 @@ export function DoctorPrescriptions() {
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs">Drug ID</Label>
-                        <Input
-                          placeholder="Drug _id"
+                      <div className="col-span-2">
+                        <Label className="text-xs">Medication</Label>
+                        <Select
                           value={item.drugId}
-                          onChange={(e) => updateLineItem(i, 'drugId', e.target.value)}
+                          onChange={(e) => {
+                            const id = e.target.value;
+                            const drug = drugOptions.find((d) => d._id === id);
+                            setLineItems((prev) =>
+                              prev.map((row, idx) =>
+                                idx === i
+                                  ? { ...row, drugId: id, drugName: drug?.name ?? row.drugName }
+                                  : row
+                              )
+                            );
+                          }}
                           className="mt-1"
-                        />
+                          disabled={drugsLoading}
+                          placeholder={drugsLoading ? 'Loading drugs…' : 'Select from catalog'}
+                        >
+                          {drugOptions.map((d) => (
+                            <option key={d._id} value={d._id}>
+                              {d.name} ({d.code})
+                            </option>
+                          ))}
+                        </Select>
                       </div>
-                      <div>
-                        <Label className="text-xs">Drug Name</Label>
+                      <div className="col-span-2">
+                        <Label className="text-xs">Drug name (editable)</Label>
                         <Input
                           placeholder="e.g. Amoxicillin"
                           value={item.drugName}
@@ -403,7 +439,10 @@ export function DoctorPrescriptions() {
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateSubmit} disabled={createMutation.isPending}>
+            <Button
+              onClick={handleCreateSubmit}
+              disabled={createMutation.isPending || myDoctorProfileLoading || !myDoctorProfileId}
+            >
               {createMutation.isPending ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>

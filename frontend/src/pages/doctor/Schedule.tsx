@@ -11,14 +11,14 @@ interface AppointmentsResponse {
   data: AppointmentRecord[];
 }
 
-interface DoctorProfile {
-  _id: string;
-  userId: string;
+interface DoctorProfileBundle {
+  user: { _id: string };
+  profile: { _id: string } | null;
 }
 
 interface DoctorProfileResponse {
   success: boolean;
-  data: DoctorProfile;
+  data: DoctorProfileBundle;
 }
 
 function formatDateForInput(d: Date): string {
@@ -35,13 +35,13 @@ export function DoctorSchedule() {
   const { data: profileData } = useQuery<DoctorProfileResponse>({
     queryKey: ['doctor', 'me', user?._id],
     queryFn: async () => {
-      const res = await api.get(`/staff/doctors/me`);
+      const res = await api.get(`/doctors/${user?._id}`);
       return res.data;
     },
     enabled: !!user?._id,
   });
 
-  const doctorId = profileData?.data?._id;
+  const doctorId = profileData?.data?.profile?._id;
 
   const { data, isLoading } = useQuery<AppointmentsResponse>({
     queryKey: ['appointments', 'doctor', selectedDate, doctorId],

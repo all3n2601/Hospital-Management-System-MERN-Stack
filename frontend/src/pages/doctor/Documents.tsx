@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { useAppSelector } from '@/store/hooks';
+import { usePatientsSelectQuery, useMyDoctorProfileId, patientSelectLabel } from '@/hooks/useEntitySelectData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,6 +38,11 @@ const DOCUMENT_TYPES: { value: DocumentType; label: string }[] = [
 
 export function DoctorDocuments() {
   const queryClient = useQueryClient();
+  const authUser = useAppSelector((s) => s.auth.user);
+  const { data: myDoctorProfileId, isLoading: myDoctorProfileLoading } = useMyDoctorProfileId(
+    authUser?._id,
+    authUser?.role
+  );
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [createOpen, setCreateOpen] = useState(false);
@@ -42,11 +50,12 @@ export function DoctorDocuments() {
 
   // Create form state
   const [patientId, setPatientId] = useState('');
-  const [issuedBy, setIssuedBy] = useState('');
   const [docType, setDocType] = useState<DocumentType>('medical_certificate');
   const [notes, setNotes] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
   const [treatment, setTreatment] = useState('');
+
+  const { data: patientOptions = [], isLoading: patientsLoading } = usePatientsSelectQuery(createOpen);
 
   const { data, isLoading, isError } = useQuery<DocumentsResponse>({
     queryKey: ['documents', 'doctor', statusFilter],
@@ -72,7 +81,6 @@ export function DoctorDocuments() {
 
   const resetCreateForm = () => {
     setPatientId('');
-    setIssuedBy('');
     setDocType('medical_certificate');
     setNotes('');
     setDiagnosis('');
@@ -87,7 +95,7 @@ export function DoctorDocuments() {
 
       const body = {
         patientId: patientId.trim(),
-        issuedBy: issuedBy.trim(),
+        issuedBy: myDoctorProfileId ?? '',
         type: docType,
         notes: notes.trim() || undefined,
         templateData: Object.keys(templateData).length > 0 ? templateData : undefined,
@@ -129,11 +137,11 @@ export function DoctorDocuments() {
 
   const handleCreateSubmit = () => {
     if (!patientId.trim()) {
-      toast.error('Patient ID is required');
+      toast.error('Please select a patient');
       return;
     }
-    if (!issuedBy.trim()) {
-      toast.error('Your Doctor Profile ID is required');
+    if (!myDoctorProfileId) {
+      toast.error('Could not load your doctor profile. Try signing in again.');
       return;
     }
     createMutation.mutate();
@@ -241,26 +249,32 @@ export function DoctorDocuments() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="patientId">Patient ID</Label>
-              <Input
+              <Label htmlFor="patientId">Patient</Label>
+              <Select
                 id="patientId"
-                placeholder="MongoDB _id of the patient record"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 className="mt-1"
-              />
+                disabled={patientsLoading}
+                placeholder={patientsLoading ? 'Loading patients…' : 'Select a patient'}
+              >
+                {patientOptions.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {patientSelectLabel(p)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="issuedBy">Your Doctor Profile ID</Label>
-              <Input
-                id="issuedBy"
-                placeholder="Doctor Profile _id"
-                value={issuedBy}
-                onChange={(e) => setIssuedBy(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">(temporary until auto-detection)</p>
+              <Label>Issuing doctor</Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {myDoctorProfileLoading
+                  ? 'Loading your profile…'
+                  : myDoctorProfileId
+                    ? `You (${authUser?.firstName ?? ''} ${authUser?.lastName ?? ''})`.trim() || 'Signed-in doctor'
+                    : 'Could not resolve your doctor profile'}
+              </p>
             </div>
 
             <div>
@@ -318,7 +332,10 @@ export function DoctorDocuments() {
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateSubmit} disabled={createMutation.isPending}>
+            <Button
+              onClick={handleCreateSubmit}
+              disabled={createMutation.isPending || myDoctorProfileLoading || !myDoctorProfileId}
+            >
               {createMutation.isPending ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>

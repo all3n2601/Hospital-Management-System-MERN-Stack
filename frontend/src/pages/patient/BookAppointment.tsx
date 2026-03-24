@@ -75,7 +75,7 @@ export function BookAppointment() {
   const { data: doctorsData, isLoading: doctorsLoading } = useQuery<DoctorsResponse>({
     queryKey: ['doctors', 'active'],
     queryFn: async () => {
-      const res = await api.get('/staff/doctors?isActive=true&limit=100');
+      const res = await api.get('/doctors?isActive=true&limit=100');
       return res.data;
     },
   });

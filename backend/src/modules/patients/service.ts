@@ -13,6 +13,9 @@ export async function createPatient(input: CreatePatientInput) {
   if (input.userId) {
     const user = await User.findById(input.userId);
     if (!user) throw new NotFoundError('User');
+    if (user.role !== 'patient') {
+      throw new ConflictError('Patient profiles can only be linked to users with the patient role');
+    }
 
     const existingProfile = await Patient.findOne({ userId: input.userId });
     if (existingProfile) throw new ConflictError('Patient profile already exists for this user');
@@ -73,8 +76,9 @@ export async function listPatients(filters: { search?: string; page?: number; li
   const query: Record<string, unknown> = {};
 
   if (search) {
-    // Find matching User IDs first (bounded by search, not unbounded)
+    // Only users with patient role can appear in the patient directory
     const matchingUsers = await User.find({
+      role: 'patient',
       $or: [
         { firstName: new RegExp(search, 'i') },
         { lastName: new RegExp(search, 'i') },
@@ -84,10 +88,18 @@ export async function listPatients(filters: { search?: string; page?: number; li
 
     const userIds = matchingUsers.map(u => u._id);
     query.userId = { $in: userIds };
+  } else {
+    const patientUserIds = await User.find({ role: 'patient' }).distinct('_id');
+    query.userId = { $in: patientUserIds };
   }
 
   const [data, total] = await Promise.all([
-    Patient.find(query).populate('userId', '-password').skip(skip).limit(limit).lean(),
+    Patient.find(query)
+      .populate('userId', '-password')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     Patient.countDocuments(query),
   ]);
 
